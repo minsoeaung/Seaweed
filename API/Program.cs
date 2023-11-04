@@ -86,6 +86,8 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+builder.Services.AddMappings();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
