@@ -1,5 +1,7 @@
 using API.Data;
 using API.Entities;
+using API.Extensions;
+using API.RequestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +19,21 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Product>>> GetProducts()
+    public async Task<ActionResult<PagedList<Product>>> GetProducts([FromQuery] ProductParams productParams)
     {
-        return await _storeContext.Products.ToListAsync();
+        var query = _storeContext.Products
+            .Include(p => p.Brand)
+            .Include(p => p.Category)
+            .Sort(productParams.OrderBy)
+            .Search(productParams.SearchTerm)
+            .Filter(productParams.Brands, productParams.Categories)
+            .AsQueryable();
+
+        var products = await PagedList<Product>
+            .ToPagedList(query, productParams.PageNumber, productParams.PageSize);
+
+        Response.AddPaginationHeader(products.MetaData);
+
+        return products;
     }
 }
