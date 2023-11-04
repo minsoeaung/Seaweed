@@ -1,5 +1,6 @@
 using API.Entities;
 using Bogus;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Data;
 
@@ -9,8 +10,31 @@ public static class Seeders
     private static List<Category> Categories { get; set; }
     private static List<Product> Products { get; set; }
 
-    public static void Seed(StoreContext context)
+    public static async Task Seed(StoreContext context, UserManager<User> userManager)
     {
+        if (!context.Roles.Any())
+        {
+            var super = new UserRole { Id = 1, Name = "Super", NormalizedName = "SUPER" };
+            var admin = new UserRole { Id = 2, Name = "Admin", NormalizedName = "ADMIN" };
+            var user = new UserRole { Id = 3, Name = "User", NormalizedName = "USER" };
+            await context.Roles.AddRangeAsync(new List<UserRole> { super, admin, user });
+        }
+
+        if (!context.Users.Any())
+        {
+            var superUser = new User
+            {
+                Id = 1,
+                UserName = "minsoeaung",
+                Email = "minsoeaung2001@gmail.com",
+                EmailConfirmed = true,
+                NormalizedEmail = "MINSOEAUNG2001@GMAIL.COM",
+                NormalizedUserName = "MINSOEAUNG",
+            };
+            await userManager.CreateAsync(superUser);
+            await userManager.AddToRoleAsync(superUser, "Super");
+        }
+
         if (!context.Products.Any())
         {
             const int productNumToSeed = 100;
@@ -47,10 +71,11 @@ public static class Seeders
                 .RuleFor(p => p.CategoryId, f => f.PickRandom(Categories).Id);
             Products = productFaker.Generate(productNumToSeed);
 
-            context.Brands.AddRange(Brands);
-            context.Categories.AddRange(Categories);
-            context.Products.AddRange(Products);
-            context.SaveChanges();
+            await context.Brands.AddRangeAsync(Brands);
+            await context.Categories.AddRangeAsync(Categories);
+            await context.Products.AddRangeAsync(Products);
         }
+
+        await context.SaveChangesAsync();
     }
 }
