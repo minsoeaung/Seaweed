@@ -2,6 +2,7 @@ using System.Security.Claims;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
 using API.Entities;
+using API.Extensions;
 using API.Services;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -82,7 +83,12 @@ public class AccountsController : ControllerBase
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        return _tokenService.GenerateToken(user, roles);
+        var refreshToken = _tokenService.GenerateRefreshToken();
+        user.RefreshToken = refreshToken;
+        await _userManager.UpdateAsync(user);
+        _tokenService.SetRefreshTokenInCookies(refreshToken, Response);
+
+        return _tokenService.GenerateAccessToken(user, roles);
     }
 
     [HttpPost("register")]
@@ -99,12 +105,61 @@ public class AccountsController : ControllerBase
             SecurityStamp = Guid.NewGuid().ToString(),
         };
 
+        var refreshToken = _tokenService.GenerateRefreshToken();
+        user.RefreshToken = refreshToken;
+
         var result = await _userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded)
             return BadRequest();
 
+        _tokenService.SetRefreshTokenInCookies(refreshToken, Response);
         await _userManager.AddToRoleAsync(user, "User");
 
-        return _tokenService.GenerateToken(user, new List<string>() { "User" });
+        return _tokenService.GenerateAccessToken(user, new List<string>() { "User" });
+    }
+
+    [HttpGet("renew-tokens")]
+    public async Task<ActionResult<TokenResult>> Refresh()
+    {
+        var refreshToken = Request.Cookies["refreshToken"];
+        if (refreshToken is null)
+            return Unauthorized();
+
+        var user = await _userManager.FindByRefreshTokenAsync(refreshToken);
+        if (user is null)
+            return Unauthorized();
+
+        if (user.RefreshToken.ExpiredAt < DateTime.UtcNow)
+            return Unauthorized();
+
+        var newRefreshToken = _tokenService.GenerateRefreshToken();
+        user.RefreshToken = newRefreshToken;
+        await _userManager.UpdateAsync(user);
+        _tokenService.SetRefreshTokenInCookies(newRefreshToken, Response);
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        return _tokenService.GenerateAccessToken(user, roles);
+    }
+
+    [HttpGet("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var refreshToken = Request.Cookies["refreshToken"];
+        if (refreshToken is null)
+            return Unauthorized();
+
+        var user = await _userManager.FindByRefreshTokenAsync(refreshToken);
+        if (user is null)
+            return Unauthorized();
+
+        _tokenService.DeleteRefreshTokenInCookies(Response);
+
+        user.RefreshToken.Token = null;
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+            return BadRequest();
+
+        return Ok();
     }
 }

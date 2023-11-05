@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using API.Configurations;
 using API.DTOs.Responses;
@@ -12,7 +13,6 @@ namespace API.Services;
 
 public class TokenService : ITokenService
 {
-    private const int ExpirationMinutes = 10;
     private readonly JwtConfig _jwtConfig;
 
     public TokenService(IOptions<JwtConfig> jwtConfig)
@@ -20,9 +20,9 @@ public class TokenService : ITokenService
         _jwtConfig = jwtConfig.Value;
     }
 
-    public TokenResult GenerateToken(User user, IList<string> roles)
+    public TokenResult GenerateAccessToken(User user, IList<string> roles)
     {
-        var expiration = DateTime.UtcNow.AddMinutes(ExpirationMinutes);
+        var expiration = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpTimeInMinutes);
 
         var token = CreateJwtToken(
             CreateClaims(user, roles),
@@ -37,6 +37,35 @@ public class TokenService : ITokenService
             AccessToken = tokenHandler.WriteToken(token),
             ExpTime = expiration
         };
+    }
+
+    public RefreshToken GenerateRefreshToken()
+    {
+        return new RefreshToken
+        {
+            Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+            CreatedAt = DateTime.UtcNow,
+            ExpiredAt = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpTimeInDays),
+        };
+    }
+
+    public void SetRefreshTokenInCookies(RefreshToken token, HttpResponse response)
+    {
+        if (token.Token is null)
+            throw new InvalidOperationException();
+
+        var cookie = new CookieOptions
+        {
+            HttpOnly = true,
+            Expires = token.ExpiredAt
+        };
+
+        response.Cookies.Append("refreshToken", token.Token, cookie);
+    }
+
+    public void DeleteRefreshTokenInCookies(HttpResponse response)
+    {
+        response.Cookies.Delete("refreshToken");
     }
 
     private JwtSecurityToken CreateJwtToken(IEnumerable<Claim> claims, SigningCredentials credentials,

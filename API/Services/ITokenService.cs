@@ -5,5 +5,8 @@ namespace API.Services;
 
 public interface ITokenService
 {
-    TokenResult GenerateToken(User user, IList<string> roles);
+    TokenResult GenerateAccessToken(User user, IList<string> roles);
+    RefreshToken GenerateRefreshToken();
+    void SetRefreshTokenInCookies(RefreshToken token, HttpResponse response);
+    void DeleteRefreshTokenInCookies(HttpResponse response);
 }
