@@ -98,10 +98,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.CreateDbIfNotExists();
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
