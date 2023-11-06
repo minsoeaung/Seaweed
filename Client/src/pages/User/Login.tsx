@@ -12,20 +12,19 @@ import {
     Link,
     Stack,
     Text,
-    useColorModeValue,
-} from '@chakra-ui/react'
-import {ChangeEvent, FormEvent, useState} from 'react'
-import {ViewIcon, ViewOffIcon} from '@chakra-ui/icons'
-import {Link as ReactRouterLink} from 'react-router-dom'
+    useColorModeValue
+} from "@chakra-ui/react";
+import {ViewIcon, ViewOffIcon} from "@chakra-ui/icons";
+import {Link as ReactRouterLink} from "react-router-dom";
+import {ChangeEvent, FormEvent, useState} from "react";
 import {useMutation} from "react-query";
-import {RegisterDto} from "../../types/registerDto.ts";
 import {ApiClient} from "../../api/apiClient.tsx";
+import {LoginDto} from "../../types/loginDto.ts";
 
-const Register = () => {
+const Login = () => {
     const [showPassword, setShowPassword] = useState(false)
-    const [formValues, setFormValues] = useState<RegisterDto>({
+    const [formValues, setFormValues] = useState<LoginDto>({
         userName: "",
-        email: "",
         password: ""
     });
 
@@ -34,7 +33,7 @@ const Register = () => {
         await registerMutation.mutateAsync(formValues);
     }
 
-    const handleFormValueChange = (formName: keyof RegisterDto) => (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFormValueChange = (formName: keyof LoginDto) => (e: ChangeEvent<HTMLInputElement>) => {
         setFormValues(prevState => ({
             ...prevState,
             [formName]: e.target.value
@@ -42,8 +41,8 @@ const Register = () => {
     }
 
     const registerMutation = useMutation(
-        async (body: RegisterDto) => {
-            await ApiClient().post("api/Accounts/register", body);
+        async (body: LoginDto) => {
+            await ApiClient().login(body.userName, body.password);
         }, {
             onSuccess: () => {
                 console.log("all fine");
@@ -54,7 +53,7 @@ const Register = () => {
         <Container>
             <Stack spacing={8} py={12} px={6}>
                 <Heading fontSize={'3xl'} textAlign={'center'}>
-                    Create Your Account
+                    Welcome to Shop! Please login.
                 </Heading>
                 <Box
                     rounded={'lg'}
@@ -64,13 +63,8 @@ const Register = () => {
                     <form onSubmit={handleSubmit}>
                         <Stack spacing={4}>
                             <FormControl id="userName" isRequired>
-                                <FormLabel>Username</FormLabel>
-                                <Input type="text" name="userName" value={formValues.userName}
-                                       onChange={handleFormValueChange("userName")}/>
-                            </FormControl>
-                            <FormControl id="email" isRequired>
                                 <FormLabel>Email address</FormLabel>
-                                <Input type="email" name="email" onChange={handleFormValueChange("email")}/>
+                                <Input type="text" name="userName" onChange={handleFormValueChange("userName")}/>
                             </FormControl>
                             <FormControl id="password" isRequired>
                                 <FormLabel>Password</FormLabel>
@@ -98,13 +92,13 @@ const Register = () => {
                                     _hover={{
                                         bg: 'blue.600',
                                     }}>
-                                    Sign up
+                                    Login
                                 </Button>
                             </Stack>
                             <Stack pt={6}>
                                 <Text align={'center'}>
-                                    Already a user? <Link as={ReactRouterLink} to="/user/login"
-                                                          color={'blue.400'}>Login</Link>.
+                                    New member? <Link as={ReactRouterLink} to="/user/register" replace
+                                                      color={'blue.400'}>Register</Link> here.
                                 </Text>
                             </Stack>
                         </Stack>
@@ -115,4 +109,4 @@ const Register = () => {
     )
 }
 
-export default Register;
+export default Login;
