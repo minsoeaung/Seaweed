@@ -1,12 +1,15 @@
 import './AntdSpin.css';
+import {Center} from "@chakra-ui/react";
 
 const AntdSpin = () => {
     return (
-        <div>
+        <Center>
+            <div>
             <span className="ant-spin-dot ant-spin-dot-spin">
                 <i></i><i></i><i></i><i></i>
             </span>
-        </div>
+            </div>
+        </Center>
     )
 }
 

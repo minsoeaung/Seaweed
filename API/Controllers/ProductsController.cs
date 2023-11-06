@@ -1,4 +1,5 @@
 using API.Data;
+using API.DTOs.Responses;
 using API.Entities;
 using API.Extensions;
 using API.RequestHelpers;
@@ -35,5 +36,15 @@ public class ProductsController : ControllerBase
         Response.AddPaginationHeader(products.MetaData);
 
         return products;
+    }
+
+    [HttpGet("filters")]
+    public async Task<ActionResult<ProductFilters>> GetFilters()
+    {
+        return new ProductFilters
+        {
+            Brands = await _storeContext.Products.Select(p => p.Brand).Distinct().ToListAsync(),
+            Categories = await _storeContext.Products.Select(p => p.Category).Distinct().ToListAsync()
+        };
     }
 }

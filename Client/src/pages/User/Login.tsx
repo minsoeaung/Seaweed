@@ -63,7 +63,7 @@ const Login = () => {
                     <form onSubmit={handleSubmit}>
                         <Stack spacing={4}>
                             <FormControl id="userName" isRequired>
-                                <FormLabel>Email address</FormLabel>
+                                <FormLabel>Username</FormLabel>
                                 <Input type="text" name="userName" onChange={handleFormValueChange("userName")}/>
                             </FormControl>
                             <FormControl id="password" isRequired>
