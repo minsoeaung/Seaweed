@@ -53,9 +53,9 @@ builder.Services.AddIdentityCore<User>(options =>
     {
         options.User.RequireUniqueEmail = true;
         options.Password.RequiredLength = 6;
-        options.Password.RequireDigit = true;
-        options.Password.RequireLowercase = true;
-        options.Password.RequireUppercase = true;
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
         options.Password.RequireNonAlphanumeric = false;
     })
     .AddRoles<UserRole>()

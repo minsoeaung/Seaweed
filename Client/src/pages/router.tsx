@@ -4,6 +4,7 @@ import {lazy} from "react";
 import HomePage from "./Home";
 
 const About = lazy(() => import('./About'));
+const Register = lazy(() => import('./User/Register'));
 
 const router = createBrowserRouter([
     {
@@ -14,6 +15,7 @@ const router = createBrowserRouter([
         children: [
             {path: "", element: <HomePage/>},
             {path: "about", element: <About/>},
+            {path: "user/register", element: <Register/>}
         ]
     },
 ]);
