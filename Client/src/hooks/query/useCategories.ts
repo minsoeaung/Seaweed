@@ -1,7 +1,7 @@
 import {useQuery} from "react-query";
-import {ApiClient} from "../api/apiClient.tsx";
-import {CATEGORIES} from "../constants/queryKeys.ts";
-import {ProductFilterDto} from "../types/productFilterDto.ts";
+import {CATEGORIES} from "../../constants/queryKeys.ts";
+import {ProductFilterDto} from "../../types/productFilterDto.ts";
+import {ApiClient} from "../../api/apiClient.tsx";
 
 const useCategories = () => useQuery(
     CATEGORIES,

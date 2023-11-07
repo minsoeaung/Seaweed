@@ -69,7 +69,7 @@ public class AccountsController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<TokenResult>> Login(LoginDto userLoginDto)
+    public async Task<ActionResult<AuthResult>> Login(LoginDto userLoginDto)
     {
         var user = await _userManager.FindByNameAsync(userLoginDto.UserName);
 
@@ -88,11 +88,14 @@ public class AccountsController : ControllerBase
         await _userManager.UpdateAsync(user);
         _tokenService.SetRefreshTokenInCookies(refreshToken, Response);
 
-        return _tokenService.GenerateAccessToken(user, roles);
+        var accountDetails = _mapper.Map<AccountDetails>((user, roles));
+        var accessToken = _tokenService.GenerateAccessToken(user, roles);
+
+        return _mapper.Map<AuthResult>((accessToken, accountDetails));
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<TokenResult>> Register(RegisterDto model)
+    public async Task<ActionResult<AuthResult>> Register(RegisterDto model)
     {
         var userExists = await _userManager.FindByNameAsync(model.UserName);
         if (userExists is not null)
@@ -115,7 +118,12 @@ public class AccountsController : ControllerBase
         _tokenService.SetRefreshTokenInCookies(refreshToken, Response);
         await _userManager.AddToRoleAsync(user, "User");
 
-        return _tokenService.GenerateAccessToken(user, new List<string>() { "User" });
+        var roles = new List<string>() { "User" };
+
+        var accountDetails = _mapper.Map<AccountDetails>((user, roles));
+        var accessToken = _tokenService.GenerateAccessToken(user, roles);
+
+        return _mapper.Map<AuthResult>((accessToken, accountDetails));
     }
 
     [HttpGet("renew-tokens")]

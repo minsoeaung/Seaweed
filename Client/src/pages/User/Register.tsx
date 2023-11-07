@@ -19,7 +19,7 @@ import {ViewIcon, ViewOffIcon} from '@chakra-ui/icons'
 import {Link as ReactRouterLink} from 'react-router-dom'
 import {useMutation} from "react-query";
 import {RegisterDto} from "../../types/registerDto.ts";
-import {ApiClient} from "../../api/apiClient.tsx";
+import {useAuth} from "../../context/AuthContext.tsx";
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false)
@@ -28,6 +28,8 @@ const Register = () => {
         email: "",
         password: ""
     });
+
+    const {register} = useAuth();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -43,7 +45,7 @@ const Register = () => {
 
     const registerMutation = useMutation(
         async (body: RegisterDto) => {
-            await ApiClient().post("api/Accounts/register", body);
+            await register(body);
         }, {
             onSuccess: () => {
                 console.log("all fine");

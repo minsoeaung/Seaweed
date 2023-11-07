@@ -1,5 +1,5 @@
 import axios from "axios";
-import {getCookiesItem} from "../utilities/getCookiesItem.tsx";
+import {getCookiesItem} from "../utilities/getCookiesItem.ts";
 
 export const ApiClient = () => {
     const api = axios.create({
@@ -57,15 +57,6 @@ export const ApiClient = () => {
         }
     );
 
-    const login = async (userName: string, password: string) => {
-        try {
-            const {data} = await api.post("api/Accounts/login", {userName, password});
-            sessionStorage.setItem("jwtToken", data.accessToken);
-        } catch (err) {
-            return err;
-        }
-    };
-
     const get = async (path: string) => {
         const response = await api.get(path);
         return response.data;
@@ -86,7 +77,6 @@ export const ApiClient = () => {
     };
 
     return {
-        login,
         get,
         post,
         put,

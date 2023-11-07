@@ -69,9 +69,9 @@ const Header = () => {
                                 Wishlist
                             </Button>
 
-                            <Link to="user/register">
+                            <Link to="user/login">
                                 <Button rightIcon={<Icon as={RxPerson}/>} variant='ghost'>
-                                    Sign up
+                                    Login
                                 </Button>
                             </Link>
 
