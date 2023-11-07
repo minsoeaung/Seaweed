@@ -54,18 +54,30 @@ public class TokenService : ITokenService
         if (token.Token is null)
             throw new InvalidOperationException();
 
-        var cookie = new CookieOptions
+        var cookieOptions = new CookieOptions
         {
+            Secure = true,
             HttpOnly = true,
-            Expires = token.ExpiredAt
+            Expires = token.ExpiredAt,
+            IsEssential = true,
+            SameSite = SameSiteMode.None,
         };
 
-        response.Cookies.Append("refreshToken", token.Token, cookie);
+        response.Cookies.Append("refreshToken", token.Token, cookieOptions);
     }
 
     public void DeleteRefreshTokenInCookies(HttpResponse response)
     {
-        response.Cookies.Delete("refreshToken");
+        var cookieOptions = new CookieOptions
+        {
+            Secure = true,
+            HttpOnly = true,
+            Expires = DateTime.Now.AddDays(-1),
+            IsEssential = true,
+            SameSite = SameSiteMode.None,
+        };
+
+        response.Cookies.Append("refreshToken", "", cookieOptions);
     }
 
     private JwtSecurityToken CreateJwtToken(IEnumerable<Claim> claims, SigningCredentials credentials,

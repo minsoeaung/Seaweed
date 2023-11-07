@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react'
 import {ChangeEvent, FormEvent, useState} from 'react'
 import {ViewIcon, ViewOffIcon} from '@chakra-ui/icons'
-import {Link as ReactRouterLink} from 'react-router-dom'
+import {Link as ReactRouterLink, useNavigate} from 'react-router-dom'
 import {useMutation} from "react-query";
 import {RegisterDto} from "../../types/registerDto.ts";
 import {useAuth} from "../../context/AuthContext.tsx";
@@ -30,6 +30,7 @@ const Register = () => {
     });
 
     const {register} = useAuth();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -48,7 +49,7 @@ const Register = () => {
             await register(body);
         }, {
             onSuccess: () => {
-                console.log("all fine");
+                navigate("/")
             },
         })
 

@@ -24,9 +24,11 @@ import {FiShoppingCart} from "react-icons/fi";
 import {RxPerson} from "react-icons/rx";
 import {Link} from "react-router-dom";
 import Placeholder from './Placeholder'
+import {useAuth} from "../context/AuthContext.tsx";
 
 const Header = () => {
-    const {colorMode, toggleColorMode} = useColorMode()
+    const {colorMode, toggleColorMode} = useColorMode();
+    const {user, logout} = useAuth();
 
     return (
         <Box
@@ -69,47 +71,50 @@ const Header = () => {
                                 Wishlist
                             </Button>
 
-                            <Link to="user/login">
-                                <Button rightIcon={<Icon as={RxPerson}/>} variant='ghost'>
-                                    Login
-                                </Button>
-                            </Link>
+                            {!user && (
+                                <Link to="user/login">
+                                    <Button rightIcon={<Icon as={RxPerson}/>} variant='ghost'>
+                                        Login
+                                    </Button>
+                                </Link>
+                            )}
 
                             <Button rightIcon={<Icon as={FiShoppingCart}/>} variant='ghost'>
                                 Cart
                             </Button>
 
-                            <Menu>
-                                <MenuButton
-                                    as={Button}
-                                    rounded={'full'}
-                                    variant={'link'}
-                                    cursor={'pointer'}
-                                    minW={0}>
-                                    <Avatar
-                                        size={'sm'}
-                                        src={'https://avatars.dicebear.com/api/male/username.svg'}
-                                    />
-                                </MenuButton>
-                                <MenuList alignItems={'center'}>
-                                    <br/>
-                                    <Center>
+                            {user && (
+                                <Menu>
+                                    <MenuButton
+                                        as={Button}
+                                        rounded={'full'}
+                                        variant={'link'}
+                                        cursor={'pointer'}
+                                        minW={0}>
                                         <Avatar
-                                            size={'2xl'}
+                                            size={'sm'}
                                             src={'https://avatars.dicebear.com/api/male/username.svg'}
                                         />
-                                    </Center>
-                                    <br/>
-                                    <Center>
-                                        <p>Username</p>
-                                    </Center>
-                                    <br/>
-                                    <MenuDivider/>
-                                    <MenuItem>Your Servers</MenuItem>
-                                    <MenuItem>Account Settings</MenuItem>
-                                    <MenuItem>Logout</MenuItem>
-                                </MenuList>
-                            </Menu>
+                                    </MenuButton>
+                                    <MenuList alignItems={'center'}>
+                                        <br/>
+                                        <Center>
+                                            <Avatar
+                                                size={'2xl'}
+                                                src={'https://avatars.dicebear.com/api/male/username.svg'}
+                                            />
+                                        </Center>
+                                        <br/>
+                                        <Center>
+                                            <p>{user.userName}</p>
+                                        </Center>
+                                        <br/>
+                                        <MenuDivider/>
+                                        <MenuItem>Account Settings</MenuItem>
+                                        <MenuItem onClick={logout}>Logout</MenuItem>
+                                    </MenuList>
+                                </Menu>
+                            )}
                         </Stack>
                     </Flex>
                 </Flex>

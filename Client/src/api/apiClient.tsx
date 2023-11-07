@@ -8,6 +8,7 @@ export const ApiClient = () => {
             "Content-Type": "application/json",
             Accept: "application/json",
         },
+        withCredentials: true
     });
 
     // Add a request interceptor to add the JWT token to the authorization header

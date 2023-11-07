@@ -15,7 +15,7 @@ import {
     useColorModeValue
 } from "@chakra-ui/react";
 import {ViewIcon, ViewOffIcon} from "@chakra-ui/icons";
-import {Link as ReactRouterLink} from "react-router-dom";
+import {Link as ReactRouterLink, useNavigate} from "react-router-dom";
 import {ChangeEvent, FormEvent, useState} from "react";
 import {useMutation} from "react-query";
 import {LoginDto} from "../../types/loginDto.ts";
@@ -29,10 +29,11 @@ const Login = () => {
     });
 
     const {login} = useAuth();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        await registerMutation.mutateAsync(formValues);
+        await loginMutation.mutateAsync(formValues);
     }
 
     const handleFormValueChange = (formName: keyof LoginDto) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -42,12 +43,12 @@ const Login = () => {
         }))
     }
 
-    const registerMutation = useMutation(
+    const loginMutation = useMutation(
         async (body: LoginDto) => {
             await login(body.userName, body.password);
         }, {
             onSuccess: () => {
-                console.log("all fine");
+                navigate("/")
             },
         })
 
@@ -87,7 +88,7 @@ const Login = () => {
                                 <Button
                                     type="submit"
                                     loadingText="Submitting"
-                                    isLoading={registerMutation.isLoading}
+                                    isLoading={loginMutation.isLoading}
                                     size="lg"
                                     bg={'blue.400'}
                                     color={'white'}
