@@ -36,7 +36,8 @@ export const Products = () => {
                         ))}
                     </ProductGrid>
                     <br/>
-                    <Progress size='xs' isIndeterminate hidden={!isFetching} colorScheme="blue"/>
+                    <Progress size='xs' isIndeterminate colorScheme="blue"
+                              visibility={isFetching ? "visible" : "hidden"}/>
                     <br/>
                     <ResponsivePagination
                         current={data.pagination.currentPage}
