@@ -48,7 +48,7 @@ const Login = () => {
             await login(body.userName, body.password);
         }, {
             onSuccess: () => {
-                navigate("/")
+                navigate("/catalog")
             },
         })
 
@@ -67,7 +67,8 @@ const Login = () => {
                         <Stack spacing={4}>
                             <FormControl id="userName" isRequired>
                                 <FormLabel>Username</FormLabel>
-                                <Input type="text" name="userName" onChange={handleFormValueChange("userName")}/>
+                                <Input type="text" name="userName"
+                                       onChange={handleFormValueChange("userName")}/>
                             </FormControl>
                             <FormControl id="password" isRequired>
                                 <FormLabel>Password</FormLabel>

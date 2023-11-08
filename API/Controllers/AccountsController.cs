@@ -88,19 +88,19 @@ public class AccountsController : ControllerBase
         await _userManager.UpdateAsync(user);
         _tokenService.SetRefreshTokenInCookies(refreshToken, Response);
 
-        var accountDetails = _mapper.Map<AccountDetails>((user, roles));
+        var accountDetails = _mapper.Map<AccountDetails>((user, roles.AsEnumerable()));
         var accessToken = _tokenService.GenerateAccessToken(user, roles);
 
-        return _mapper.Map<AuthResult>((accessToken, accountDetails));
+        return new AuthResult
+        {
+            AccessToken = accessToken.AccessToken,
+            AccountDetails = accountDetails
+        };
     }
 
     [HttpPost("register")]
     public async Task<ActionResult<AuthResult>> Register(RegisterDto model)
     {
-        var userExists = await _userManager.FindByNameAsync(model.UserName);
-        if (userExists is not null)
-            return BadRequest();
-
         var user = new User()
         {
             UserName = model.UserName,
@@ -119,11 +119,16 @@ public class AccountsController : ControllerBase
         await _userManager.AddToRoleAsync(user, "User");
 
         var roles = new List<string>() { "User" };
+        var createdUser = await _userManager.FindByNameAsync(user.UserName);
 
-        var accountDetails = _mapper.Map<AccountDetails>((user, roles));
-        var accessToken = _tokenService.GenerateAccessToken(user, roles);
+        var accountDetails = _mapper.Map<AccountDetails>((createdUser, roles.AsEnumerable()));
+        var accessToken = _tokenService.GenerateAccessToken(createdUser!, roles);
 
-        return _mapper.Map<AuthResult>((accessToken, accountDetails));
+        return new AuthResult
+        {
+            AccessToken = accessToken.AccessToken,
+            AccountDetails = accountDetails
+        };
     }
 
     [HttpGet("renew-tokens")]
@@ -155,11 +160,11 @@ public class AccountsController : ControllerBase
     {
         var refreshToken = Request.Cookies["refreshToken"];
         if (refreshToken is null)
-            return Unauthorized();
+            return BadRequest();
 
         var user = await _userManager.FindByRefreshTokenAsync(refreshToken);
         if (user is null)
-            return Unauthorized();
+            return BadRequest();
 
         _tokenService.DeleteRefreshTokenInCookies(Response);
 

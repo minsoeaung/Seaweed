@@ -49,7 +49,7 @@ const Register = () => {
             await register(body);
         }, {
             onSuccess: () => {
-                navigate("/")
+                navigate("/catalog")
             },
         })
 

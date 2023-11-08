@@ -8,5 +8,5 @@ public class AccountDetails
     public string PhoneNumber { get; set; } = string.Empty;
     public bool EmailConfirmed { get; set; }
     public bool PhoneNumberConfirmed { get; set; }
-    public IList<string> Roles { get; set; }
+    public IEnumerable<string> Roles { get; set; } = new List<string>();
 }

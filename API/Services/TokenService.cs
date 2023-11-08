@@ -20,12 +20,12 @@ public class TokenService : ITokenService
         _jwtConfig = jwtConfig.Value;
     }
 
-    public TokenResult GenerateAccessToken(User user, IList<string> roles)
+    public TokenResult GenerateAccessToken(User user, IEnumerable<string> roles)
     {
         var expiration = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpTimeInMinutes);
 
         var token = CreateJwtToken(
-            CreateClaims(user, roles),
+            CreateClaims(user, roles.ToList()),
             CreateSigningCredentials(),
             expiration
         );
