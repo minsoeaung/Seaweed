@@ -20,7 +20,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PagedList<Product>>> GetProducts([FromQuery] ProductParams productParams)
+    public async Task<ActionResult<PagedResponse<Product>>> GetProducts([FromQuery] ProductParams productParams)
     {
         var query = _storeContext.Products
             .Include(p => p.Brand)
@@ -28,14 +28,19 @@ public class ProductsController : ControllerBase
             .Sort(productParams.OrderBy)
             .Search(productParams.SearchTerm)
             .Filter(productParams.Brands, productParams.Categories)
+            .AsNoTracking()
             .AsQueryable();
 
         var products = await PagedList<Product>
             .ToPagedList(query, productParams.PageNumber, productParams.PageSize);
 
-        Response.AddPaginationHeader(products.MetaData);
+        // Response.AddPaginationHeader(products.MetaData);
 
-        return products;
+        return new PagedResponse<Product>
+        {
+            Pagination = products.MetaData,
+            Results = products
+        };
     }
 
     [HttpGet("filters")]
@@ -43,8 +48,8 @@ public class ProductsController : ControllerBase
     {
         return new ProductFilters
         {
-            Brands = await _storeContext.Products.Select(p => p.Brand).Distinct().ToListAsync(),
-            Categories = await _storeContext.Products.Select(p => p.Category).Distinct().ToListAsync()
+            Brands = await _storeContext.Products.Select(p => p.Brand).Distinct().AsNoTracking().ToListAsync(),
+            Categories = await _storeContext.Products.Select(p => p.Category).Distinct().AsNoTracking().ToListAsync()
         };
     }
 }

@@ -7,5 +7,5 @@ public class ProductParams
     public string Brands { get; set; } = string.Empty;
     public string Categories { get; set; } = string.Empty;
     public int PageNumber { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
+    public int PageSize { get; set; } = 25;
 }

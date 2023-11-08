@@ -8,12 +8,13 @@ import {
     Stack,
     StackProps,
     Text,
+    Tooltip,
     useColorModeValue,
 } from '@chakra-ui/react'
 import {Rating} from './Rating'
 import {FavouriteButton} from './FavouriteButton'
 import {PriceTag} from './PriceTag'
-import {Product} from './_data'
+import {Product} from '../../types/product'
 
 interface Props {
     product: Product
@@ -22,14 +23,14 @@ interface Props {
 
 export const ProductCard = (props: Props) => {
     const {product, rootProps} = props
-    const {name, imageUrl, price, salePrice, rating} = product
+    const {name, price} = product
 
     return (
         <Stack spacing={{base: '4', md: '5'}} {...rootProps}>
             <Box position="relative">
                 <AspectRatio ratio={4 / 3}>
                     <Image
-                        src={imageUrl}
+                        src='https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=680&q=80'
                         alt={name}
                         draggable="false"
                         fallback={<Skeleton borderRadius={{base: 'md', md: 'xl'}}/>}
@@ -45,13 +46,15 @@ export const ProductCard = (props: Props) => {
             </Box>
             <Stack>
                 <Stack spacing="1">
-                    <Text fontWeight="medium" color={useColorModeValue('gray.700', 'gray.400')}>
-                        {name}
-                    </Text>
-                    <PriceTag price={price} salePrice={salePrice} currency="USD"/>
+                    <Tooltip label={name}>
+                        <Text fontWeight="medium" color={useColorModeValue('gray.700', 'gray.400')} noOfLines={1}>
+                            {name}
+                        </Text>
+                    </Tooltip>
+                    <PriceTag price={price} salePrice={0} currency="USD"/>
                 </Stack>
                 <HStack>
-                    <Rating defaultValue={rating} size="sm"/>
+                    <Rating defaultValue={4} size="sm"/>
                     <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
                         (12)
                     </Text>

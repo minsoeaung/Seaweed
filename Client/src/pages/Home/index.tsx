@@ -1,15 +1,4 @@
-import {
-    Box,
-    Flex,
-    Heading,
-    HStack,
-    Icon,
-    Image,
-    Link,
-    Skeleton,
-    Stack,
-    useColorModeValue,
-} from '@chakra-ui/react'
+import {Box, Flex, Heading, HStack, Icon, Image, Link, Skeleton, Stack, useColorModeValue,} from '@chakra-ui/react'
 import {FaArrowRight} from 'react-icons/fa'
 import {Link as ReactRouterLink} from 'react-router-dom'
 
