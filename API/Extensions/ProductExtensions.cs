@@ -4,7 +4,7 @@ namespace API.Extensions;
 
 public static class ProductExtensions
 {
-    public static IQueryable<Product> Sort(this IQueryable<Product> query, string orderBy)
+    public static IQueryable<Product> Sort(this IQueryable<Product> query, string? orderBy)
     {
         if (string.IsNullOrWhiteSpace(orderBy))
             return query.OrderBy(p => p.Name);
@@ -13,20 +13,23 @@ public static class ProductExtensions
         {
             "price" => query.OrderBy(p => p.Price),
             "priceDesc" => query.OrderByDescending(p => p.Price),
+            "name" => query.OrderBy(p => p.Name),
+            "nameDesc" => query.OrderByDescending(p => p.Name),
+            // TODO: default should be last created at
             _ => query.OrderBy(p => p.Name)
         };
 
         return query;
     }
 
-    public static IQueryable<Product> Search(this IQueryable<Product> query, string searchTerm)
+    public static IQueryable<Product> Search(this IQueryable<Product> query, string? searchTerm)
     {
         return string.IsNullOrWhiteSpace(searchTerm)
             ? query
             : query.Where(p => p.Name.ToLower().Contains(searchTerm.Trim().ToLower()));
     }
 
-    public static IQueryable<Product> Filter(this IQueryable<Product> query, string brands, string categories)
+    public static IQueryable<Product> Filter(this IQueryable<Product> query, string? brands, string? categories)
     {
         var brandList = new List<string>();
         var categoryList = new List<string>();

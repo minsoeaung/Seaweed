@@ -2,11 +2,11 @@ import {createBrowserRouter} from "react-router-dom";
 import Root from "./Root";
 import {lazy} from "react";
 import HomePage from "./Home";
-import Login from "./User/Login.tsx";
-import CatalogPage from "./Catalog";
 
 const About = lazy(() => import('./About'));
 const Register = lazy(() => import('./User/Register'));
+const Login = lazy(() => import('./User/Login'));
+const CatalogPage = lazy(() => import('./Catalog'));
 
 const router = createBrowserRouter([
     {

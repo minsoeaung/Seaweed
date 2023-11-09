@@ -22,11 +22,9 @@ ApiClient.interceptors.request.use(authRequestInterceptor);
 
 ApiClient.interceptors.response.use(
     (response) => {
-        console.log("onFulfilledResponse", response);
         return response.data;
     },
     async (error) => {
-        console.log("onRejectedError", error);
         const originalRequest = error.config;
 
         if (error.response.status === 401) {
@@ -47,16 +45,13 @@ ApiClient.interceptors.response.use(
                     ApiClient(originalRequest)
                         .then(response => {
                             resolve(response);
-                            console.log("originalRequestResponse", response);
                         })
                         .catch(error => {
-                            console.log("originalRequestError", error);
                             reject(error);
                         })
                 })
             })
         } else {
-            console.log("Not a 401", error);
             return Promise.reject(error);
         }
     }

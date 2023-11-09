@@ -20,6 +20,15 @@ public class StoreContext : IdentityDbContext<User, UserRole, int>
                     .IsUnique();
             });
 
+        builder.Entity<Brand>()
+            .HasIndex(b => b.Name)
+            .IsUnique();
+
+        builder.Entity<Category>()
+            .HasIndex(b => b.Name)
+            .IsUnique();
+
+
         base.OnModelCreating(builder);
     }
 

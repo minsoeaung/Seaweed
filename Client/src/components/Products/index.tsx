@@ -1,29 +1,43 @@
-import {Box, Center, IconButton, Progress} from "@chakra-ui/react";
+import {Box, Button, Center, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Progress} from "@chakra-ui/react";
 import {ProductGrid} from "./ProductGrid.tsx";
 import {ProductCard} from "./ProductCard.tsx";
 import {usePaginatedProducts} from "../../hooks/query/usePaginatedProducts.ts";
-import {useSearchParams} from "react-router-dom";
-import AntdSpin from "../AntdSpin";
 import ResponsivePagination from 'react-responsive-pagination';
 import 'react-responsive-pagination/themes/classic.css';
-import {useEffect} from "react";
-import {ArrowUpIcon} from "@chakra-ui/icons";
+import {ArrowUpIcon, ChevronDownIcon} from "@chakra-ui/icons";
+import {useSearchParams} from "react-router-dom";
+import AntdSpin from "../AntdSpin";
+import {ProductFilters} from "./ProductFilters.tsx";
+
+const sortMenus = {
+    name: "Name",
+    nameDesc: "Name [Z-A]",
+    price: "Price",
+    priceDesc: "Price [Z-A]",
+    "_": ""
+}
 
 export const Products = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [params, setParams] = useSearchParams();
+
     const {
-        setPageNumber,
         data,
         isLoading,
         isFetching,
         isError,
-    } = usePaginatedProducts(Number(searchParams.get("page")));
+    } = usePaginatedProducts(params.toString());
 
-    useEffect(() => {
-        const p = Number(searchParams.get("page"));
-        setPageNumber((!isNaN(p) && p > 0) ? p : 1);
-    }, [searchParams.get("page")])
+    const handlePageChange = (page: number) => {
+        const newParams = new URLSearchParams(params);
+        newParams.set("pageNumber", String(page));
+        setParams(newParams);
+    }
 
+    const handleSortMenuClick = (value: string) => () => {
+        const newParams = new URLSearchParams(params);
+        newParams.set("orderBy", value);
+        setParams(newParams);
+    }
 
     return (
         <Box
@@ -38,10 +52,30 @@ export const Products = () => {
                 <p>Something went wrong.</p>
             ) : data && (
                 <>
+                    <Flex justifyContent="space-between" mb={4}>
+                        <ProductFilters/>
+                        <Menu>
+                            <MenuButton as={Button} rightIcon={<ChevronDownIcon/>} px={4} variant="outline">
+                                Sort
+                                by: {sortMenus[(params.get("orderBy") || "_") as keyof typeof sortMenus] || ""}
+                            </MenuButton>
+                            <MenuList>
+                                <MenuItem onClick={handleSortMenuClick("name")}>Name</MenuItem>
+                                <MenuItem onClick={handleSortMenuClick("nameDesc")}>Name [Z-A]</MenuItem>
+                                <MenuItem onClick={handleSortMenuClick("price")}>Price</MenuItem>
+                                <MenuItem onClick={handleSortMenuClick("priceDesc")}>Price [Z-A]</MenuItem>
+                            </MenuList>
+                        </Menu>
+                    </Flex>
                     <ProductGrid>
                         {data.results.map((product) => (
                             <ProductCard key={product.id} product={product}/>
                         ))}
+                        {data.results.length === 0 && (
+                            <Center>
+                                <p>No product found!</p>
+                            </Center>
+                        )}
                     </ProductGrid>
                     <br/>
                     <Progress size='xs' isIndeterminate colorScheme="blue"
@@ -50,11 +84,7 @@ export const Products = () => {
                     <ResponsivePagination
                         current={data.pagination.currentPage}
                         total={data.pagination.totalPages}
-                        onPageChange={(page) => {
-                            setPageNumber(page);
-                            searchParams.set("page", String(page));
-                            setSearchParams(searchParams);
-                        }}
+                        onPageChange={handlePageChange}
                     />
                     <br/>
                     <Center>

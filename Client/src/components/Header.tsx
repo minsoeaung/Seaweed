@@ -4,7 +4,6 @@ import {
     Button,
     Center,
     Flex,
-    Heading,
     Icon,
     IconButton,
     Input,
@@ -22,13 +21,29 @@ import {MoonIcon, SearchIcon, SunIcon} from '@chakra-ui/icons'
 import {LuHeart} from "react-icons/lu";
 import {FiShoppingCart} from "react-icons/fi";
 import {RxPerson} from "react-icons/rx";
-import {Link} from "react-router-dom";
+import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import Placeholder from './Placeholder'
 import {useAuth} from "../context/AuthContext.tsx";
+import {AppLogo} from "./AppLogo.tsx";
+import React, {useState} from "react";
 
 const Header = () => {
     const {colorMode, toggleColorMode} = useColorMode();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchInputValue, setSearchInputValue] = useState(searchParams.get("searchTerm") || "");
     const {user, logout} = useAuth();
+    const navigate = useNavigate();
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            searchParams.set("searchTerm", searchInputValue);
+            setSearchParams(searchParams);
+            navigate({
+                pathname: '/catalog',
+                search: searchParams.toString()
+            })
+        }
+    }
 
     return (
         <Box
@@ -41,13 +56,11 @@ const Header = () => {
                 borderBottomColor: "gray.200"
             }}
         >
-            <Placeholder minH="20">
-                <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
+            <Placeholder minH="12">
+                <Flex h={12} alignItems={'center'} justifyContent={'space-between'}>
                     <Box>
                         <Link to="/">
-                            <Heading>
-                                Logo
-                            </Heading>
+                            <AppLogo/>
                         </Link>
                     </Box>
 
@@ -55,7 +68,15 @@ const Header = () => {
                         <InputLeftElement pointerEvents='none'>
                             <SearchIcon color='gray.300'/>
                         </InputLeftElement>
-                        <Input type='search' placeholder='What are you looking for?' autoComplete='off'/>
+                        <Input
+                            type='search'
+                            placeholder='What are you looking for?'
+                            autoComplete='off'
+                            name='search'
+                            value={searchInputValue}
+                            onChange={e => setSearchInputValue(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                        />
                     </InputGroup>
 
                     <Flex alignItems={'center'}>
