@@ -5,10 +5,9 @@ import {ApiClient} from "../../api/apiClient.tsx";
 
 const useCategories = () => useQuery(
     CATEGORIES,
-    async (): Promise<ProductFilterDto> => await ApiClient().get("api/Products/filters"),
+    async () => await ApiClient.get<never, ProductFilterDto>("api/Products/filters"),
     {
         refetchOnMount: false,
-        refetchOnWindowFocus: false,
     }
 )
 

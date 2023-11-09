@@ -28,18 +28,18 @@ export const AuthContextProvider = ({children}: { children: ReactNode }) => {
     const [user, setUser] = useLocalStorage<User | null>("currentUser", null);
 
     const login = async (userName: string, password: string) => {
-        const data = await ApiClient().post("api/Accounts/login", {userName, password}) as AuthResponse;
+        const data = await ApiClient.post<never, AuthResponse>("api/Accounts/login", {userName, password});
         sessionStorage.setItem("jwtToken", data.accessToken);
         setUser(data.accountDetails);
     };
 
     const logout = async () => {
-        await ApiClient().get("api/Accounts/logout");
+        await ApiClient.get("api/Accounts/logout");
         setUser(null);
     }
 
     const register = async (body: RegisterDto) => {
-        const data = await ApiClient().post("api/Accounts/register", body);
+        const data = await ApiClient.post<never, AuthResponse>("api/Accounts/register", body);
         sessionStorage.setItem("jwtToken", data.accessToken);
         setUser(data.accountDetails);
     }

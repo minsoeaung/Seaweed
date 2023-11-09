@@ -136,14 +136,14 @@ public class AccountsController : ControllerBase
     {
         var refreshToken = Request.Cookies["refreshToken"];
         if (refreshToken is null)
-            return Unauthorized();
+            return BadRequest();
 
         var user = await _userManager.FindByRefreshTokenAsync(refreshToken);
         if (user is null)
-            return Unauthorized();
+            return BadRequest();
 
         if (user.RefreshToken.ExpiredAt < DateTime.UtcNow)
-            return Unauthorized();
+            return BadRequest();
 
         var newRefreshToken = _tokenService.GenerateRefreshToken();
         user.RefreshToken = newRefreshToken;
@@ -160,19 +160,15 @@ public class AccountsController : ControllerBase
     {
         var refreshToken = Request.Cookies["refreshToken"];
         if (refreshToken is null)
-            return BadRequest();
+            return Ok();
 
         var user = await _userManager.FindByRefreshTokenAsync(refreshToken);
         if (user is null)
-            return BadRequest();
+            return Ok();
 
         _tokenService.DeleteRefreshTokenInCookies(Response);
-
         user.RefreshToken.Token = null;
-        var result = await _userManager.UpdateAsync(user);
-        if (!result.Succeeded)
-            return BadRequest();
-
+        await _userManager.UpdateAsync(user);
         return Ok();
     }
 }

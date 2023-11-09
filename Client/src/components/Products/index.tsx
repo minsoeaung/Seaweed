@@ -11,7 +11,13 @@ import {ArrowUpIcon} from "@chakra-ui/icons";
 
 export const Products = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const {setPageNumber, data, isLoading, isFetching} = usePaginatedProducts(Number(searchParams.get("page")));
+    const {
+        setPageNumber,
+        data,
+        isLoading,
+        isFetching,
+        isError,
+    } = usePaginatedProducts(Number(searchParams.get("page")));
 
     useEffect(() => {
         const p = Number(searchParams.get("page"));
@@ -28,6 +34,8 @@ export const Products = () => {
         >
             {isLoading ? (
                 <AntdSpin/>
+            ) : isError ? (
+                <p>Something went wrong.</p>
             ) : data && (
                 <>
                     <ProductGrid>
