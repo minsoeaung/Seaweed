@@ -7,6 +7,7 @@ const About = lazy(() => import('./About'));
 const Register = lazy(() => import('./User/Register'));
 const Login = lazy(() => import('./User/Login'));
 const CatalogPage = lazy(() => import('./Catalog'));
+const WishListPage = lazy(() => import('./User/WishList'));
 
 const router = createBrowserRouter([
     {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
             {path: "about", element: <About/>},
             {path: "user/register", element: <Register/>},
             {path: "user/login", element: <Login/>},
+            {path: "user/wishlist", element: <WishListPage/>},
             {path: "catalog", element: <CatalogPage/>},
         ]
     },

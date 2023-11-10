@@ -16,6 +16,7 @@ import {
     MenuList,
     Stack,
     useColorMode,
+    useColorModeValue,
 } from '@chakra-ui/react'
 import {MoonIcon, SearchIcon, SunIcon} from '@chakra-ui/icons'
 import {LuHeart} from "react-icons/lu";
@@ -66,7 +67,7 @@ const Header = () => {
 
                     <InputGroup maxWidth={800}>
                         <InputLeftElement pointerEvents='none'>
-                            <SearchIcon color='gray.300'/>
+                            <SearchIcon color={useColorModeValue('red.500', 'red.300')}/>
                         </InputLeftElement>
                         <Input
                             type='search'
@@ -88,7 +89,7 @@ const Header = () => {
                                 onClick={toggleColorMode}
                             />
 
-                            <Button rightIcon={<Icon as={LuHeart}/>} variant='ghost'>
+                            <Button as={Link} to="/user/wishlist" rightIcon={<Icon as={LuHeart}/>} variant='ghost'>
                                 Wishlist
                             </Button>
 

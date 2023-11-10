@@ -1,13 +1,14 @@
 import {Box, Button, Center, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Progress} from "@chakra-ui/react";
 import {ProductGrid} from "./ProductGrid.tsx";
 import {ProductCard} from "./ProductCard.tsx";
-import {usePaginatedProducts} from "../../hooks/query/usePaginatedProducts.ts";
+import {usePaginatedProducts} from "../../hooks/queries/usePaginatedProducts.ts";
 import ResponsivePagination from 'react-responsive-pagination';
 import 'react-responsive-pagination/themes/classic.css';
 import {ArrowUpIcon, ChevronDownIcon} from "@chakra-ui/icons";
 import {useSearchParams} from "react-router-dom";
 import AntdSpin from "../AntdSpin";
 import {ProductFilters} from "./ProductFilters.tsx";
+import {useWishList} from "../../hooks/queries/useWishList.ts";
 
 const sortMenus = {
     name: "Name",
@@ -38,6 +39,8 @@ export const Products = () => {
         newParams.set("orderBy", value);
         setParams(newParams);
     }
+
+    useWishList();
 
     return (
         <Box

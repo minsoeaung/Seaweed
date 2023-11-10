@@ -16,7 +16,7 @@ import {
     Wrap
 } from "@chakra-ui/react";
 import {AiOutlineFilter} from "react-icons/ai";
-import useProductFilters from "../../hooks/query/useProductFilters.ts";
+import useProductFilters from "../../hooks/queries/useProductFilters.ts";
 import {useCallback, useEffect, useState} from "react";
 import {useSearchParams} from "react-router-dom";
 

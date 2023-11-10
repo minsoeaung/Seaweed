@@ -15,6 +15,7 @@ import {Rating} from './Rating'
 import {FavouriteButton} from './FavouriteButton'
 import {PriceTag} from './PriceTag'
 import {Product} from '../../types/product'
+import {useWishList} from "../../hooks/queries/useWishList.ts";
 
 interface Props {
     product: Product
@@ -24,6 +25,8 @@ interface Props {
 export const ProductCard = (props: Props) => {
     const {product, rootProps} = props
     const {name, price} = product
+
+    const {data: wishList} = useWishList();
 
     return (
         <Stack spacing={{base: '4', md: '5'}} {...rootProps}>
@@ -37,12 +40,16 @@ export const ProductCard = (props: Props) => {
                         borderRadius={{base: 'md', md: 'xl'}}
                     />
                 </AspectRatio>
-                <FavouriteButton
-                    position="absolute"
-                    top="4"
-                    right="4"
-                    aria-label={`Add ${name} to your favourites`}
-                />
+                {wishList && (
+                    <FavouriteButton
+                        position="absolute"
+                        top="4"
+                        right="4"
+                        aria-label={`Add ${name} to your favourites`}
+                        productId={product.id}
+                        isChecked={wishList.filter(w => w.productId === product.id).length === 1}
+                    />
+                )}
             </Box>
             <Stack>
                 <Stack spacing="1">
