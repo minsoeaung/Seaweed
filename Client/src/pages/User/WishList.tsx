@@ -1,10 +1,17 @@
 import {useWishList} from "../../hooks/queries/useWishList.ts";
 import {
     AbsoluteCenter,
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogOverlay,
     Button,
+    ButtonGroup,
     Card,
     Container,
     HStack,
+    IconButton,
     Image,
     Table,
     TableContainer,
@@ -14,13 +21,32 @@ import {
     Th,
     Thead,
     Tr,
+    useDisclosure,
     VStack
 } from "@chakra-ui/react";
 import {formatPrice} from "../../utilities/formatPrice.ts";
 import AntdSpin from "../../components/AntdSpin";
+import {DeleteIcon} from "@chakra-ui/icons";
+import {useRef} from "react";
+import {useToggleWishList} from "../../hooks/mutations/useToggleWishList.ts";
 
 const WishListPage = () => {
     const {isLoading, data, isError} = useWishList();
+    const {isOpen, onOpen, onClose} = useDisclosure();
+    const cancelRef = useRef(null);
+    const productIdToRemoveRef = useRef<number | null>(null);
+
+    const mutation = useToggleWishList();
+
+    const handleRemoveProduct = async () => {
+        if (productIdToRemoveRef.current) {
+            await mutation.mutateAsync({
+                productId: productIdToRemoveRef.current,
+                type: "REMOVE"
+            })
+        }
+        onClose();
+    }
 
     if (isLoading) {
         return (
@@ -72,7 +98,17 @@ const WishListPage = () => {
                                                 : <Tag>In stock</Tag>}
                                         </Td>
                                         <Td>
-                                            <Button colorScheme='blue' variant="outline">Add to cart</Button>
+                                            <ButtonGroup isAttached variant='outline'>
+                                                <Button colorScheme='blue' variant="outline">Add to cart</Button>
+                                                <IconButton
+                                                    aria-label='Remove from wishlist'
+                                                    icon={<DeleteIcon/>}
+                                                    onClick={() => {
+                                                        productIdToRemoveRef.current = w.productId
+                                                        onOpen();
+                                                    }}
+                                                />
+                                            </ButtonGroup>
                                         </Td>
                                     </Tr>
                                 ))
@@ -81,6 +117,29 @@ const WishListPage = () => {
                     </Table>
                 </TableContainer>
             </Card>
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+                isCentered
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                            Are you sure to remove from wishlist?
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme='red' onClick={handleRemoveProduct} ml={3}
+                                    isLoading={mutation.isLoading}>
+                                Delete
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </Container>
     )
 }
