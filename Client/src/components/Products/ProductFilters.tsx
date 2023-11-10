@@ -72,6 +72,7 @@ export const ProductFilters = () => {
         searchParams.set("brands", Object.keys(selectedBrands).join(","));
         searchParams.set("categories", Object.keys(selectedCategories).join(","));
         setSearchParams(searchParams);
+        onClose();
     }
 
     return (

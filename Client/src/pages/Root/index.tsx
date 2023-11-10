@@ -4,7 +4,7 @@ import {Flex, useColorModeValue} from "@chakra-ui/react";
 import {Footer} from "../../components/Footer.tsx";
 import Placeholder from "../../components/Placeholder.tsx";
 import {Suspense} from "react";
-import PageLoading from "../../components/PageLoading.tsx";
+import {Fallback} from "../../components/Fallback";
 
 const Root = () => {
     return (
@@ -12,7 +12,7 @@ const Root = () => {
             <Header/>
             <Flex as="main" role="main" direction="column" flex="1" bgColor={useColorModeValue("gray.100", "gray.900")}>
                 <Placeholder minH="lg" bg="bg.accent.default">
-                    <Suspense fallback={<PageLoading/>}>
+                    <Suspense fallback={<Fallback/>}>
                         <Outlet/>
                     </Suspense>
                 </Placeholder>

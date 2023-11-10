@@ -9,6 +9,7 @@ import {useSearchParams} from "react-router-dom";
 import AntdSpin from "../AntdSpin";
 import {ProductFilters} from "./ProductFilters.tsx";
 import {useWishList} from "../../hooks/queries/useWishList.ts";
+import {Fallback} from "../Fallback";
 
 const sortMenus = {
     name: "Name",
@@ -49,6 +50,9 @@ export const Products = () => {
             px={{base: '4', md: '8', lg: '12'}}
             py={{base: '6', md: '8', lg: '12'}}
         >
+            {isFetching && (
+                <Fallback/>
+            )}
             {isLoading ? (
                 <AntdSpin/>
             ) : isError ? (

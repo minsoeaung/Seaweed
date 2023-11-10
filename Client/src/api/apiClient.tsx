@@ -49,6 +49,8 @@ ApiClient.interceptors.response.use(
                         .catch(error => {
                             reject(error);
                         })
+                }).catch(error => {
+                    reject(error);
                 })
             })
         } else {

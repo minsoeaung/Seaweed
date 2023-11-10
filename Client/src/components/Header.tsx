@@ -81,7 +81,7 @@ const Header = () => {
                     </InputGroup>
 
                     <Flex alignItems={'center'}>
-                        <Stack direction={'row'} spacing={1}>
+                        <Stack direction={'row'} spacing={2}>
                             <IconButton
                                 aria-label="Color mode"
                                 variant="ghost"
@@ -89,53 +89,57 @@ const Header = () => {
                                 onClick={toggleColorMode}
                             />
 
-                            <Button as={Link} to="/user/wishlist" rightIcon={<Icon as={LuHeart}/>} variant='ghost'>
-                                Wishlist
-                            </Button>
+                            {user && (
+                                <Button as={Link} to="/user/wishlist" rightIcon={<Icon as={LuHeart}/>} variant='ghost'>
+                                    Wishlist
+                                </Button>
+                            )}
 
                             {!user && (
                                 <Link to="user/login">
-                                    <Button rightIcon={<Icon as={RxPerson}/>} variant='ghost'>
+                                    <Button rightIcon={<Icon as={RxPerson}/>} variant='solid' colorScheme="blue">
                                         Login
                                     </Button>
                                 </Link>
                             )}
 
-                            <Button rightIcon={<Icon as={FiShoppingCart}/>} variant='ghost'>
-                                Cart
-                            </Button>
 
                             {user && (
-                                <Menu>
-                                    <MenuButton
-                                        as={Button}
-                                        rounded={'full'}
-                                        variant={'link'}
-                                        cursor={'pointer'}
-                                        minW={0}>
-                                        <Avatar
-                                            size={'sm'}
-                                            src={'https://avatars.dicebear.com/api/male/username.svg'}
-                                        />
-                                    </MenuButton>
-                                    <MenuList alignItems={'center'}>
-                                        <br/>
-                                        <Center>
+                                <>
+                                    <Button rightIcon={<Icon as={FiShoppingCart}/>} variant='ghost'>
+                                        Cart
+                                    </Button>
+                                    <Menu>
+                                        <MenuButton
+                                            as={Button}
+                                            rounded={'full'}
+                                            variant={'link'}
+                                            cursor={'pointer'}
+                                            minW={0}>
                                             <Avatar
-                                                size={'2xl'}
+                                                size={'sm'}
                                                 src={'https://avatars.dicebear.com/api/male/username.svg'}
                                             />
-                                        </Center>
-                                        <br/>
-                                        <Center>
-                                            <p>{user.userName}</p>
-                                        </Center>
-                                        <br/>
-                                        <MenuDivider/>
-                                        <MenuItem>Account Settings</MenuItem>
-                                        <MenuItem onClick={logout}>Logout</MenuItem>
-                                    </MenuList>
-                                </Menu>
+                                        </MenuButton>
+                                        <MenuList alignItems={'center'}>
+                                            <br/>
+                                            <Center>
+                                                <Avatar
+                                                    size={'2xl'}
+                                                    src={'https://avatars.dicebear.com/api/male/username.svg'}
+                                                />
+                                            </Center>
+                                            <br/>
+                                            <Center>
+                                                <p>{user.userName}</p>
+                                            </Center>
+                                            <br/>
+                                            <MenuDivider/>
+                                            <MenuItem>Account Settings</MenuItem>
+                                            <MenuItem onClick={logout}>Logout</MenuItem>
+                                        </MenuList>
+                                    </Menu>
+                                </>
                             )}
                         </Stack>
                     </Flex>

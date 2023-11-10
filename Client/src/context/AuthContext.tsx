@@ -3,6 +3,7 @@ import {useLocalStorage} from "../hooks/useLocalStorage.ts";
 import {ApiClient} from "../api/apiClient.tsx";
 import {RegisterDto} from "../types/registerDto.ts";
 import {AuthResponse, User} from "../types/authResponse.ts";
+import {useQueryClient} from "react-query";
 
 interface IAuthContext {
     user: User | null;
@@ -27,6 +28,8 @@ const AuthContext = createContext<IAuthContext>({
 export const AuthContextProvider = ({children}: { children: ReactNode }) => {
     const [user, setUser] = useLocalStorage<User | null>("currentUser", null);
 
+    const queryClient = useQueryClient();
+
     const login = async (userName: string, password: string) => {
         const data = await ApiClient.post<never, AuthResponse>("api/Accounts/login", {userName, password});
         sessionStorage.setItem("jwtToken", data.accessToken);
@@ -35,6 +38,8 @@ export const AuthContextProvider = ({children}: { children: ReactNode }) => {
 
     const logout = async () => {
         await ApiClient.get("api/Accounts/logout");
+        sessionStorage.removeItem("jwtToken");
+        queryClient.clear();
         setUser(null);
     }
 

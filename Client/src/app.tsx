@@ -20,14 +20,14 @@ const queryClient = new QueryClient({
 
 const App = () => {
     return (
-        <ChakraProvider>
-            <AuthContextProvider>
-                <QueryClientProvider client={queryClient}>
+        <QueryClientProvider client={queryClient}>
+            <ChakraProvider>
+                <AuthContextProvider>
                     <RouterProvider router={router}/>
                     <ReactQueryDevtools initialIsOpen={false}/>
-                </QueryClientProvider>
-            </AuthContextProvider>
-        </ChakraProvider>
+                </AuthContextProvider>
+            </ChakraProvider>
+        </QueryClientProvider>
     )
 }
 
