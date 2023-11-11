@@ -96,17 +96,17 @@ const Header = () => {
                             )}
 
                             {!user && (
-                                <Link to="user/login">
-                                    <Button rightIcon={<Icon as={RxPerson}/>} variant='solid' colorScheme="blue">
-                                        Login
-                                    </Button>
-                                </Link>
+                                <Button as={Link} to="user/login" rightIcon={<Icon as={RxPerson}/>} variant='solid'
+                                        colorScheme="blue">
+                                    Login
+                                </Button>
                             )}
 
 
                             {user && (
                                 <>
-                                    <Button rightIcon={<Icon as={FiShoppingCart}/>} variant='ghost'>
+                                    <Button as={Link} to="user/cart" rightIcon={<Icon as={FiShoppingCart}/>}
+                                            variant='ghost'>
                                         Cart
                                     </Button>
                                     <Menu>

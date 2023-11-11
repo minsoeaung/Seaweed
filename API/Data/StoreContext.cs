@@ -38,4 +38,5 @@ public class StoreContext : IdentityDbContext<User, UserRole, int>
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Brand> Brands => Set<Brand>();
     public DbSet<WishList> WishLists => Set<WishList>();
+    public DbSet<CartItem> CartItems => Set<CartItem>();
 }

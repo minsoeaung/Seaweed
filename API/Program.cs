@@ -48,6 +48,7 @@ builder.Services.AddDbContext<StoreContext>(opt => opt.UseNpgsql(builder.Configu
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("Jwt"));
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddIdentityCore<User>(options =>
     {

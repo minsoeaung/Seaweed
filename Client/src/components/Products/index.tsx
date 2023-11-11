@@ -10,6 +10,7 @@ import AntdSpin from "../AntdSpin";
 import {ProductFilters} from "./ProductFilters.tsx";
 import {useWishList} from "../../hooks/queries/useWishList.ts";
 import {Fallback} from "../Fallback";
+import {useCart} from "../../hooks/queries/useCart.ts";
 
 const sortMenus = {
     name: "Name",
@@ -42,6 +43,7 @@ export const Products = () => {
     }
 
     useWishList();
+    useCart();
 
     return (
         <Box

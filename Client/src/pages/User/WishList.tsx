@@ -29,14 +29,18 @@ import AntdSpin from "../../components/AntdSpin";
 import {DeleteIcon} from "@chakra-ui/icons";
 import {useRef} from "react";
 import {useToggleWishList} from "../../hooks/mutations/useToggleWishList.ts";
+import {AddToCartButton} from "../../components/Products/AddToCartButton.tsx";
+import {useCart} from "../../hooks/queries/useCart.ts";
+import {Fallback} from "../../components/Fallback/index.tsx";
 
 const WishListPage = () => {
-    const {isLoading, data, isError} = useWishList();
+    const {isLoading, data, isError, isFetching} = useWishList();
     const {isOpen, onOpen, onClose} = useDisclosure();
     const cancelRef = useRef(null);
     const productIdToRemoveRef = useRef<number | null>(null);
 
     const mutation = useToggleWishList();
+    const {data: cart} = useCart();
 
     const handleRemoveProduct = async () => {
         if (productIdToRemoveRef.current) {
@@ -58,6 +62,7 @@ const WishListPage = () => {
 
     return (
         <Container maxWidth="7xl">
+            {isFetching && <Fallback/>}
             <Card variant="outline">
                 <TableContainer>
                     <Table variant='simple'>
@@ -97,10 +102,16 @@ const WishListPage = () => {
                                                 ? <Tag colorScheme='red'>Low stock</Tag>
                                                 : <Tag>In stock</Tag>}
                                         </Td>
-                                        <Td>
-                                            <ButtonGroup isAttached variant='outline'>
-                                                <Button colorScheme='blue' variant="outline">Add to cart</Button>
+                                        <Td isNumeric>
+                                            <ButtonGroup spacing={4} variant='outline' justifyContent="end">
+                                                <AddToCartButton
+                                                    colorScheme='blue'
+                                                    disabled={!!cart}
+                                                    productId={w.product.id}
+                                                    isInCart={cart ? cart.cartItems.findIndex(c => c.product.id === w.product.id) >= 0 : false}
+                                                />
                                                 <IconButton
+                                                    colorScheme="red"
                                                     aria-label='Remove from wishlist'
                                                     icon={<DeleteIcon/>}
                                                     onClick={() => {

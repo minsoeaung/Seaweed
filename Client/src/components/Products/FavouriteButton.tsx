@@ -9,6 +9,7 @@ type Props = {
 
 export const FavouriteButton = (props: Props) => {
     const mutation = useToggleWishList();
+    const {isChecked, productId} = props;
 
     return (
         <LightMode>
@@ -21,13 +22,13 @@ export const FavouriteButton = (props: Props) => {
                 sx={{':hover > svg': {transform: 'scale(1.1)'}}}
                 transition="all 0.15s ease"
                 icon={<Icon as={props.isChecked ? AiFillHeart : AiOutlineHeart}
-                            transition="all 0.15s ease" color={props.isChecked ? "red" : ""}/>}
+                            transition="all 0.15s ease" color={isChecked ? "red" : ""}/>}
                 boxShadow="base"
                 {...props}
                 onClick={async () => {
                     await mutation.mutateAsync({
-                        type: props.isChecked ? "REMOVE" : "ADD",
-                        productId: props.productId
+                        type: isChecked ? "REMOVE" : "ADD",
+                        productId
                     })
                 }}
                 isLoading={mutation.isLoading}

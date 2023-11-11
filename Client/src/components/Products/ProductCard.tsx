@@ -1,7 +1,6 @@
 import {
     AspectRatio,
     Box,
-    Button,
     HStack,
     Image,
     Skeleton,
@@ -16,6 +15,8 @@ import {FavouriteButton} from './FavouriteButton'
 import {PriceTag} from './PriceTag'
 import {Product} from '../../types/product'
 import {useWishList} from "../../hooks/queries/useWishList.ts";
+import {AddToCartButton} from "./AddToCartButton.tsx";
+import {useCart} from "../../hooks/queries/useCart.ts";
 
 interface Props {
     product: Product
@@ -27,6 +28,7 @@ export const ProductCard = (props: Props) => {
     const {name, price} = product
 
     const {data: wishList} = useWishList();
+    const {data: cart} = useCart();
 
     return (
         <Stack spacing={{base: '4', md: '5'}} {...rootProps}>
@@ -47,7 +49,7 @@ export const ProductCard = (props: Props) => {
                         right="4"
                         aria-label={`Add ${name} to your favourites`}
                         productId={product.id}
-                        isChecked={wishList.filter(w => w.productId === product.id).length === 1}
+                        isChecked={wishList.findIndex(w => w.productId === product.id) >= 0}
                     />
                 )}
             </Box>
@@ -68,9 +70,11 @@ export const ProductCard = (props: Props) => {
                 </HStack>
             </Stack>
             <Stack align="center">
-                <Button colorScheme="blue" width="full" variant="outline">
-                    Add to cart
-                </Button>
+                <AddToCartButton
+                    disabled={!!cart}
+                    productId={product.id}
+                    isInCart={cart ? cart.cartItems.findIndex(c => c.product.id === product.id) >= 0 : false}
+                />
             </Stack>
         </Stack>
     )
