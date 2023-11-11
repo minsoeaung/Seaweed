@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import {CartProductMeta} from './CartProductMeta'
 import {PriceTag} from '../../../components/Products/PriceTag'
-import {CartItem} from "../../../types/cartResponse.ts";
+import {CartItem as CartItemType} from "../../../types/cartResponse.ts";
 import {useRef} from "react";
 import {useAddToCart} from "../../../hooks/mutations/useAddToCart.ts";
 import {DeleteIcon} from "@chakra-ui/icons";
@@ -35,7 +35,7 @@ const QuantitySelect = (props: SelectProps) => {
     )
 }
 
-export const CartItem = ({cartItem}: { cartItem: CartItem }) => {
+export const CartItem = ({cartItem}: { cartItem: CartItemType }) => {
     const {
         quantity,
         total,
