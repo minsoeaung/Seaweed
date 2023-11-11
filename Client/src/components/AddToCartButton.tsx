@@ -1,22 +1,23 @@
 import {Button, ButtonProps} from "@chakra-ui/react";
-import {useAddToCart} from "../../hooks/mutations/useAddToCart.ts";
+import {useAddToCart} from "../hooks/mutations/useAddToCart.ts";
 
 type Props = {
     isInCart: boolean;
     productId: number;
-} & ButtonProps;
+    buttonProps?: ButtonProps;
+};
 
-export const AddToCartButton = (props: Props) => {
+export const AddToCartButton = ({isInCart, productId, buttonProps}: Props) => {
     const mutation = useAddToCart();
-    const {isInCart, productId} = props;
 
     return (
         <Button
             colorScheme="blue"
             width="full"
             variant="outline"
-            {...props}
-            onClick={async () => {
+            {...buttonProps}
+            onClick={async (e) => {
+                e.preventDefault();
                 await mutation.mutateAsync({
                     productId,
                     quantity: isInCart ? 0 : 1

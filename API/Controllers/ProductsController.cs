@@ -43,6 +43,17 @@ public class ProductsController : ControllerBase
         };
     }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Product>> GetProduct(int id)
+    {
+        var product = await _storeContext.Products
+            .Include(p => p.Category)
+            .Include(p => p.Brand)
+            .Where(p => p.Id == id)
+            .FirstOrDefaultAsync();
+        return product == null ? NotFound() : product;
+    }
+
     [HttpGet("filters")]
     public async Task<ActionResult<ProductFilters>> GetFilters()
     {

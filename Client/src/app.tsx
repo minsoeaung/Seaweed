@@ -2,7 +2,6 @@ import {ChakraProvider} from "@chakra-ui/react";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {RouterProvider} from "react-router-dom";
 import router from "./pages/router.tsx";
-import {AuthContextProvider} from "./context/AuthContext.tsx";
 import {ReactQueryDevtools} from "react-query/devtools";
 
 const queryClient = new QueryClient({
@@ -22,10 +21,8 @@ const App = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <ChakraProvider>
-                <AuthContextProvider>
-                    <RouterProvider router={router}/>
-                    <ReactQueryDevtools initialIsOpen={false}/>
-                </AuthContextProvider>
+                <RouterProvider router={router}/>
+                <ReactQueryDevtools initialIsOpen={false}/>
             </ChakraProvider>
         </QueryClientProvider>
     )

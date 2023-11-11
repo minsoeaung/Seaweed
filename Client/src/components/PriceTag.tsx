@@ -1,6 +1,6 @@
 import {HStack, StackProps, Text, TextProps, useColorModeValue as mode} from '@chakra-ui/react'
 import {ReactNode} from 'react'
-import {formatPrice} from "../../utilities/formatPrice.ts";
+import {formatPrice} from "../utilities/formatPrice.ts";
 
 interface PriceTagProps {
     currency: string

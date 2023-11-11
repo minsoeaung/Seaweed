@@ -4,6 +4,7 @@ import {ApiClient} from "../api/apiClient.tsx";
 import {RegisterDto} from "../types/registerDto.ts";
 import {AuthResponse, User} from "../types/authResponse.ts";
 import {useQueryClient} from "react-query";
+import {useNavigate} from "react-router-dom";
 
 interface IAuthContext {
     user: User | null;
@@ -30,6 +31,8 @@ export const AuthContextProvider = ({children}: { children: ReactNode }) => {
 
     const queryClient = useQueryClient();
 
+    const navigate = useNavigate();
+
     const login = async (userName: string, password: string) => {
         const data = await ApiClient.post<never, AuthResponse>("api/Accounts/login", {userName, password});
         sessionStorage.setItem("jwtToken", data.accessToken);
@@ -41,6 +44,9 @@ export const AuthContextProvider = ({children}: { children: ReactNode }) => {
         sessionStorage.removeItem("jwtToken");
         queryClient.clear();
         setUser(null);
+        if (window.location.pathname.includes("user/")) {
+            navigate("/");
+        }
     }
 
     const register = async (body: RegisterDto) => {

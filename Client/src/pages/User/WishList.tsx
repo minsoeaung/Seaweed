@@ -29,9 +29,9 @@ import AntdSpin from "../../components/AntdSpin";
 import {DeleteIcon} from "@chakra-ui/icons";
 import {useRef} from "react";
 import {useToggleWishList} from "../../hooks/mutations/useToggleWishList.ts";
-import {AddToCartButton} from "../../components/Products/AddToCartButton.tsx";
 import {useCart} from "../../hooks/queries/useCart.ts";
-import {Fallback} from "../../components/Fallback/index.tsx";
+import {Fallback} from "../../components/Fallback";
+import {AddToCartButton} from "../../components/AddToCartButton.tsx";
 
 const WishListPage = () => {
     const {isLoading, data, isError, isFetching} = useWishList();
@@ -105,8 +105,7 @@ const WishListPage = () => {
                                         <Td isNumeric>
                                             <ButtonGroup spacing={4} variant='outline' justifyContent="end">
                                                 <AddToCartButton
-                                                    colorScheme='blue'
-                                                    disabled={!!cart}
+                                                    buttonProps={{isDisabled: !!cart}}
                                                     productId={w.product.id}
                                                     isInCart={cart ? cart.cartItems.findIndex(c => c.product.id === w.product.id) >= 0 : false}
                                                 />

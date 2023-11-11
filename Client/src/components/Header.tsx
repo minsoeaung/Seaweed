@@ -27,6 +27,7 @@ import Placeholder from './Placeholder'
 import {useAuth} from "../context/AuthContext.tsx";
 import {AppLogo} from "./AppLogo.tsx";
 import React, {useState} from "react";
+import {useCart} from "../hooks/queries/useCart.ts";
 
 const Header = () => {
     const {colorMode, toggleColorMode} = useColorMode();
@@ -34,6 +35,8 @@ const Header = () => {
     const [searchInputValue, setSearchInputValue] = useState(searchParams.get("searchTerm") || "");
     const {user, logout} = useAuth();
     const navigate = useNavigate();
+
+    const {data: cart} = useCart();
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -105,8 +108,23 @@ const Header = () => {
 
                             {user && (
                                 <>
-                                    <Button as={Link} to="user/cart" rightIcon={<Icon as={FiShoppingCart}/>}
-                                            variant='ghost'>
+                                    <Button
+                                        as={Link}
+                                        to="user/cart"
+                                        position="relative"
+                                        rightIcon={
+                                            <>
+                                                <Icon as={FiShoppingCart}/>
+                                                <Box as={'span'} position={'absolute'} top="-2px"
+                                                     right={'4px'} fontSize={'0.8rem'}
+                                                     bgColor={'red'} color="white" borderRadius={'xl'} zIndex={9999}
+                                                     p={"2px"}>
+                                                    {cart?.cartItems.length}
+                                                </Box>
+                                            </>
+                                        }
+                                        variant='ghost'
+                                    >
                                         Cart
                                     </Button>
                                     <Menu>

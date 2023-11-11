@@ -7,8 +7,5 @@ export const useCart = () => {
     return useQuery(
         CART,
         async () => await ApiClient.get<never, CartResponse>("api/Cart"),
-        {
-            refetchOnMount: false
-        }
     )
 }

@@ -13,7 +13,7 @@ import {
     useDisclosure
 } from '@chakra-ui/react'
 import {CartProductMeta} from './CartProductMeta'
-import {PriceTag} from '../../../components/Products/PriceTag'
+import {PriceTag} from '../../../components/PriceTag'
 import {CartItem as CartItemType} from "../../../types/cartResponse.ts";
 import {useRef} from "react";
 import {useAddToCart} from "../../../hooks/mutations/useAddToCart.ts";
