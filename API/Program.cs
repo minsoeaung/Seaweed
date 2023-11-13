@@ -3,6 +3,7 @@ using API.Configurations;
 using API.Data;
 using API.Entities;
 using API.Extensions;
+using API.Middlewares;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -90,6 +91,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddMappings();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
