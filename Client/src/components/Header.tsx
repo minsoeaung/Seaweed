@@ -99,7 +99,7 @@ const Header = () => {
                             )}
 
                             {!user && (
-                                <Button as={Link} to="user/login" rightIcon={<Icon as={RxPerson}/>} variant='solid'
+                                <Button as={Link} to="/login" rightIcon={<Icon as={RxPerson}/>} variant='solid'
                                         colorScheme="blue">
                                     Login
                                 </Button>
@@ -153,7 +153,7 @@ const Header = () => {
                                             </Center>
                                             <br/>
                                             <MenuDivider/>
-                                            <MenuItem>Account Settings</MenuItem>
+                                            <MenuItem as={Link} to="/user/my-account">My Account</MenuItem>
                                             <MenuItem onClick={logout}>Logout</MenuItem>
                                         </MenuList>
                                     </Menu>

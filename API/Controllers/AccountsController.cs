@@ -41,7 +41,7 @@ public class AccountsController : ControllerBase
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        return _mapper.Map<AccountDetails>((user, roles));
+        return _mapper.Map<AccountDetails>((user, roles.AsEnumerable()));
     }
 
     [Authorize(Roles = "Super")]

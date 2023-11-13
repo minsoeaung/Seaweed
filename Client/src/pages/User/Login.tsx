@@ -101,7 +101,7 @@ const Login = () => {
                             </Stack>
                             <Stack pt={6}>
                                 <Text align={'center'}>
-                                    New member? <Link as={ReactRouterLink} to="/user/register" replace
+                                    New member? <Link as={ReactRouterLink} to="/register" replace
                                                       color={'blue.400'}>Register</Link> here.
                                 </Text>
                             </Stack>

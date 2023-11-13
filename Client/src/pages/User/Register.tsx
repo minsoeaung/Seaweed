@@ -106,7 +106,7 @@ const Register = () => {
                             </Stack>
                             <Stack pt={6}>
                                 <Text align={'center'}>
-                                    Already a user? <Link as={ReactRouterLink} to="/user/login"
+                                    Already a user? <Link as={ReactRouterLink} to="/login"
                                                           color={'blue.400'}>Login</Link>.
                                 </Text>
                             </Stack>
