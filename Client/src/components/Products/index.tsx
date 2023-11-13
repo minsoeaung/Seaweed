@@ -1,24 +1,17 @@
-import {Box, Button, Center, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Progress} from "@chakra-ui/react";
+import {Box, Center, Flex, IconButton, Progress} from "@chakra-ui/react";
 import {ProductGrid} from "./ProductGrid.tsx";
 import {ProductCard} from "./ProductCard.tsx";
 import {usePaginatedProducts} from "../../hooks/queries/usePaginatedProducts.ts";
 import ResponsivePagination from 'react-responsive-pagination';
 import 'react-responsive-pagination/themes/classic.css';
-import {ArrowUpIcon, ChevronDownIcon} from "@chakra-ui/icons";
+import {ArrowUpIcon} from "@chakra-ui/icons";
 import {useSearchParams} from "react-router-dom";
 import AntdSpin from "../AntdSpin";
-import {ProductFilters} from "./ProductFilters.tsx";
 import {useWishList} from "../../hooks/queries/useWishList.ts";
 import {Fallback} from "../Fallback";
 import {useCart} from "../../hooks/queries/useCart.ts";
-
-const sortMenus = {
-    name: "Name",
-    nameDesc: "Name [Z-A]",
-    price: "Price",
-    priceDesc: "Price [Z-A]",
-    "_": ""
-}
+import {ProductSortBy} from "../ProductSortBy.tsx";
+import {ProductFilters} from "../ProductFilters.tsx";
 
 export const Products = () => {
     const [params, setParams] = useSearchParams();
@@ -33,12 +26,6 @@ export const Products = () => {
     const handlePageChange = (page: number) => {
         const newParams = new URLSearchParams(params);
         newParams.set("pageNumber", String(page));
-        setParams(newParams);
-    }
-
-    const handleSortMenuClick = (value: string) => () => {
-        const newParams = new URLSearchParams(params);
-        newParams.set("orderBy", value);
         setParams(newParams);
     }
 
@@ -63,18 +50,7 @@ export const Products = () => {
                 <>
                     <Flex justifyContent="space-between" mb={4}>
                         <ProductFilters/>
-                        <Menu>
-                            <MenuButton as={Button} rightIcon={<ChevronDownIcon/>} px={4} variant="outline">
-                                Sort
-                                by: {sortMenus[(params.get("orderBy") || "_") as keyof typeof sortMenus] || ""}
-                            </MenuButton>
-                            <MenuList>
-                                <MenuItem onClick={handleSortMenuClick("name")}>Name</MenuItem>
-                                <MenuItem onClick={handleSortMenuClick("nameDesc")}>Name [Z-A]</MenuItem>
-                                <MenuItem onClick={handleSortMenuClick("price")}>Price</MenuItem>
-                                <MenuItem onClick={handleSortMenuClick("priceDesc")}>Price [Z-A]</MenuItem>
-                            </MenuList>
-                        </Menu>
+                        <ProductSortBy/>
                     </Flex>
                     <ProductGrid>
                         {data.results.map((product) => (

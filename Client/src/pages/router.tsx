@@ -13,11 +13,12 @@ const ProductDetailPage = lazy(() => import('./Catalog/ProductDetail'));
 const WishListPage = lazy(() => import('./User/WishList'));
 const CartPage = lazy(() => import('./User/Cart/index.tsx'));
 const MyAccountPage = lazy(() => import('./User/MyAccount'));
+const AdminPage = lazy(() => import("./Admin"));
 
-const ProtectedRoute = ({onlyFor}: { onlyFor: "User" | "Admin" | "Super" }) => {
+const ProtectedRoute = ({onlyFor}: { onlyFor: string[] }) => {
     const {user} = useAuth();
 
-    if (!user || user?.roles.includes(onlyFor)) {
+    if (!user || !user.roles.some(role => onlyFor.includes(role))) {
         return <Navigate to="/catalog" replace/>
     }
 
@@ -35,9 +36,13 @@ const router = createBrowserRouter([
         children: [
             {path: "", element: <HomePage/>},
             {path: "about", element: <About/>},
+            {path: "register", element: <Register/>},
+            {path: "login", element: <Login/>},
+            {path: "catalog", element: <CatalogPage/>},
+            {path: "catalog/:id", element: <ProductDetailPage/>},
             {
                 path: "user",
-                element: <ProtectedRoute onlyFor="User"/>,
+                element: <ProtectedRoute onlyFor={["User"]}/>,
                 children: [
                     {
                         path: "wishlist",
@@ -53,10 +58,16 @@ const router = createBrowserRouter([
                     }
                 ]
             },
-            {path: "register", element: <Register/>},
-            {path: "login", element: <Login/>},
-            {path: "catalog", element: <CatalogPage/>},
-            {path: "catalog/:id", element: <ProductDetailPage/>},
+            {
+                path: "admin",
+                element: <ProtectedRoute onlyFor={["Super", "Admin"]}/>,
+                children: [
+                    {
+                        path: "",
+                        element: <AdminPage/>
+                    }
+                ]
+            },
             {path: "*", element: <NotFoundPage/>},
         ],
     },

@@ -16,9 +16,9 @@ import {
     Wrap
 } from "@chakra-ui/react";
 import {AiOutlineFilter} from "react-icons/ai";
-import useProductFilters from "../../hooks/queries/useProductFilters.ts";
 import {useCallback, useEffect, useState} from "react";
 import {useSearchParams} from "react-router-dom";
+import useProductFilters from "../hooks/queries/useProductFilters.ts";
 
 export const ProductFilters = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -73,13 +73,17 @@ export const ProductFilters = () => {
         searchParams.set("categories", Object.keys(selectedCategories).join(","));
         setSearchParams(searchParams);
         onClose();
-    }
+    };
+
+    // const filterApplied = !!Object.keys(selectedCategories).length || !!Object.keys(selectedCategories).length
 
     return (
         <>
             <IconButton
                 aria-label="Filter"
                 variant="outline"
+                // variant={filterApplied ? "solid" : "outline"}
+                // colorScheme={filterApplied ? "blue" : "gray"}
                 icon={<AiOutlineFilter/>}
                 onClick={onOpen}
                 isLoading={isLoading}

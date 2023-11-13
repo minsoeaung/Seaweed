@@ -6,17 +6,13 @@ public static class ProductExtensions
 {
     public static IQueryable<Product> Sort(this IQueryable<Product> query, string? orderBy)
     {
-        if (string.IsNullOrWhiteSpace(orderBy))
-            return query.OrderBy(p => p.Name);
-
         query = orderBy switch
         {
             "price" => query.OrderBy(p => p.Price),
             "priceDesc" => query.OrderByDescending(p => p.Price),
             "name" => query.OrderBy(p => p.Name),
             "nameDesc" => query.OrderByDescending(p => p.Name),
-            // TODO: default should be last created at
-            _ => query.OrderBy(p => p.Name)
+            _ => query.OrderByDescending(p => p.Id)
         };
 
         return query;

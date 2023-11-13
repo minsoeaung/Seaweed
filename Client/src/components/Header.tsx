@@ -154,6 +154,9 @@ const Header = () => {
                                             <br/>
                                             <MenuDivider/>
                                             <MenuItem as={Link} to="/user/my-account">My Account</MenuItem>
+                                            {user.roles.some(role => ["Admin", "Super"].includes(role)) && (
+                                                <MenuItem as={Link} to="/admin">Admin</MenuItem>
+                                            )}
                                             <MenuItem onClick={logout}>Logout</MenuItem>
                                         </MenuList>
                                     </Menu>
