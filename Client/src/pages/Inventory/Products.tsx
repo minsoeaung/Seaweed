@@ -2,10 +2,18 @@ import {useSearchParams} from "react-router-dom";
 import {usePaginatedProducts} from "../../hooks/queries/usePaginatedProducts.ts";
 import ResponsivePagination from "react-responsive-pagination";
 import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogOverlay,
     Box,
+    Button,
+    Center,
     Flex,
+    HStack,
+    IconButton,
     Input,
-    Skeleton,
     Table,
     TableCaption,
     TableContainer,
@@ -13,22 +21,35 @@ import {
     Td,
     Th,
     Thead,
-    Tr
+    Tr,
+    useColorModeValue,
+    useDisclosure
 } from "@chakra-ui/react";
-import 'react-responsive-pagination/themes/bootstrap.css';
+import 'react-responsive-pagination/themes/classic.css';
 import {formatPrice} from "../../utilities/formatPrice.ts";
 import {ProductFilters} from "../../components/ProductFilters.tsx";
 import {ProductSortBy} from "../../components/ProductSortBy.tsx";
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
+import {ProductCreate} from "../../components/ProductCreate.tsx";
+import AntdSpin from "../../components/AntdSpin";
+import {DeleteIcon, EditIcon} from "@chakra-ui/icons";
+import {useDeleteProduct} from "../../hooks/mutations/useDeleteProduct.ts";
+import {Fallback} from "../../components/Fallback/index.tsx";
 
 const Products = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchInputValue, setSearchInputValue] = useState(searchParams.get("searchTerm") || "");
+    const {isOpen, onOpen, onClose} = useDisclosure();
+    const cancelRef = useRef(null);
+    const productIdToDelete = useRef<number>(0);
+
+    const deleteMutation = useDeleteProduct();
 
     const {
         data,
         isLoading,
         isError,
+        isFetching
     } = usePaginatedProducts(searchParams.toString());
 
     const handlePageChange = (page: number) => {
@@ -38,7 +59,7 @@ const Products = () => {
     }
 
     if (isLoading) {
-        return <Skeleton/>
+        return <Center><AntdSpin/></Center>
     }
 
     if (isError) {
@@ -54,8 +75,14 @@ const Products = () => {
         }
     }
 
+    const handleDeleteProduct = async () => {
+        await deleteMutation.mutateAsync(productIdToDelete.current);
+        onClose();
+    }
+
     return (
         <Box>
+            {isFetching && <Fallback/>}
             <Flex justifyContent="space-between" mb={4}>
                 <ProductFilters/>
                 <Input
@@ -69,10 +96,11 @@ const Products = () => {
                     maxW={"md"}
                 />
                 <ProductSortBy/>
+                <ProductCreate/>
             </Flex>
             <TableContainer>
                 <Table variant='simple'>
-                    <Thead>
+                    <Thead position="relative">
                         <Tr>
                             <Th>Id</Th>
                             <Th>Name</Th>
@@ -82,9 +110,11 @@ const Products = () => {
                             <Th>Quantity</Th>
                             <Th>Brand</Th>
                             <Th>Category</Th>
+                            <Th position="sticky" right={0}
+                                bgColor={useColorModeValue("#EDF2F7", "#171923")}>Actions</Th>
                         </Tr>
                     </Thead>
-                    <Tbody>
+                    <Tbody position="relative">
                         {data.results.map(product => (
                             <Tr key={product.id}>
                                 <Td>{product.id}</Td>
@@ -96,6 +126,23 @@ const Products = () => {
                                 <Td isNumeric>{product.quantityInStock}</Td>
                                 <Td>{product.brand.name}</Td>
                                 <Td>{product.category.name}</Td>
+                                <Td position="sticky" right={0} bgColor={useColorModeValue("#EDF2F7", "#171923")}>
+                                    <HStack>
+                                        <IconButton
+                                            aria-label="Delete product"
+                                            icon={<DeleteIcon/>}
+                                            size="sm"
+                                            colorScheme="red"
+                                            variant="outline"
+                                            onClick={() => {
+                                                productIdToDelete.current = product.id;
+                                                onOpen();
+                                            }}
+                                        />
+                                        <IconButton aria-label="Edit product" icon={<EditIcon/>} size="sm"
+                                                    colorScheme="orange" variant="outline"/>
+                                    </HStack>
+                                </Td>
                             </Tr>
                         ))}
                     </Tbody>
@@ -110,6 +157,29 @@ const Products = () => {
                 total={data.pagination.totalPages}
                 onPageChange={handlePageChange}
             />
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+                isCentered
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                            Are you sure to remove from wishlist?
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme='red' onClick={handleDeleteProduct} ml={3}
+                                    isLoading={deleteMutation.isLoading}>
+                                Delete
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </Box>
     )
 }

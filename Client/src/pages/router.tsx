@@ -13,7 +13,7 @@ const ProductDetailPage = lazy(() => import('./Catalog/ProductDetail'));
 const WishListPage = lazy(() => import('./User/WishList'));
 const CartPage = lazy(() => import('./User/Cart/index.tsx'));
 const MyAccountPage = lazy(() => import('./User/MyAccount'));
-const AdminPage = lazy(() => import("./Admin"));
+const InventoryPage = lazy(() => import("./Inventory"));
 
 const ProtectedRoute = ({onlyFor}: { onlyFor: string[] }) => {
     const {user} = useAuth();
@@ -59,12 +59,12 @@ const router = createBrowserRouter([
                 ]
             },
             {
-                path: "admin",
+                path: "inventory",
                 element: <ProtectedRoute onlyFor={["Super", "Admin"]}/>,
                 children: [
                     {
                         path: "",
-                        element: <AdminPage/>
+                        element: <InventoryPage/>
                     }
                 ]
             },

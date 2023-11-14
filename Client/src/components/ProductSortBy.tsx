@@ -10,15 +10,14 @@ const sortMenus = {
     "_": ""
 }
 
-export const ProductSortBy =() => {
+export const ProductSortBy = () => {
     const [params, setParams] = useSearchParams();
 
     const handleSortMenuClick = (value: string) => () => {
-        const newParams = new URLSearchParams(params);
-        newParams.set("orderBy", value);
-        setParams(newParams);
+        params.set("orderBy", value === "default" ? "" : value);
+        setParams(params);
     }
-    
+
     return (
         <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon/>} px={4} variant="outline">
@@ -26,6 +25,7 @@ export const ProductSortBy =() => {
                 by: {sortMenus[(params.get("orderBy") || "_") as keyof typeof sortMenus] || ""}
             </MenuButton>
             <MenuList>
+                <MenuItem onClick={handleSortMenuClick("default")}>Default</MenuItem>
                 <MenuItem onClick={handleSortMenuClick("name")}>Name</MenuItem>
                 <MenuItem onClick={handleSortMenuClick("nameDesc")}>Name [Z-A]</MenuItem>
                 <MenuItem onClick={handleSortMenuClick("price")}>Price</MenuItem>

@@ -11,10 +11,6 @@ const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
 // TODO: improve about "never" -> "ApiClient.post<never, AuthResponse>"
 export const ApiClient = axios.create({
     baseURL: import.meta.env.VITE_ROOT_URL,
-    headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-    },
     withCredentials: true,
 });
 
@@ -35,7 +31,6 @@ ApiClient.interceptors.response.use(
                     url: `${import.meta.env.VITE_ROOT_URL}api/Accounts/renew-tokens`,
                     withCredentials: true,
                     headers: {
-                        "Content-Type": "application/json",
                         Accept: "application/json",
                     }
                 }).then((response) => {
