@@ -1,5 +1,9 @@
 export const CATEGORIES = "categories";
 
+export const BRANDS = "brands";
+
+export const PRODUCT_FILTERS = "productFilters";
+
 export const PRODUCTS = "products";
 
 export const WISHLIST = "wishlist";

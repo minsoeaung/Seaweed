@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using API.Data;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
@@ -95,5 +96,50 @@ public class ProductsController : ControllerBase
             Brands = await _storeContext.Products.Select(p => p.Brand).Distinct().AsNoTracking().ToListAsync(),
             Categories = await _storeContext.Products.Select(p => p.Category).Distinct().AsNoTracking().ToListAsync()
         };
+    }
+
+    [HttpGet("categories/{id}")]
+    public async Task<ActionResult<Category>> GetCategory(int id)
+    {
+        var category = await _storeContext.Categories.FindAsync(id);
+        return category == null ? NotFound() : category;
+    }
+
+    [HttpDelete("categories/{id}")]
+    public async Task<ActionResult<Category>> DeleteCategory(int id)
+    {
+        var category = await _storeContext.Categories.FindAsync(id);
+        if (category == null) return NotFound();
+
+        _storeContext.Categories.Remove(category);
+        await _storeContext.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPut("categories/{id}")]
+    public async Task<ActionResult<Category>> UpdateCategory(int id, [Required] string name)
+    {
+        var category = await _storeContext.Categories.FindAsync(id);
+        if (category == null) return NotFound();
+
+        category.Name = name;
+        _storeContext.Categories.Update(category);
+        await _storeContext.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPost("categories")]
+    public async Task<ActionResult<Category>> CreateCategory([Required] string name)
+    {
+        var existing = await _storeContext.Categories.FirstOrDefaultAsync(c => c.Name == name);
+        if (existing != null)
+            return BadRequest();
+
+        var category = new Category { Name = name };
+
+        _storeContext.Categories.Add(category);
+        await _storeContext.SaveChangesAsync();
+
+        return category;
     }
 }

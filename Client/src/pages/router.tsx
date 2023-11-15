@@ -14,6 +14,8 @@ const WishListPage = lazy(() => import('./User/WishList'));
 const CartPage = lazy(() => import('./User/Cart/index.tsx'));
 const MyAccountPage = lazy(() => import('./User/MyAccount'));
 const InventoryPage = lazy(() => import("./Inventory"));
+const AddInventoryPage = lazy(() => import("./Inventory/Add"));
+const InventoryDetails = lazy(() => import("./Inventory/Details"));
 
 const ProtectedRoute = ({onlyFor}: { onlyFor: string[] }) => {
     const {user} = useAuth();
@@ -65,6 +67,14 @@ const router = createBrowserRouter([
                     {
                         path: "",
                         element: <InventoryPage/>
+                    },
+                    {
+                        path: "add",
+                        element: <AddInventoryPage/>
+                    },
+                    {
+                        path: ":id",
+                        element: <InventoryDetails/>
                     }
                 ]
             },

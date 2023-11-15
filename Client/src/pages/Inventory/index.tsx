@@ -1,5 +1,5 @@
-import {Container, Tab, TabList, TabPanel, TabPanels, Tabs} from "@chakra-ui/react";
-import {useSearchParams} from "react-router-dom";
+import {Button, Container, Flex, HStack, Tab, TabList, TabPanel, TabPanels, Tabs} from "@chakra-ui/react";
+import {Link, useSearchParams} from "react-router-dom";
 import {lazy} from "react";
 
 const Products = lazy(() => import("./Products"));
@@ -20,9 +20,22 @@ const Admin = () => {
         <Container maxW="7xl">
             <Tabs index={isNaN(Number(tab)) ? 0 : Number(tab)} onChange={handleTabsChange} isLazy>
                 <TabList>
-                    <Tab>Products</Tab>
-                    <Tab>Brands</Tab>
-                    <Tab>Categories</Tab>
+                    <Flex justify='space-between' w='full'>
+                        <HStack>
+                            <Tab>Products</Tab>
+                            <Tab>Brands</Tab>
+                            <Tab>Categories</Tab>
+                        </HStack>
+                        <Button
+                            as={Link}
+                            to={`0?type=category`}
+                            variant='solid'
+                            colorScheme='blue'
+                            size='sm'
+                        >
+                            Add
+                        </Button>
+                    </Flex>
                 </TabList>
 
                 <TabPanels>

@@ -139,8 +139,13 @@ const Products = () => {
                                                 onOpen();
                                             }}
                                         />
-                                        <IconButton aria-label="Edit product" icon={<EditIcon/>} size="sm"
-                                                    colorScheme="orange" variant="outline"/>
+                                        <IconButton 
+                                            aria-label="Edit product"
+                                            icon={<EditIcon/>} 
+                                            size="sm"
+                                            colorScheme="orange"
+                                            variant="outline"
+                                        />
                                     </HStack>
                                 </Td>
                             </Tr>
@@ -166,7 +171,7 @@ const Products = () => {
                 <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                            Are you sure to remove from wishlist?
+                            Are you sure to delete the product?
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <Button ref={cancelRef} onClick={onClose}>

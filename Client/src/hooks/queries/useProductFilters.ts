@@ -1,14 +1,14 @@
 import {useQuery} from "react-query";
-import {CATEGORIES} from "../../constants/queryKeys.ts";
+import {PRODUCT_FILTERS} from "../../constants/queryKeys.ts";
 import {ProductFilterDto} from "../../types/productFilterDto.ts";
 import {ApiClient} from "../../api/apiClient.tsx";
 
-const useCategories = () => useQuery(
-    CATEGORIES,
+const useProductFilters = () => useQuery(
+    PRODUCT_FILTERS,
     async () => await ApiClient.get<never, ProductFilterDto>("api/Products/filters"),
     {
         refetchOnMount: false,
     }
 )
 
-export default useCategories;
+export default useProductFilters;
