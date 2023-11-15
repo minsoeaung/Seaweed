@@ -52,7 +52,7 @@ const Category = ({category}: { category: NamedApiResource }) => {
                     overflow='hidden'
                 />
             </Box>
-            <Center>
+            <Center pl={2} pr={2}>
                 <Heading
                     color={useColorModeValue('gray.700', 'white')}
                     fontSize={'2xl'}

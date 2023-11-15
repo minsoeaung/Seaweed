@@ -93,8 +93,8 @@ public class ProductsController : ControllerBase
     {
         return new ProductFilters
         {
-            Brands = await _storeContext.Products.Select(p => p.Brand).Distinct().AsNoTracking().ToListAsync(),
-            Categories = await _storeContext.Products.Select(p => p.Category).Distinct().AsNoTracking().ToListAsync()
+            Brands = await _storeContext.Brands.AsNoTracking().ToListAsync(),
+            Categories = await _storeContext.Categories.AsNoTracking().ToListAsync()
         };
     }
 
@@ -137,9 +137,54 @@ public class ProductsController : ControllerBase
 
         var category = new Category { Name = name };
 
-        _storeContext.Categories.Add(category);
+        await _storeContext.Categories.AddAsync(category);
         await _storeContext.SaveChangesAsync();
 
         return category;
+    }
+
+    [HttpGet("brands/{id}")]
+    public async Task<ActionResult<Brand>> GetBrand(int id)
+    {
+        var brand = await _storeContext.Brands.FindAsync(id);
+        return brand == null ? NotFound() : brand;
+    }
+
+    [HttpDelete("brands/{id}")]
+    public async Task<ActionResult<Brand>> DeleteBrand(int id)
+    {
+        var brand = await _storeContext.Brands.FindAsync(id);
+        if (brand == null) return NotFound();
+
+        _storeContext.Brands.Remove(brand);
+        await _storeContext.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPut("brands/{id}")]
+    public async Task<ActionResult<Brand>> UpdateBrand(int id, [Required] string name)
+    {
+        var brand = await _storeContext.Brands.FindAsync(id);
+        if (brand == null) return NotFound();
+
+        brand.Name = name;
+        _storeContext.Brands.Update(brand);
+        await _storeContext.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPost("brands")]
+    public async Task<ActionResult<Brand>> CreateBrand([Required] string name)
+    {
+        var existing = await _storeContext.Brands.FirstOrDefaultAsync(c => c.Name == name);
+        if (existing != null)
+            return BadRequest();
+
+        var brand = new Brand { Name = name };
+
+        await _storeContext.Brands.AddAsync(brand);
+        await _storeContext.SaveChangesAsync();
+
+        return brand;
     }
 }

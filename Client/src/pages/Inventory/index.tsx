@@ -6,10 +6,16 @@ const Products = lazy(() => import("./Products"));
 const Categories = lazy(() => import("./Categories"));
 const Brands = lazy(() => import("./Brands"));
 
+const tabToCategory = {
+    "0": "product",
+    "1": "brand",
+    "2": "category"
+} as const;
+
 const Admin = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const tab = searchParams.get("tab");
+    const tab = searchParams.get("tab") as keyof typeof tabToCategory;
 
     const handleTabsChange = (index: number) => {
         searchParams.set("tab", String(index));
@@ -28,7 +34,7 @@ const Admin = () => {
                         </HStack>
                         <Button
                             as={Link}
-                            to={`0?type=category`}
+                            to={`0?type=${tabToCategory[tab]}`}
                             variant='solid'
                             colorScheme='blue'
                             size='sm'

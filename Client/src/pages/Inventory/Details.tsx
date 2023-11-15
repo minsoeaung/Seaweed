@@ -24,6 +24,8 @@ import {BiSave} from "react-icons/bi";
 import {DeleteIcon} from "@chakra-ui/icons";
 import {useCategory} from "../../hooks/queries/useCategory.ts";
 import {useCategoryCUD} from "../../hooks/mutations/useCategoryCUD.ts";
+import {useBrand} from "../../hooks/queries/useBrand.ts";
+import {useBrandCUD} from "../../hooks/mutations/useBrandCUD.ts";
 
 const validType = ["category", "brand", "product"] as const;
 
@@ -42,6 +44,7 @@ const Details = () => {
             <Card>
                 <CardBody>
                     {pageType === "category" && <CategoryDetails id={Number(id)}/>}
+                    {pageType === "brand" && <BrandDetails id={Number(id)}/>}
                 </CardBody>
             </Card>
         </Container>
@@ -92,7 +95,7 @@ const CategoryDetails = ({id}: { id: number }) => {
             name: value
         })
         if (result) {
-            navigate(`/inventory/${result.id}?type=category`)
+            navigate(`/inventory/${result.id}?type=category`, {replace: true})
         }
     }
 
@@ -100,7 +103,7 @@ const CategoryDetails = ({id}: { id: number }) => {
         return <Center><AntdSpin/></Center>
     }
 
-    if (!data && id !== 0) return <p>Product not found</p>;
+    if (!data && id !== 0) return <p>Error loading category.</p>;
 
     return (
         <>
@@ -174,6 +177,142 @@ const CategoryDetails = ({id}: { id: number }) => {
                                 Cancel
                             </Button>
                             <Button colorScheme='red' onClick={handleDeleteCategory} ml={3}
+                                    isLoading={mutation.isLoading}>
+                                Delete
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
+        </>
+    )
+}
+
+const BrandDetails = ({id}: { id: number }) => {
+    const [value, setValue] = useState('')
+
+    const {data, isLoading} = useBrand(id);
+
+    const {isOpen, onOpen, onClose} = useDisclosure();
+
+    const cancelRef = useRef(null);
+
+    const mutation = useBrandCUD();
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (data) {
+            setValue(data.name);
+        }
+    }, [data])
+
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => setValue(event.target.value)
+
+    const handleDeleteBrand = async () => {
+        await mutation.mutateAsync({
+            type: "DELETE",
+            id: id,
+            pushOnSuccess: "/inventory?pageSize=10&tab=1",
+        });
+    }
+
+    const handleUpdateBrand = async () => {
+        await mutation.mutateAsync({
+            type: "UPDATE",
+            id: id,
+            name: value
+        });
+    }
+
+    const handleCreateBrand = async () => {
+        const result = await mutation.mutateAsync({
+            type: "CREATE",
+            name: value
+        })
+        if (result) {
+            navigate(`/inventory/${result.id}?type=brand`, {replace: true})
+        }
+    }
+
+    if (isLoading) {
+        return <Center><AntdSpin/></Center>
+    }
+
+    if (!data && id !== 0) return <p>Error loading brand.</p>;
+
+    return (
+        <>
+            <Text mb='8px'>Brand Name</Text>
+            <Input
+                value={value}
+                onChange={handleChange}
+                placeholder='Brand name'
+            />
+            <br/>
+            <br/>
+            <Flex justify='space-between'>
+                {id === 0 ? (
+                    <Button
+                        leftIcon={<BiSave/>}
+                        variant='solid'
+                        colorScheme='blue'
+                        isDisabled={value.trim().length === 0}
+                        onClick={handleCreateBrand}
+                        isLoading={mutation.isLoading}
+                    >
+                        Add
+                    </Button>
+                ) : data && (
+                    <>
+                        <Button
+                            leftIcon={<BiSave/>}
+                            variant='solid'
+                            colorScheme='blue'
+                            isDisabled={data.name === value || value.trim().length === 0}
+                            onClick={handleUpdateBrand}
+                            isLoading={mutation.isLoading}
+                        >
+                            Save
+                        </Button>
+                        <Button
+                            leftIcon={<DeleteIcon/>}
+                            variant='outline'
+                            colorScheme='red'
+                            onClick={onOpen}
+                        >
+                            Delete
+                        </Button>
+                    </>
+                )}
+            </Flex>
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+                isCentered
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                            Delete brand
+                        </AlertDialogHeader>
+                        <AlertDialogBody>
+                            <Highlight query='All the related products will be deleted too'
+                                       styles={{
+                                           px: '1',
+                                           py: '1',
+                                           bg: "red.700",
+                                           color: "white",
+                                       }}>
+                                Are you sure? All the related products will be deleted too.
+                            </Highlight>
+                        </AlertDialogBody>
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme='red' onClick={handleDeleteBrand} ml={3}
                                     isLoading={mutation.isLoading}>
                                 Delete
                             </Button>
