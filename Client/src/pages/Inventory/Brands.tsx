@@ -1,4 +1,3 @@
-import useProductFilters from "../../hooks/queries/useProductFilters.ts";
 import {Box, Button, ButtonGroup, Center, Heading, Image, useColorModeValue, Wrap, WrapItem} from "@chakra-ui/react";
 import AntdSpin from "../../components/AntdSpin";
 import {Fallback} from "../../components/Fallback";
@@ -6,10 +5,11 @@ import {NamedApiResource} from "../../types/namedApiResource.ts";
 import {Link, useSearchParams} from "react-router-dom";
 import {IoIosImages} from "react-icons/io";
 import {EditIcon} from "@chakra-ui/icons";
+import {useBrands} from "../../hooks/queries/useBrands.ts";
 
 // TODO: try not to duplicate 
 const Brands = () => {
-    const {data, isLoading, isFetching} = useProductFilters();
+    const {data, isLoading, isFetching} = useBrands();
 
     if (isLoading) {
         return <Center><AntdSpin/></Center>
@@ -21,9 +21,9 @@ const Brands = () => {
         <Box>
             {isFetching && <Fallback/>}
             <Wrap spacing='30px'>
-                {data.brands.map(cat => (
-                    <WrapItem key={cat.id}>
-                        <Brand brand={cat}/>
+                {data.map(brand => (
+                    <WrapItem key={brand.id}>
+                        <Brand brand={brand}/>
                     </WrapItem>
                 ))}
             </Wrap>

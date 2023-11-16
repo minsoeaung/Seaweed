@@ -30,18 +30,19 @@ export const useCategoryCUD = () => {
     return useMutation(
         async (data: CreateType | UpdateType | DeleteType) => {
             const type = data.type;
-
+            
             if (type === "CREATE") {
-                return await ApiClient.post<never, NamedApiResource>(`api/Products/categories?name=${data.name}`);
+                return await ApiClient.post<never, NamedApiResource>(`api/categories?name=${data.name}`);
             } else if (type === "UPDATE") {
-                return await ApiClient.put<never, NamedApiResource>(`api/Products/categories/${data.id}?name=${data.name}`)
+                return await ApiClient.put<never, NamedApiResource>(`api/categories/${data.id}?name=${data.name}`)
             } else if (type === "DELETE") {
-                return await ApiClient.delete<never, never>(`api/Products/categories/${data.id}`)
+                return await ApiClient.delete<never, never>(`api/categories/${data.id}`)
             }
         },
         {
             onSuccess: async (_, data) => {
                 await queryClient.invalidateQueries({refetchInactive: true, queryKey: PRODUCT_FILTERS});
+                await queryClient.invalidateQueries({refetchInactive: true, queryKey: CATEGORIES});
 
                 if (!!data.pushOnSuccess)
                     navigate(data.pushOnSuccess);

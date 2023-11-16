@@ -32,16 +32,17 @@ export const useBrandCUD = () => {
             const type = data.type;
 
             if (type === "CREATE") {
-                return await ApiClient.post<never, NamedApiResource>(`api/Products/brands?name=${data.name}`);
+                return await ApiClient.post<never, NamedApiResource>(`api/brands?name=${data.name}`);
             } else if (type === "UPDATE") {
-                return await ApiClient.put<never, NamedApiResource>(`api/Products/brands/${data.id}?name=${data.name}`)
+                return await ApiClient.put<never, NamedApiResource>(`api/brands/${data.id}?name=${data.name}`)
             } else if (type === "DELETE") {
-                return await ApiClient.delete<never, never>(`api/Products/brands/${data.id}`)
+                return await ApiClient.delete<never, never>(`api/brands/${data.id}`)
             }
         },
         {
             onSuccess: async (_, data) => {
                 await queryClient.invalidateQueries({refetchInactive: true, queryKey: PRODUCT_FILTERS});
+                await queryClient.invalidateQueries({refetchInactive: true, queryKey: BRANDS});
 
                 if (!!data.pushOnSuccess)
                     navigate(data.pushOnSuccess);

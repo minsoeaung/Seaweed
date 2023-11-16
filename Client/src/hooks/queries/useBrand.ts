@@ -6,9 +6,9 @@ import {NamedApiResource} from "../../types/namedApiResource.ts";
 export const useBrand = (id: number) => {
     return useQuery(
         [BRANDS, String(id)],
-        async () => await ApiClient.get<never, NamedApiResource>(`api/Products/brands/${id}`),
+        async () => await ApiClient.get<never, NamedApiResource>(`api/Brands/${id}`),
         {
-            enabled: id > 0
+            enabled: isNaN(Number(id)) ? false : Number(id) > 0
         }
     );
 }

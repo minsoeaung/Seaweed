@@ -1,14 +1,14 @@
 import {Box, Button, ButtonGroup, Center, Heading, Image, useColorModeValue, Wrap, WrapItem} from "@chakra-ui/react";
 import {NamedApiResource} from "../../types/namedApiResource.ts";
-import useProductFilters from "../../hooks/queries/useProductFilters.ts";
 import AntdSpin from "../../components/AntdSpin";
 import {IoIosImages} from "react-icons/io";
 import {EditIcon} from "@chakra-ui/icons";
 import {Link, useSearchParams} from "react-router-dom";
 import {Fallback} from "../../components/Fallback";
+import {useCategories} from "../../hooks/queries/useCategories.ts";
 
 const Categories = () => {
-    const {data, isLoading, isFetching} = useProductFilters();
+    const {data, isLoading, isFetching} = useCategories();
 
     if (isLoading) {
         return <Center><AntdSpin/></Center>
@@ -20,7 +20,7 @@ const Categories = () => {
         <Box>
             {isFetching && <Fallback/>}
             <Wrap spacing='30px'>
-                {data.categories.map(cat => (
+                {data.map(cat => (
                     <WrapItem key={cat.id}>
                         <Category category={cat}/>
                     </WrapItem>
@@ -57,7 +57,7 @@ const Category = ({category}: { category: NamedApiResource }) => {
                     color={useColorModeValue('gray.700', 'white')}
                     fontSize={'2xl'}
                     fontFamily={'body'}
-                    noOfLines={2}
+                    noOfLines={1}
                 >
                     {category.name}
                 </Heading>
