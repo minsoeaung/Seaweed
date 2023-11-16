@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using API.Data;
 using API.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
+[Authorize(Roles = "Super,Admin")]
 [ApiController]
 [Route("api/[controller]")]
 public class CategoriesController : ControllerBase
@@ -17,12 +19,14 @@ public class CategoriesController : ControllerBase
         _storeContext = storeContext;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
     {
         return await _storeContext.Categories.AsNoTracking().ToListAsync();
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<Category>> GetCategory(int id)
     {

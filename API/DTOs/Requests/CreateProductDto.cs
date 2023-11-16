@@ -8,7 +8,7 @@ public class CreateProductDto
     [Required] [MaxLength(100)] public string Sku { get; set; }
     [Required] public string Description { get; set; }
 
-    public IFormFile Picture { get; set; }
+    public IFormFile? Picture { get; set; }
     public IEnumerable<IFormFile>? Album { get; set; }
 
     [Required]

@@ -15,7 +15,7 @@ const tabToCategory = {
 const Admin = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const tab = searchParams.get("tab") as keyof typeof tabToCategory;
+    const tab = searchParams.get("tab") as keyof typeof tabToCategory | null;
 
     const handleTabsChange = (index: number) => {
         searchParams.set("tab", String(index));
@@ -34,7 +34,7 @@ const Admin = () => {
                         </HStack>
                         <Button
                             as={Link}
-                            to={`0?type=${tabToCategory[tab]}`}
+                            to={`0?type=${tabToCategory[tab || "0"]}`}
                             variant='solid'
                             colorScheme='blue'
                             size='sm'

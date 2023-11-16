@@ -9,49 +9,277 @@ import {
     Button,
     Card,
     CardBody,
+    CardHeader,
     Center,
     Container,
     Flex,
+    FormControl,
+    FormLabel,
+    Heading,
     Highlight,
     Input,
+    Select,
     Text,
-    useDisclosure
+    Textarea,
+    useDisclosure,
+    VStack
 } from "@chakra-ui/react";
 import NotFoundPage from "../NotFound";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import AntdSpin from "../../components/AntdSpin";
 import {BiSave} from "react-icons/bi";
-import {DeleteIcon} from "@chakra-ui/icons";
+import {AddIcon, DeleteIcon} from "@chakra-ui/icons";
 import {useCategory} from "../../hooks/queries/useCategory.ts";
 import {useCategoryCUD} from "../../hooks/mutations/useCategoryCUD.ts";
 import {useBrand} from "../../hooks/queries/useBrand.ts";
 import {useBrandCUD} from "../../hooks/mutations/useBrandCUD.ts";
+import {useProductDetails} from "../../hooks/queries/useProductDetails.ts";
+import {CreateProductDto} from "../../types/createProductDto.ts";
+import {useCategories} from "../../hooks/queries/useCategories.ts";
+import {useBrands} from "../../hooks/queries/useBrands.ts";
+import {useProductCUD} from "../../hooks/mutations/useProductCUD.ts";
 
 const validType = ["category", "brand", "product"] as const;
 
 const Details = () => {
     const [searchParams] = useSearchParams();
     const {id} = useParams();
+    const numId = Number(id);
 
     const pageType = searchParams.get("type") as typeof validType[number];
 
-    if (!validType.includes(pageType) || isNaN(Number(id))) {
+    if (!validType.includes(pageType) || isNaN(numId)) {
         return <NotFoundPage/>
     }
 
     return (
         <Container maxW='7xl'>
             <Card>
+                <CardHeader>
+                    <Heading fontSize='xl'>
+                        {numId > 0 ? "Edit" : "Add"} {pageType[0].toUpperCase() + pageType.slice(1)}
+                    </Heading>
+                </CardHeader>
                 <CardBody>
-                    {pageType === "category" && <CategoryDetails id={Number(id)}/>}
-                    {pageType === "brand" && <BrandDetails id={Number(id)}/>}
+                    {pageType === "category" && <CategoryEdit id={numId}/>}
+                    {pageType === "brand" && <BrandEdit id={numId}/>}
+                    {pageType === "product" && <ProductEdit id={numId}/>}
                 </CardBody>
             </Card>
         </Container>
     )
 };
 
-const CategoryDetails = ({id}: { id: number }) => {
+const PRODUCT_INITIAL_STATE = {
+    name: "",
+    sku: "",
+    description: "",
+    picture: null,
+    album: null,
+    price: 0,
+    quantityInStock: 0,
+    brandId: 0,
+    categoryId: 0,
+}
+
+const ProductEdit = ({id}: { id: number }) => {
+    // TODO: fix un consistent data type id 
+    const {data, isLoading, isError} = useProductDetails(String(id));
+    const [values, setValues] = useState<CreateProductDto>(PRODUCT_INITIAL_STATE);
+    const {isOpen, onOpen, onClose} = useDisclosure();
+    const cancelRef = useRef(null);
+
+    const {data: categories} = useCategories();
+    const {data: brands} = useBrands();
+
+    const navigate = useNavigate();
+    const mutation = useProductCUD();
+
+    useEffect(() => {
+        if (data) {
+            console.log("new data", data);
+            setValues({
+                name: data.name,
+                picture: null,
+                album: null,
+                brandId: data.brandId,
+                sku: data.sku,
+                price: data.price,
+                quantityInStock: data.quantityInStock,
+                description: data.description,
+                categoryId: data.categoryId
+            });
+        }
+    }, [data])
+
+    if (isLoading) return <Center><AntdSpin/></Center>
+    if (isError || (!data && id !== 0)) return <p>Error loading product.</p>;
+
+    const handleFormChange = (name: keyof CreateProductDto) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        if ((name === "picture" || name === "album")) {
+            setValues(prevState => ({
+                ...prevState,
+                [name]: (e.target as HTMLInputElement).files
+            }))
+        } else {
+            setValues(prevState => ({
+                ...prevState,
+                [name]: e.target.value
+            }))
+        }
+    }
+
+    const handleCreateProduct = async () => {
+        const result = await mutation.mutateAsync({
+            type: "CREATE",
+            product: values,
+        });
+        if (result) {
+            navigate(`/inventory/${result.id}?type=product`, {replace: true})
+        }
+    }
+
+    const handleUpdateProduct = async () => {
+        await mutation.mutateAsync({
+            type: "UPDATE",
+            id: id,
+            product: values
+        });
+    }
+
+    return (
+        <>
+            <VStack spacing='8px'>
+                <FormControl>
+                    <FormLabel>Name</FormLabel>
+                    <Input required type='text' name='name' value={values.name} onChange={handleFormChange(("name"))}/>
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Sku</FormLabel>
+                    <Input required type='text' name='sku' value={values.sku} onChange={handleFormChange(("sku"))}/>
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Description</FormLabel>
+                    <Textarea required placeholder='Product description' name='description'
+                              value={values.description} onChange={handleFormChange(("description"))}/>
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Picture</FormLabel>
+                    <Input required type='file' accept='image/png' multiple={false} name="picture"
+                           onChange={handleFormChange(("picture"))}/>
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Album</FormLabel>
+                    <Input required type='file' accept='image/*' multiple name="album"
+                           onChange={handleFormChange(("album"))}/>
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Price</FormLabel>
+                    <Input required type='number' name='price' min={0}
+                           value={values.price} onChange={handleFormChange(("price"))}/>
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Quantity In Stock</FormLabel>
+                    <Input required type='number' name='quantityInStock' min={0} max={500}
+                           value={values.quantityInStock} onChange={handleFormChange(("quantityInStock"))}/>
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Category</FormLabel>
+                    <Select required placeholder='Select a category' name='categoryId'
+                            value={values.categoryId} onChange={handleFormChange(("categoryId"))}>
+                        {categories?.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                    </Select>
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Brand</FormLabel>
+                    <Select required placeholder='Select a brand' name='brandId'
+                            value={values.brandId} onChange={handleFormChange(("brandId"))}>
+                        {brands?.map(brand => (
+                            <option key={brand.id} value={brand.id}>{brand.name}</option>
+                        ))}
+                    </Select>
+                </FormControl>
+            </VStack>
+            <br/>
+            <br/>
+            <Flex justify='space-between'>
+                {id === 0 ? (
+                    <Button
+                        leftIcon={<AddIcon/>}
+                        variant='solid'
+                        colorScheme='blue'
+                        onClick={handleCreateProduct}
+                        isLoading={mutation.isLoading}
+                    >
+                        Add
+                    </Button>
+                ) : data && (
+                    <>
+                        <Button
+                            leftIcon={<BiSave/>}
+                            variant='solid'
+                            colorScheme='blue'
+                            onClick={handleUpdateProduct}
+                            isLoading={mutation.isLoading}
+                        >
+                            Save
+                        </Button>
+                        <Button
+                            leftIcon={<DeleteIcon/>}
+                            variant='outline'
+                            colorScheme='red'
+                            onClick={onOpen}
+                        >
+                            Delete
+                        </Button>
+                    </>
+                )}
+            </Flex>
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+                isCentered
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                            Delete category
+                        </AlertDialogHeader>
+                        <AlertDialogBody>
+                            <Highlight query='All the related products will be deleted too'
+                                       styles={{
+                                           px: '1',
+                                           py: '1',
+                                           bg: "red.700",
+                                           color: "white",
+                                       }}>
+                                Are you sure? All the related products will be deleted too.
+                            </Highlight>
+                        </AlertDialogBody>
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button
+                                colorScheme='red'
+                                // onClick={handleDeleteCategory} 
+                                ml={3}
+                                // isLoading={mutation.isLoading}
+                            >
+                                Delete
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
+        </>
+    )
+}
+
+const CategoryEdit = ({id}: { id: number }) => {
     const [value, setValue] = useState('')
 
     const {data, isLoading} = useCategory(id);
@@ -188,7 +416,7 @@ const CategoryDetails = ({id}: { id: number }) => {
     )
 }
 
-const BrandDetails = ({id}: { id: number }) => {
+const BrandEdit = ({id}: { id: number }) => {
     const [value, setValue] = useState('')
 
     const {data, isLoading} = useBrand(id);

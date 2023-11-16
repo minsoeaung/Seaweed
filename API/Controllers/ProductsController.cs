@@ -55,13 +55,26 @@ public class ProductsController : ControllerBase
             .Include(p => p.Category)
             .Include(p => p.Brand)
             .Where(p => p.Id == id)
+            .AsNoTracking()
             .FirstOrDefaultAsync();
         return product == null ? NotFound() : product;
     }
 
     [Authorize(Roles = "Super,Admin")]
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteProduct(int id)
+    {
+        var product = await _storeContext.Products.FindAsync(id);
+        if (product == null) return NotFound();
+
+        _storeContext.Products.Remove(product);
+        await _storeContext.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [Authorize(Roles = "Super,Admin")]
     [HttpPost]
-    public async Task<ActionResult> CreateProduct([FromForm] CreateProductDto productDto)
+    public async Task<ActionResult<Product>> CreateProduct([FromForm] CreateProductDto productDto)
     {
         var product = _mapper.Map<Product>(productDto);
         await _storeContext.Products.AddAsync(product);
@@ -73,19 +86,22 @@ public class ProductsController : ControllerBase
     }
 
     [Authorize(Roles = "Super,Admin")]
-    [HttpDelete]
-    public async Task<ActionResult> DeleteProduct(int productId)
+    [HttpPut("{id}")]
+    public async Task<ActionResult<Product>> UpdateProduct(int id, [FromForm] CreateProductDto productDto)
     {
-        var productToDelete = await _storeContext.Products.FindAsync(productId);
-        if (productToDelete == null)
-            return NotFound();
+        var product = await _storeContext.Products.AnyAsync(p => p.Id == id);
+        if (!product) return NotFound();
 
-        _storeContext.Products.Remove(productToDelete);
-        await _storeContext.SaveChangesAsync();
+        var newProduct = _mapper.Map<Product>(productDto);
+        newProduct.Id = id; // ***
+        _storeContext.Entry(newProduct).State = EntityState.Modified;
 
-        return NoContent();
+        var updates = await _storeContext.SaveChangesAsync();
+        if (updates > 0)
+            return newProduct;
+
+        return BadRequest();
     }
-
 
     [HttpGet("filters")]
     public async Task<ActionResult<ProductFilters>> GetFilters()

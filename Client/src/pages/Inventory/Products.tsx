@@ -1,4 +1,4 @@
-import {useSearchParams} from "react-router-dom";
+import {Link, useSearchParams} from "react-router-dom";
 import {usePaginatedProducts} from "../../hooks/queries/usePaginatedProducts.ts";
 import ResponsivePagination from "react-responsive-pagination";
 import {
@@ -30,11 +30,10 @@ import {formatPrice} from "../../utilities/formatPrice.ts";
 import {ProductFilters} from "../../components/ProductFilters.tsx";
 import {ProductSortBy} from "../../components/ProductSortBy.tsx";
 import React, {useRef, useState} from "react";
-import {ProductCreate} from "../../components/ProductCreate.tsx";
 import AntdSpin from "../../components/AntdSpin";
 import {DeleteIcon, EditIcon} from "@chakra-ui/icons";
-import {useDeleteProduct} from "../../hooks/mutations/useDeleteProduct.ts";
 import {Fallback} from "../../components/Fallback/index.tsx";
+import {useProductCUD} from "../../hooks/mutations/useProductCUD.ts";
 
 const Products = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -43,7 +42,7 @@ const Products = () => {
     const cancelRef = useRef(null);
     const productIdToDelete = useRef<number>(0);
 
-    const deleteMutation = useDeleteProduct();
+    const deleteMutation = useProductCUD();
 
     const {
         data,
@@ -76,7 +75,10 @@ const Products = () => {
     }
 
     const handleDeleteProduct = async () => {
-        await deleteMutation.mutateAsync(productIdToDelete.current);
+        await deleteMutation.mutateAsync({
+            id: productIdToDelete.current,
+            type: "DELETE"
+        });
         onClose();
     }
 
@@ -96,7 +98,6 @@ const Products = () => {
                     maxW={"md"}
                 />
                 <ProductSortBy/>
-                <ProductCreate/>
             </Flex>
             <TableContainer>
                 <Table variant='simple'>
@@ -139,9 +140,11 @@ const Products = () => {
                                                 onOpen();
                                             }}
                                         />
-                                        <IconButton 
+                                        <IconButton
+                                            as={Link}
+                                            to={`${product.id}?type=product`}
                                             aria-label="Edit product"
-                                            icon={<EditIcon/>} 
+                                            icon={<EditIcon/>}
                                             size="sm"
                                             colorScheme="orange"
                                             variant="outline"

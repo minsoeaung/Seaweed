@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using API.Data;
 using API.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
+[Authorize(Roles = "Super,Admin")]
 [ApiController]
 [Route("api/[controller]")]
 public class BrandsController : ControllerBase
@@ -17,12 +19,14 @@ public class BrandsController : ControllerBase
         _storeContext = storeContext;
     }
 
+    [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Brand>>> GetCategories()
+    public async Task<ActionResult<IEnumerable<Brand>>> GetBrands()
     {
         return await _storeContext.Brands.AsNoTracking().ToListAsync();
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<Brand>> GetBrand(int id)
     {
