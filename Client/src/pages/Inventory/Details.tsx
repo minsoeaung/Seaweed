@@ -17,6 +17,9 @@ import {
     FormLabel,
     Heading,
     Highlight,
+    HStack,
+    IconButton,
+    Image,
     Input,
     Select,
     Text,
@@ -28,7 +31,7 @@ import NotFoundPage from "../NotFound";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import AntdSpin from "../../components/AntdSpin";
 import {BiSave} from "react-icons/bi";
-import {AddIcon, DeleteIcon} from "@chakra-ui/icons";
+import {AddIcon, ChevronLeftIcon, DeleteIcon} from "@chakra-ui/icons";
 import {useCategory} from "../../hooks/queries/useCategory.ts";
 import {useCategoryCUD} from "../../hooks/mutations/useCategoryCUD.ts";
 import {useBrand} from "../../hooks/queries/useBrand.ts";
@@ -38,6 +41,8 @@ import {CreateProductDto} from "../../types/createProductDto.ts";
 import {useCategories} from "../../hooks/queries/useCategories.ts";
 import {useBrands} from "../../hooks/queries/useBrands.ts";
 import {useProductCUD} from "../../hooks/mutations/useProductCUD.ts";
+import {PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
+import placeholderImg from '../../assets/placeholderImage.webp';
 
 const validType = ["category", "brand", "product"] as const;
 
@@ -45,6 +50,7 @@ const Details = () => {
     const [searchParams] = useSearchParams();
     const {id} = useParams();
     const numId = Number(id);
+    const navigate = useNavigate();
 
     const pageType = searchParams.get("type") as typeof validType[number];
 
@@ -56,9 +62,18 @@ const Details = () => {
         <Container maxW='7xl'>
             <Card>
                 <CardHeader>
-                    <Heading fontSize='xl'>
-                        {numId > 0 ? "Edit" : "Add"} {pageType[0].toUpperCase() + pageType.slice(1)}
-                    </Heading>
+                    <HStack>
+                        <IconButton
+                            icon={<ChevronLeftIcon fontSize='30px'/>}
+                            variant='ghost'
+                            colorScheme='blue'
+                            aria-label='Go back'
+                            onClick={() => navigate(-1)}
+                        />
+                        <Heading fontSize='xl'>
+                            {numId > 0 ? "Edit" : "Add"} {pageType[0].toUpperCase() + pageType.slice(1)}
+                        </Heading>
+                    </HStack>
                 </CardHeader>
                 <CardBody>
                     {pageType === "category" && <CategoryEdit id={numId}/>}
@@ -80,14 +95,17 @@ const PRODUCT_INITIAL_STATE = {
     quantityInStock: 0,
     brandId: 0,
     categoryId: 0,
-}
+};
+
 
 const ProductEdit = ({id}: { id: number }) => {
     // TODO: fix un consistent data type id 
     const {data, isLoading, isError} = useProductDetails(String(id));
     const [values, setValues] = useState<CreateProductDto>(PRODUCT_INITIAL_STATE);
+    const [picturePreview, setPicturePreview] = useState<string | null>(null);
     const {isOpen, onOpen, onClose} = useDisclosure();
     const cancelRef = useRef(null);
+    const pictureInputRef = useRef<HTMLInputElement>(null);
 
     const {data: categories} = useCategories();
     const {data: brands} = useBrands();
@@ -97,7 +115,6 @@ const ProductEdit = ({id}: { id: number }) => {
 
     useEffect(() => {
         if (data) {
-            console.log("new data", data);
             setValues({
                 name: data.name,
                 picture: null,
@@ -110,6 +127,10 @@ const ProductEdit = ({id}: { id: number }) => {
                 categoryId: data.categoryId
             });
         }
+
+        return () => {
+            picturePreview && URL.revokeObjectURL(picturePreview)
+        }
     }, [data])
 
     if (isLoading) return <Center><AntdSpin/></Center>
@@ -117,10 +138,15 @@ const ProductEdit = ({id}: { id: number }) => {
 
     const handleFormChange = (name: keyof CreateProductDto) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         if ((name === "picture" || name === "album")) {
+            const files = (e.target as HTMLInputElement).files;
+
             setValues(prevState => ({
                 ...prevState,
-                [name]: (e.target as HTMLInputElement).files
+                [name]: files
             }))
+            if (name === "picture" && files?.length) {
+                setPicturePreview(URL.createObjectURL(files[0]))
+            }
         } else {
             setValues(prevState => ({
                 ...prevState,
@@ -165,8 +191,27 @@ const ProductEdit = ({id}: { id: number }) => {
                 </FormControl>
                 <FormControl>
                     <FormLabel>Picture</FormLabel>
-                    <Input required type='file' accept='image/png' multiple={false} name="picture"
-                           onChange={handleFormChange(("picture"))}/>
+                    <Image
+                        src={picturePreview || (data ? (PRODUCT_IMAGES + data.id) : undefined)}
+                        fallbackSrc={placeholderImg}
+                        height='150px'
+                        rounded='xl'
+                        aspectRatio='4/3'
+                        objectFit='cover'
+                    />
+                    <Button
+                        size='sm'
+                        variant='ghost'
+                        colorScheme='blue'
+                        onClick={() => pictureInputRef.current?.click()}
+                    >
+                        Select picture
+                    </Button>
+                    <Input required type='file' accept='image/*' multiple={false} name="picture"
+                           onChange={handleFormChange(("picture"))}
+                           ref={pictureInputRef}
+                           hidden
+                    />
                 </FormControl>
                 <FormControl>
                     <FormLabel>Album</FormLabel>
