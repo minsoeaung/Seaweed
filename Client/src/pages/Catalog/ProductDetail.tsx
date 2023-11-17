@@ -23,6 +23,7 @@ import {useWishList} from "../../hooks/queries/useWishList.ts";
 import AntdSpin from "../../components/AntdSpin";
 import {AiFillHeart, AiOutlineHeart} from "react-icons/ai";
 import {useToggleWishList} from "../../hooks/mutations/useToggleWishList.ts";
+import {PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
 
 type Params = {
     id: string;
@@ -134,7 +135,7 @@ const ProductDetailPage = () => {
                         </VStack>
                     </Box>
                     <Box width="50%" height="50vh">
-                        <ImageSlider imgHeight="50vh"/>
+                        <ImageSlider imgHeight="50vh" images={[PRODUCT_IMAGES + data.id]}/>
                     </Box>
                 </Flex>
             </Card>

@@ -1,0 +1,1 @@
+export const PRODUCT_IMAGES = import.meta.env.VITE_CLOUD_FRONT + '/product_images/'

@@ -18,6 +18,9 @@ import {useCart} from "../../hooks/queries/useCart.ts";
 import {Link} from "react-router-dom";
 import {Rating} from "../Rating.tsx";
 import {AddToCartButton} from "../AddToCartButton.tsx";
+import {PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
+import placeholderImage from '../../assets/placeholderImage.webp';
+import {useState} from "react";
 
 interface Props {
     product: Product
@@ -27,6 +30,7 @@ interface Props {
 export const ProductCard = (props: Props) => {
     const {product, rootProps} = props
     const {name, price} = product
+    const [imageSrc, setImageSrc] = useState(PRODUCT_IMAGES + product.id);
 
     const {data: wishList} = useWishList();
     const {data: cart} = useCart();
@@ -37,10 +41,13 @@ export const ProductCard = (props: Props) => {
                 <Box position="relative">
                     <AspectRatio ratio={4 / 3}>
                         <Image
-                            src='https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=680&q=80'
+                            src={imageSrc}
                             alt={name}
                             draggable="false"
                             fallback={<Skeleton borderRadius={{base: 'md', md: 'xl'}}/>}
+                            onError={() => {
+                                setImageSrc(placeholderImage)
+                            }}
                             borderRadius={{base: 'md', md: 'xl'}}
                         />
                     </AspectRatio>

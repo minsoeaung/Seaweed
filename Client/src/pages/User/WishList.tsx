@@ -32,6 +32,8 @@ import {useToggleWishList} from "../../hooks/mutations/useToggleWishList.ts";
 import {useCart} from "../../hooks/queries/useCart.ts";
 import {Fallback} from "../../components/Fallback";
 import {AddToCartButton} from "../../components/AddToCartButton.tsx";
+import {PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
+import placeholderImage from '../../assets/placeholderImage.webp';
 
 const WishListPage = () => {
     const {isLoading, data, isError, isFetching} = useWishList();
@@ -86,9 +88,10 @@ const WishListPage = () => {
                                                     width='70px'
                                                     height='70px'
                                                     objectFit='cover'
-                                                    src='https://bit.ly/dan-abramov'
+                                                    src={PRODUCT_IMAGES + w.product.id}
                                                     alt='Dan Abramov'
                                                     borderRadius={{base: 'md', md: 'xl'}}
+                                                    fallbackSrc={placeholderImage}
                                                 />
                                                 <VStack alignItems="start">
                                                     <b>{w.product.name}</b>

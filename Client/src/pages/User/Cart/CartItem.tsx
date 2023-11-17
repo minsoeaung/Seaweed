@@ -18,6 +18,7 @@ import {CartItem as CartItemType} from "../../../types/cartResponse.ts";
 import {useRef} from "react";
 import {useAddToCart} from "../../../hooks/mutations/useAddToCart.ts";
 import {DeleteIcon} from "@chakra-ui/icons";
+import {PRODUCT_IMAGES} from "../../../constants/fileUrls.ts";
 
 const QuantitySelect = (props: SelectProps) => {
     return (
@@ -58,7 +59,7 @@ export const CartItem = ({cartItem}: { cartItem: CartItemType }) => {
             <CartProductMeta
                 name={product.name}
                 description={product.brand.name}
-                image={'https://images.unsplash.com/photo-1591561954557-26941169b49e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=774&q=80'}
+                image={PRODUCT_IMAGES + product.id}
                 isGiftWrapping={false}
             />
 

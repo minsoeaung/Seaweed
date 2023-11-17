@@ -1,9 +1,11 @@
+using System.Net;
 using API.Data;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
 using API.Entities;
 using API.Extensions;
 using API.RequestHelpers;
+using API.Services;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +19,13 @@ public class ProductsController : ControllerBase
 {
     private readonly StoreContext _storeContext;
     private readonly IMapper _mapper;
+    private readonly IImageService _imageService;
 
-    public ProductsController(StoreContext storeContext, IMapper mapper)
+    public ProductsController(StoreContext storeContext, IMapper mapper, IImageService imageService)
     {
         _storeContext = storeContext;
         _mapper = mapper;
+        _imageService = imageService;
     }
 
     [HttpGet]
@@ -68,8 +72,16 @@ public class ProductsController : ControllerBase
         if (product == null) return NotFound();
 
         _storeContext.Products.Remove(product);
-        await _storeContext.SaveChangesAsync();
-        return NoContent();
+
+        var fileDeleteResponse = await _imageService.DeleteProductImageAsync(product.Id);
+        if (fileDeleteResponse.HttpStatusCode == HttpStatusCode.NoContent)
+        {
+            var updates = await _storeContext.SaveChangesAsync();
+            if (updates > 0)
+                return NoContent();
+        }
+
+        return BadRequest();
     }
 
     [Authorize(Roles = "Super,Admin")]
@@ -79,10 +91,14 @@ public class ProductsController : ControllerBase
         var product = _mapper.Map<Product>(productDto);
         await _storeContext.Products.AddAsync(product);
         var result = await _storeContext.SaveChangesAsync();
-        if (result > 0)
-            return CreatedAtAction(nameof(GetProduct), new { product.Id }, product);
 
-        return BadRequest(new ProblemDetails { Title = "Problem creating new product" });
+        if (result <= 0)
+            return BadRequest(new ProblemDetails { Title = "Problem creating new product" });
+
+        if (productDto.Picture != null)
+            await _imageService.UploadProductImageAsync(product.Id, productDto.Picture);
+
+        return CreatedAtAction(nameof(GetProduct), new { product.Id }, product);
     }
 
     [Authorize(Roles = "Super,Admin")]
@@ -98,7 +114,12 @@ public class ProductsController : ControllerBase
 
         var updates = await _storeContext.SaveChangesAsync();
         if (updates > 0)
+        {
+            if (productDto.Picture != null)
+                await _imageService.UploadProductImageAsync(id, productDto.Picture);
+
             return newProduct;
+        }
 
         return BadRequest();
     }

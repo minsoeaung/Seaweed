@@ -1,4 +1,5 @@
 using System.Text;
+using Amazon.S3;
 using API.Configurations;
 using API.Data;
 using API.Entities;
@@ -47,9 +48,14 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<StoreContext>(opt => opt.UseNpgsql(builder.Configuration["Psql:connectionString"]));
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<AwsConfig>(builder.Configuration.GetSection("AWS"));
 
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonS3>();
+    
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 builder.Services.AddIdentityCore<User>(options =>
     {

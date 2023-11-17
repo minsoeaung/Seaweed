@@ -24,6 +24,33 @@ type UpdateType = {
     pushOnSuccess?: string;
 }
 
+const prepareFormData = (product: Partial<CreateProductDto>): FormData => {
+    const keys = Object.keys(product) as Array<keyof typeof product>;
+
+    const formData = new FormData();
+
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+
+        // Will implement later
+        if (key === "album")
+            continue;
+
+        if (product[key]) {
+            if (key === "picture") {
+                const files = product[key];
+                if (files?.length) {
+                    formData.set(key, files[0]);
+                }
+            } else {
+                formData.set(key, String(product[key]));
+            }
+        }
+    }
+
+    return formData;
+}
+
 export const useProductCUD = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -31,39 +58,11 @@ export const useProductCUD = () => {
     return useMutation(
         async (data: CreateType | UpdateType | DeleteType) => {
             const type = data.type;
-
-            const formData = new FormData();
-
+            
             if (type === "CREATE") {
-                const keys = Object.keys(data.product) as Array<keyof typeof data.product>;
-
-                for (let i = 0; i < keys.length; i++) {
-                    const key = keys[i];
-
-                    if (key === "album" || key === "picture")
-                        continue;
-
-                    if (data.product[key]) {
-                        formData.set(key, String(data.product[key]));
-                    }
-                }
-
-                return await ApiClient.post<never, Omit<Product, "category" | "brand">>(`api/Products`, formData);
+                return await ApiClient.post<never, Omit<Product, "category" | "brand">>(`api/Products`, prepareFormData(data.product));
             } else if (type === "UPDATE") {
-                const keys = Object.keys(data.product) as Array<keyof typeof data.product>;
-
-                for (let i = 0; i < keys.length; i++) {
-                    const key = keys[i];
-
-                    if (key === "album" || key === "picture")
-                        continue;
-
-                    if (data.product[key]) {
-                        formData.set(key, String(data.product[key]));
-                    }
-                }
-
-                return await ApiClient.put<never, Omit<Product, "category" | "brand">>(`api/Products/${data.id}`, formData)
+                return await ApiClient.put<never, Omit<Product, "category" | "brand">>(`api/Products/${data.id}`, prepareFormData(data.product))
             } else if (type === "DELETE") {
                 return await ApiClient.delete<never, undefined>(`api/Products/${data.id}`)
             }

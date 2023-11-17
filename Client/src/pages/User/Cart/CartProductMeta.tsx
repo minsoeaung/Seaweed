@@ -1,5 +1,6 @@
 import {Box, HStack, Icon, Image, Link, Stack, Text, useColorModeValue as mode,} from '@chakra-ui/react'
 import {FiGift} from 'react-icons/fi'
+import placeholderImage from '../../../assets/placeholderImage.webp';
 
 export type CartProductMetaProps = {
     isGiftWrapping?: boolean
@@ -19,8 +20,8 @@ export const CartProductMeta = (props: CartProductMetaProps) => {
                 fit="cover"
                 src={image}
                 alt={name}
+                fallbackSrc={placeholderImage}
                 draggable="false"
-                loading="lazy"
             />
             <Box pt="4">
                 <Stack spacing="0.5">
