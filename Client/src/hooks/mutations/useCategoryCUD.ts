@@ -6,8 +6,11 @@ import {useNavigate} from "react-router-dom";
 
 type CreateType = {
     type: "CREATE",
-    name: string;
     pushOnSuccess?: string;
+    category: {
+        name: string;
+        files: FileList;
+    }
 }
 
 type DeleteType = {
@@ -19,8 +22,11 @@ type DeleteType = {
 type UpdateType = {
     type: "UPDATE",
     id: number;
-    name: string;
     pushOnSuccess?: string;
+    category: {
+        name: string;
+        files: FileList | null;
+    }
 }
 
 export const useCategoryCUD = () => {
@@ -30,11 +36,17 @@ export const useCategoryCUD = () => {
     return useMutation(
         async (data: CreateType | UpdateType | DeleteType) => {
             const type = data.type;
-            
+            const formData = new FormData();
+
             if (type === "CREATE") {
-                return await ApiClient.post<never, NamedApiResource>(`api/categories?name=${data.name}`);
+                formData.set("name", data.category.name);
+                formData.set("picture", data.category.files[0]);
+                return await ApiClient.post<never, NamedApiResource>(`api/categories`, formData);
             } else if (type === "UPDATE") {
-                return await ApiClient.put<never, NamedApiResource>(`api/categories/${data.id}?name=${data.name}`)
+                formData.set("name", data.category.name);
+                if (data.category.files?.length)
+                    formData.set("picture", data.category.files[0]);
+                return await ApiClient.put<never, NamedApiResource>(`api/categories/${data.id}`, formData)
             } else if (type === "DELETE") {
                 return await ApiClient.delete<never, never>(`api/categories/${data.id}`)
             }

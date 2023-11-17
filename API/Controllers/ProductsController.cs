@@ -72,16 +72,10 @@ public class ProductsController : ControllerBase
         if (product == null) return NotFound();
 
         _storeContext.Products.Remove(product);
-
-        var fileDeleteResponse = await _imageService.DeleteProductImageAsync(product.Id);
-        if (fileDeleteResponse.HttpStatusCode == HttpStatusCode.NoContent)
-        {
-            var updates = await _storeContext.SaveChangesAsync();
-            if (updates > 0)
-                return NoContent();
-        }
-
-        return BadRequest();
+        await _storeContext.SaveChangesAsync();
+        await _imageService.DeleteImageAsync(product.Id, ImageFolders.ProductImages);
+        
+        return NoContent();
     }
 
     [Authorize(Roles = "Super,Admin")]
@@ -96,7 +90,7 @@ public class ProductsController : ControllerBase
             return BadRequest(new ProblemDetails { Title = "Problem creating new product" });
 
         if (productDto.Picture != null)
-            await _imageService.UploadProductImageAsync(product.Id, productDto.Picture);
+            await _imageService.UploadImageAsync(product.Id, productDto.Picture, ImageFolders.ProductImages);
 
         return CreatedAtAction(nameof(GetProduct), new { product.Id }, product);
     }
@@ -116,7 +110,7 @@ public class ProductsController : ControllerBase
         if (updates > 0)
         {
             if (productDto.Picture != null)
-                await _imageService.UploadProductImageAsync(id, productDto.Picture);
+                await _imageService.UploadImageAsync(id, productDto.Picture, ImageFolders.ProductImages);
 
             return newProduct;
         }

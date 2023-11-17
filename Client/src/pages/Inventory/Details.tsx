@@ -19,7 +19,6 @@ import {
     Highlight,
     HStack,
     IconButton,
-    Image,
     Input,
     Select,
     Text,
@@ -41,8 +40,8 @@ import {CreateProductDto} from "../../types/createProductDto.ts";
 import {useCategories} from "../../hooks/queries/useCategories.ts";
 import {useBrands} from "../../hooks/queries/useBrands.ts";
 import {useProductCUD} from "../../hooks/mutations/useProductCUD.ts";
-import {PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
-import placeholderImg from '../../assets/placeholderImage.webp';
+import {ImageInputWithPreview} from "../../components/ImageInputWithPreview.tsx";
+import {CATEGORY_IMAGES, PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
 
 const validType = ["category", "brand", "product"] as const;
 
@@ -97,15 +96,11 @@ const PRODUCT_INITIAL_STATE = {
     categoryId: 0,
 };
 
-
 const ProductEdit = ({id}: { id: number }) => {
-    // TODO: fix un consistent data type id 
     const {data, isLoading, isError} = useProductDetails(String(id));
     const [values, setValues] = useState<CreateProductDto>(PRODUCT_INITIAL_STATE);
-    const [picturePreview, setPicturePreview] = useState<string | null>(null);
     const {isOpen, onOpen, onClose} = useDisclosure();
     const cancelRef = useRef(null);
-    const pictureInputRef = useRef<HTMLInputElement>(null);
 
     const {data: categories} = useCategories();
     const {data: brands} = useBrands();
@@ -127,32 +122,30 @@ const ProductEdit = ({id}: { id: number }) => {
                 categoryId: data.categoryId
             });
         }
-
-        return () => {
-            picturePreview && URL.revokeObjectURL(picturePreview)
-        }
     }, [data])
 
     if (isLoading) return <Center><AntdSpin/></Center>
     if (isError || (!data && id !== 0)) return <p>Error loading product.</p>;
 
     const handleFormChange = (name: keyof CreateProductDto) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        if ((name === "picture" || name === "album")) {
-            const files = (e.target as HTMLInputElement).files;
-
+        if (name === "album") {
             setValues(prevState => ({
                 ...prevState,
-                [name]: files
+                [name]: (e.target as HTMLInputElement).files
             }))
-            if (name === "picture" && files?.length) {
-                setPicturePreview(URL.createObjectURL(files[0]))
-            }
         } else {
             setValues(prevState => ({
                 ...prevState,
                 [name]: e.target.value
             }))
         }
+    };
+
+    const handlePictureInputChange = (files: FileList) => {
+        setValues(prevState => ({
+            ...prevState,
+            "picture": files
+        }))
     }
 
     const handleCreateProduct = async () => {
@@ -173,6 +166,14 @@ const ProductEdit = ({id}: { id: number }) => {
         });
     }
 
+    const handleDeleteProduct = async () => {
+        await mutation.mutateAsync({
+            type: "DELETE",
+            id: id,
+            pushOnSuccess: "/inventory?pageSize=10&tab=0",
+        })
+    }
+
     return (
         <>
             <VStack spacing='8px'>
@@ -191,26 +192,9 @@ const ProductEdit = ({id}: { id: number }) => {
                 </FormControl>
                 <FormControl>
                     <FormLabel>Picture</FormLabel>
-                    <Image
-                        src={picturePreview || (data ? (PRODUCT_IMAGES + data.id) : undefined)}
-                        fallbackSrc={placeholderImg}
-                        height='150px'
-                        rounded='xl'
-                        aspectRatio='4/3'
-                        objectFit='cover'
-                    />
-                    <Button
-                        size='sm'
-                        variant='ghost'
-                        colorScheme='blue'
-                        onClick={() => pictureInputRef.current?.click()}
-                    >
-                        Select picture
-                    </Button>
-                    <Input required type='file' accept='image/*' multiple={false} name="picture"
-                           onChange={handleFormChange(("picture"))}
-                           ref={pictureInputRef}
-                           hidden
+                    <ImageInputWithPreview
+                        onInputChange={handlePictureInputChange}
+                        src={id ? PRODUCT_IMAGES + id : undefined}
                     />
                 </FormControl>
                 <FormControl>
@@ -291,18 +275,10 @@ const ProductEdit = ({id}: { id: number }) => {
                 <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                            Delete category
+                            Delete product
                         </AlertDialogHeader>
                         <AlertDialogBody>
-                            <Highlight query='All the related products will be deleted too'
-                                       styles={{
-                                           px: '1',
-                                           py: '1',
-                                           bg: "red.700",
-                                           color: "white",
-                                       }}>
-                                Are you sure? All the related products will be deleted too.
-                            </Highlight>
+                            Are you sure to delete the product?
                         </AlertDialogBody>
                         <AlertDialogFooter>
                             <Button ref={cancelRef} onClick={onClose}>
@@ -310,9 +286,9 @@ const ProductEdit = ({id}: { id: number }) => {
                             </Button>
                             <Button
                                 colorScheme='red'
-                                // onClick={handleDeleteCategory} 
+                                onClick={handleDeleteProduct}
                                 ml={3}
-                                // isLoading={mutation.isLoading}
+                                isLoading={mutation.isLoading}
                             >
                                 Delete
                             </Button>
@@ -325,7 +301,8 @@ const ProductEdit = ({id}: { id: number }) => {
 }
 
 const CategoryEdit = ({id}: { id: number }) => {
-    const [value, setValue] = useState('')
+    const [value, setValue] = useState('');
+    const [files, setFiles] = useState<FileList | null>(null);
 
     const {data, isLoading} = useCategory(id);
 
@@ -350,7 +327,6 @@ const CategoryEdit = ({id}: { id: number }) => {
             type: "DELETE",
             id: id,
             pushOnSuccess: "/inventory?pageSize=10&tab=2",
-
         });
     }
 
@@ -358,18 +334,30 @@ const CategoryEdit = ({id}: { id: number }) => {
         await mutation.mutateAsync({
             type: "UPDATE",
             id: id,
-            name: value
+            category: {
+                name: value,
+                files: files
+            }
         });
     }
 
     const handleCreateCategory = async () => {
+        if (!files) return;
+
         const result = await mutation.mutateAsync({
             type: "CREATE",
-            name: value
+            category: {
+                name: value,
+                files: files
+            }
         })
         if (result) {
             navigate(`/inventory/${result.id}?type=category`, {replace: true})
         }
+    }
+
+    const handleImageInputChange = (files: FileList) => {
+        setFiles(files);
     }
 
     if (isLoading) {
@@ -388,13 +376,20 @@ const CategoryEdit = ({id}: { id: number }) => {
             />
             <br/>
             <br/>
+            <Text mb='8px'>Category Image</Text>
+            <ImageInputWithPreview
+                onInputChange={handleImageInputChange}
+                src={id === 0 ? undefined : CATEGORY_IMAGES + id}
+            />
+            <br/>
+            <br/>
             <Flex justify='space-between'>
                 {id === 0 ? (
                     <Button
                         leftIcon={<BiSave/>}
                         variant='solid'
                         colorScheme='blue'
-                        isDisabled={value.trim().length === 0}
+                        isDisabled={value.trim().length === 0 || !files}
                         onClick={handleCreateCategory}
                         isLoading={mutation.isLoading}
                     >
@@ -406,7 +401,7 @@ const CategoryEdit = ({id}: { id: number }) => {
                             leftIcon={<BiSave/>}
                             variant='solid'
                             colorScheme='blue'
-                            isDisabled={data.name === value || value.trim().length === 0}
+                            isDisabled={(data.name === value || value.trim().length === 0) ? (!files) : false}
                             onClick={handleUpdateCategory}
                             isLoading={mutation.isLoading}
                         >

@@ -4,7 +4,7 @@ namespace API.Services;
 
 public interface IImageService
 {
-    Task<PutObjectResponse> UploadProductImageAsync(int id, IFormFile file);
+    Task<PutObjectResponse> UploadImageAsync(int id, IFormFile file, string folder);
 
-    Task<DeleteObjectResponse> DeleteProductImageAsync(int id);
+    Task<DeleteObjectResponse> DeleteImageAsync(int id, string folder);
 }

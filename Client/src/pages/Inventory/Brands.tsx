@@ -37,22 +37,21 @@ const Brand = ({brand}: { brand: NamedApiResource }) => {
     return (
         <Box
             maxW={{base: '100%', sm: '250px'}}
-            w={'full'}
-            bg={useColorModeValue('white', 'gray.800')}
             overflow={'hidden'}
+            bg={useColorModeValue('white', 'gray.800')}
             rounded='xl'
         >
-            <Box bg={'gray.100'} mt={-6} mx={-6} mb={2} pos={'relative'} overflow='hidden'>
-                <Image
-                    src={
-                        'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-                    }
-                    w='full'
-                    aspectRatio='16/11'
-                    alt="Example"
-                    overflow='hidden'
-                />
-            </Box>
+            <Image
+                src={
+                    'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+                }
+                height='200px'
+                aspectRatio='4/3'
+                objectFit='cover'
+                alt="Example"
+                overflow='hidden'
+                mb={4}
+            />
             <Center pl={2} pr={2}>
                 <Heading
                     color={useColorModeValue('gray.700', 'white')}
