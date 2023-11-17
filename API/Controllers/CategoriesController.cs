@@ -38,7 +38,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<Category>> DeleteCategory(int id)
+    public async Task<ActionResult> DeleteCategory(int id)
     {
         var category = await _storeContext.Categories.FindAsync(id);
         if (category == null) return NotFound();

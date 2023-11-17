@@ -1,6 +1,7 @@
-using System.ComponentModel.DataAnnotations;
 using API.Data;
+using API.DTOs.Requests;
 using API.Entities;
+using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,12 @@ namespace API.Controllers;
 public class BrandsController : ControllerBase
 {
     private readonly StoreContext _storeContext;
+    private readonly IImageService _imageService;
 
-    public BrandsController(StoreContext storeContext)
+    public BrandsController(StoreContext storeContext, IImageService imageService)
     {
         _storeContext = storeContext;
+        _imageService = imageService;
     }
 
     [AllowAnonymous]
@@ -35,39 +38,47 @@ public class BrandsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<Brand>> DeleteBrand(int id)
+    public async Task<ActionResult> DeleteBrand(int id)
     {
         var brand = await _storeContext.Brands.FindAsync(id);
         if (brand == null) return NotFound();
 
         _storeContext.Brands.Remove(brand);
+
         await _storeContext.SaveChangesAsync();
+        await _imageService.DeleteImageAsync(id, ImageFolders.BrandImages);
+
         return NoContent();
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<Brand>> UpdateBrand(int id, [Required] string name)
+    public async Task<ActionResult<Brand>> UpdateBrand(int id, [FromForm] UpdateBrandDto dto)
     {
         var brand = await _storeContext.Brands.FindAsync(id);
         if (brand == null) return NotFound();
 
-        brand.Name = name;
+        brand.Name = dto.Name;
         _storeContext.Brands.Update(brand);
         await _storeContext.SaveChangesAsync();
+
+        if (dto.Picture != null)
+            await _imageService.UploadImageAsync(id, dto.Picture, ImageFolders.BrandImages);
+
         return NoContent();
     }
 
     [HttpPost]
-    public async Task<ActionResult<Brand>> CreateBrand([Required] string name)
+    public async Task<ActionResult<Brand>> CreateBrand([FromForm] CreateBrandDto dto)
     {
-        var existing = await _storeContext.Brands.FirstOrDefaultAsync(c => c.Name == name);
+        var existing = await _storeContext.Brands.FirstOrDefaultAsync(c => c.Name == dto.Name);
         if (existing != null)
             return BadRequest();
 
-        var brand = new Brand { Name = name };
+        var brand = new Brand { Name = dto.Name };
 
         await _storeContext.Brands.AddAsync(brand);
         await _storeContext.SaveChangesAsync();
+        await _imageService.UploadImageAsync(brand.Id, dto.Picture, ImageFolders.BrandImages);
 
         return brand;
     }

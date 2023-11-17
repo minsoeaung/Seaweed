@@ -6,6 +6,8 @@ import {Link, useSearchParams} from "react-router-dom";
 import {IoIosImages} from "react-icons/io";
 import {EditIcon} from "@chakra-ui/icons";
 import {useBrands} from "../../hooks/queries/useBrands.ts";
+import placeholderImage from '../../assets/placeholderImage.webp';
+import {BRAND_IMAGES} from "../../constants/fileUrls.ts";
 
 // TODO: try not to duplicate 
 const Brands = () => {
@@ -42,9 +44,8 @@ const Brand = ({brand}: { brand: NamedApiResource }) => {
             rounded='xl'
         >
             <Image
-                src={
-                    'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-                }
+                src={BRAND_IMAGES + brand.id}
+                fallbackSrc={placeholderImage}
                 height='200px'
                 aspectRatio='4/3'
                 objectFit='cover'

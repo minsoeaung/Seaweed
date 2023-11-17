@@ -41,7 +41,7 @@ import {useCategories} from "../../hooks/queries/useCategories.ts";
 import {useBrands} from "../../hooks/queries/useBrands.ts";
 import {useProductCUD} from "../../hooks/mutations/useProductCUD.ts";
 import {ImageInputWithPreview} from "../../components/ImageInputWithPreview.tsx";
-import {CATEGORY_IMAGES, PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
+import {BRAND_IMAGES, CATEGORY_IMAGES, PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
 
 const validType = ["category", "brand", "product"] as const;
 
@@ -457,7 +457,8 @@ const CategoryEdit = ({id}: { id: number }) => {
 }
 
 const BrandEdit = ({id}: { id: number }) => {
-    const [value, setValue] = useState('')
+    const [value, setValue] = useState('');
+    const [files, setFiles] = useState<FileList | null>(null);
 
     const {data, isLoading} = useBrand(id);
 
@@ -475,6 +476,10 @@ const BrandEdit = ({id}: { id: number }) => {
         }
     }, [data])
 
+    const handleImageInputChange = (files: FileList) => {
+        setFiles(files);
+    }
+
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => setValue(event.target.value)
 
     const handleDeleteBrand = async () => {
@@ -489,14 +494,22 @@ const BrandEdit = ({id}: { id: number }) => {
         await mutation.mutateAsync({
             type: "UPDATE",
             id: id,
-            name: value
+            brand: {
+                name: value,
+                files
+            }
         });
     }
 
     const handleCreateBrand = async () => {
+        if (!files) return;
+
         const result = await mutation.mutateAsync({
             type: "CREATE",
-            name: value
+            brand: {
+                name: value,
+                files
+            }
         })
         if (result) {
             navigate(`/inventory/${result.id}?type=brand`, {replace: true})
@@ -519,13 +532,20 @@ const BrandEdit = ({id}: { id: number }) => {
             />
             <br/>
             <br/>
+            <Text mb='8px'>Brand Image</Text>
+            <ImageInputWithPreview
+                onInputChange={handleImageInputChange}
+                src={id === 0 ? undefined : BRAND_IMAGES + id}
+            />
+            <br/>
+            <br/>
             <Flex justify='space-between'>
                 {id === 0 ? (
                     <Button
                         leftIcon={<BiSave/>}
                         variant='solid'
                         colorScheme='blue'
-                        isDisabled={value.trim().length === 0}
+                        isDisabled={value.trim().length === 0 || !files}
                         onClick={handleCreateBrand}
                         isLoading={mutation.isLoading}
                     >
@@ -537,7 +557,7 @@ const BrandEdit = ({id}: { id: number }) => {
                             leftIcon={<BiSave/>}
                             variant='solid'
                             colorScheme='blue'
-                            isDisabled={data.name === value || value.trim().length === 0}
+                            isDisabled={(data.name === value || value.trim().length === 0) ? (!files) : false}
                             onClick={handleUpdateBrand}
                             isLoading={mutation.isLoading}
                         >
