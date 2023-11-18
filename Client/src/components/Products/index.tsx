@@ -72,21 +72,23 @@ export const Products = () => {
                         onPageChange={handlePageChange}
                     />
                     <br/>
-                    <Center>
-                        <IconButton
-                            isRound
-                            variant='outline'
-                            colorScheme="blue"
-                            aria-label='Back to top'
-                            icon={<ArrowUpIcon/>}
-                            onClick={() => {
-                                window.scrollTo({
-                                    top: 0,
-                                    behavior: "smooth"
-                                })
-                            }}
-                        />
-                    </Center>
+                    {data.results.length > 10 && (
+                        <Center>
+                            <IconButton
+                                isRound
+                                variant='outline'
+                                colorScheme="blue"
+                                aria-label='Back to top'
+                                icon={<ArrowUpIcon/>}
+                                onClick={() => {
+                                    window.scrollTo({
+                                        top: 0,
+                                        behavior: "smooth"
+                                    })
+                                }}
+                            />
+                        </Center>
+                    )}
                 </>
             )}
         </Box>

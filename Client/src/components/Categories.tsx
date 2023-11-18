@@ -1,7 +1,8 @@
-import useCategories from "../hooks/useCategories.ts";
 import {List, ListItem} from "@chakra-ui/react";
 import AntdSpin from "./AntdSpin";
 import {Link} from "react-router-dom";
+import { useCategories } from "../hooks/queries/useCategories";
+import {NamedApiResource} from "../types/namedApiResource.ts";
 
 const Categories = () => {
     const {data, isLoading} = useCategories();
@@ -12,7 +13,7 @@ const Categories = () => {
 
     return (
         <List spacing={2}>
-            {data?.categories.map(cat => (
+            {data?.map((cat: NamedApiResource) => (
                 <ListItem key={cat.id}>
                     <Link to={`catalog?categories=${cat.name}`}>
                         {cat.name}

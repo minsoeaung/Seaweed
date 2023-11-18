@@ -1,6 +1,11 @@
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {
     AbsoluteCenter,
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogOverlay,
     Box,
     Button,
     Card,
@@ -10,6 +15,7 @@ import {
     HStack,
     Icon,
     Text,
+    useDisclosure,
     VStack
 } from "@chakra-ui/react";
 import {useProductDetails} from "../../hooks/queries/useProductDetails.ts";
@@ -24,6 +30,8 @@ import AntdSpin from "../../components/AntdSpin";
 import {AiFillHeart, AiOutlineHeart} from "react-icons/ai";
 import {useToggleWishList} from "../../hooks/mutations/useToggleWishList.ts";
 import {PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
+import {useRef} from "react";
+import {useAuth} from "../../context/AuthContext.tsx";
 
 type Params = {
     id: string;
@@ -31,14 +39,14 @@ type Params = {
 
 const ProductDetailPage = () => {
     const {id} = useParams<Params>();
-
-    // const [quantity, setQuantity] = useState();
-
     const {data, isLoading, isError} = useProductDetails(id);
-
+    const cancelRef = useRef(null);
+    const {isOpen, onOpen, onClose} = useDisclosure();
     const {data: cart} = useCart();
     const {data: wishList} = useWishList();
     const favoriteMutation = useToggleWishList();
+    const navigate = useNavigate();
+    const {user} = useAuth();
 
 
     if (isLoading) {
@@ -69,6 +77,7 @@ const ProductDetailPage = () => {
 
     const isInCart = cart ? cart.cartItems.findIndex(c => c.product.id === data.id) >= 0 : false;
     const isFavorite = wishList ? wishList.findIndex(w => w.productId === data.id) >= 0 : false;
+    const goToLoginPage = () => navigate("/login");
 
     return (
         <Container maxWidth="7xl">
@@ -91,25 +100,10 @@ const ProductDetailPage = () => {
                             <PriceTag currency="USD" price={data.price} priceProps={{fontSize: "3xl"}}/>
                             <Text fontSize='lg' mt={2}>{data.description}</Text>
                             <br/>
-                            {/*<ButtonGroup variant='outline' spacing='6' border="1px" p={2} rounded="lg"*/}
-                            {/*             borderColor={useColorModeValue("gray.200", "rgba(255, 255, 255, 0.16)")}>*/}
-                            {/*    <IconButton*/}
-                            {/*        variant="solid"*/}
-                            {/*        aria-label='Reduce product quantity by 1'*/}
-                            {/*        icon={<MinusIcon/>}*/}
-                            {/*    />*/}
-                            {/*    <Button variant="unstyled">1</Button>*/}
-                            {/*    <IconButton*/}
-                            {/*        variant="solid"*/}
-                            {/*        aria-label='Increase product quantity by 1'*/}
-                            {/*        icon={<AddIcon/>}*/}
-                            {/*    />*/}
-                            {/*</ButtonGroup>*/}
                             <HStack w="full">
                                 <AddToCartButton
                                     buttonProps={{
                                         width: {base: "full", md: "50%", lg: "50%"},
-                                        variant: isInCart ? "outline" : "solid"
                                     }}
                                     productId={data.id}
                                     isInCart={isInCart}
@@ -119,13 +113,18 @@ const ProductDetailPage = () => {
                                                     transition="all 0.15s ease" color={isFavorite ? "red" : ""}/>}
                                     colorScheme='blue'
                                     width="50%"
-                                    variant={isFavorite ? 'outline' : 'solid'}
+                                    variant={'outline'}
                                     onClick={async (e) => {
                                         e.preventDefault();
-                                        await favoriteMutation.mutateAsync({
-                                            type: isFavorite ? "REMOVE" : "ADD",
-                                            productId: data.id
-                                        })
+
+                                        if (user) {
+                                            await favoriteMutation.mutateAsync({
+                                                type: isFavorite ? "REMOVE" : "ADD",
+                                                productId: data.id
+                                            })
+                                        } else {
+                                            onOpen();
+                                        }
                                     }}
                                     isLoading={favoriteMutation.isLoading}
                                 >
@@ -139,6 +138,28 @@ const ProductDetailPage = () => {
                     </Box>
                 </Flex>
             </Card>
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+                isCentered
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                            Please login first
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme='blue' variant='solid' onClick={goToLoginPage} ml={3}>
+                                Login
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </Container>
     )
 }

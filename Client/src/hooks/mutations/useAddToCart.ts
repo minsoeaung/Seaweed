@@ -16,7 +16,7 @@ export const useAddToCart = () => {
         {
             onSuccess: async () => {
                 await queryClient.invalidateQueries(CART);
-            }
+            },
         }
     )
 }

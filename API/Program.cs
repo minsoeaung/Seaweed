@@ -52,7 +52,7 @@ builder.Services.Configure<AwsConfig>(builder.Configuration.GetSection("AWS"));
 
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddAWSService<IAmazonS3>();
-    
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IImageService, ImageService>();
