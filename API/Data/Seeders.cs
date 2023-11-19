@@ -24,29 +24,28 @@ public static class Seeders
         {
             var superUser = new User
             {
-                Id = 1,
-                UserName = "minsoeaung",
-                Email = "minsoeaung2001@gmail.com",
+                UserName = "super",
+                Email = "super@gmail.com",
                 EmailConfirmed = true,
-                NormalizedEmail = "MINSOEAUNG2001@GMAIL.COM",
-                NormalizedUserName = "MINSOEAUNG",
+                NormalizedEmail = "SUPER@GMAIL.COM",
+                NormalizedUserName = "SUPER",
             };
-            await userManager.CreateAsync(superUser);
+            await userManager.CreateAsync(superUser, "super_account");
             await userManager.AddToRoleAsync(superUser, "Super");
         }
 
         if (!context.Products.Any())
         {
-            const int productNumToSeed = 100;
-            const int brandNumToSeed = 20;
-            const int categoryNumToSeed = 30;
+            const int productNumToSeed = 75;
+            const int brandNumToSeed = 12;
+            const int categoryNumToSeed = 15;
 
             var brandIds = 1;
             var brandFaker = new Faker<Brand>()
                 .StrictMode(true)
                 .UseSeed(1111)
                 .RuleFor(d => d.Id, f => brandIds++)
-                .RuleFor(d => d.Name, f => f.Company.CompanyName());
+                .RuleFor(d => d.Name, f => f.Company.CompanyName() + brandIds);
             Brands = brandFaker.Generate(brandNumToSeed);
 
             var categoryIds = 1;
@@ -54,7 +53,7 @@ public static class Seeders
                 .StrictMode(true)
                 .UseSeed(5555)
                 .RuleFor(d => d.Id, f => categoryIds++)
-                .RuleFor(d => d.Name, f => f.Commerce.Product());
+                .RuleFor(d => d.Name, f => f.Commerce.Product() + categoryIds);
             Categories = categoryFaker.Generate(categoryNumToSeed);
 
             var productIds = 1;

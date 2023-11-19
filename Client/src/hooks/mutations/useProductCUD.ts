@@ -4,6 +4,7 @@ import {PRODUCT_DETAILS, PRODUCTS} from "../../constants/queryKeys.ts";
 import {useNavigate} from "react-router-dom";
 import {CreateProductDto} from "../../types/createProductDto.ts";
 import {Product} from "../../types/product.ts";
+import {useToast} from "@chakra-ui/react";
 
 type CreateType = {
     type: "CREATE",
@@ -54,11 +55,12 @@ const prepareFormData = (product: Partial<CreateProductDto>): FormData => {
 export const useProductCUD = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
+    const toast = useToast()
 
     return useMutation(
         async (data: CreateType | UpdateType | DeleteType) => {
             const type = data.type;
-            
+
             if (type === "CREATE") {
                 return await ApiClient.post<never, Omit<Product, "category" | "brand">>(`api/Products`, prepareFormData(data.product));
             } else if (type === "UPDATE") {
@@ -69,6 +71,12 @@ export const useProductCUD = () => {
         },
         {
             onSuccess: async (_, data) => {
+                toast({
+                    title: 'Success',
+                    status: 'success',
+                    isClosable: true,
+                })
+
                 await queryClient.invalidateQueries({refetchInactive: true, queryKey: PRODUCTS});  // This is heavy
 
                 if (!!data.pushOnSuccess)

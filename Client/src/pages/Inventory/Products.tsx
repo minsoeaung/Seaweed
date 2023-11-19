@@ -13,6 +13,7 @@ import {
     Flex,
     HStack,
     IconButton,
+    Image,
     Input,
     Table,
     TableCaption,
@@ -32,8 +33,9 @@ import {ProductSortBy} from "../../components/ProductSortBy.tsx";
 import React, {useRef, useState} from "react";
 import AntdSpin from "../../components/AntdSpin";
 import {DeleteIcon, EditIcon} from "@chakra-ui/icons";
-import {Fallback} from "../../components/Fallback/index.tsx";
+import {Fallback} from "../../components/Fallback";
 import {useProductCUD} from "../../hooks/mutations/useProductCUD.ts";
+import {PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
 
 const Products = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -62,7 +64,7 @@ const Products = () => {
     }
 
     if (isError) {
-        return <p>Problems</p>
+        return <p>Problem loading products.</p>
     }
 
     if (!data) return null;
@@ -105,6 +107,7 @@ const Products = () => {
                         <Tr>
                             <Th>Id</Th>
                             <Th>Name</Th>
+                            <Th>Image</Th>
                             <Th>sku</Th>
                             <Th>Description</Th>
                             <Th>Price</Th>
@@ -112,7 +115,7 @@ const Products = () => {
                             <Th>Brand</Th>
                             <Th>Category</Th>
                             <Th position="sticky" right={0}
-                                bgColor={useColorModeValue("#EDF2F7", "#171923")}>Actions</Th>
+                                bgColor={useColorModeValue("#FFFFFF", "#2D3748")}>Actions</Th>
                         </Tr>
                     </Thead>
                     <Tbody position="relative">
@@ -120,6 +123,15 @@ const Products = () => {
                             <Tr key={product.id}>
                                 <Td>{product.id}</Td>
                                 <Td>{product.name}</Td>
+                                <Td>
+                                    <Image
+                                        src={PRODUCT_IMAGES + product.id}
+                                        height='70px'
+                                        aspectRatio='4/3'
+                                        objectFit='cover'
+                                        alt={product.name}
+                                    />
+                                </Td>
                                 <Td>{product.sku}</Td>
                                 <Td maxW="200px" overflow="hidden" textOverflow="ellipsis"
                                     whiteSpace="nowrap">{product.description}</Td>
@@ -127,7 +139,7 @@ const Products = () => {
                                 <Td isNumeric>{product.quantityInStock}</Td>
                                 <Td>{product.brand.name}</Td>
                                 <Td>{product.category.name}</Td>
-                                <Td position="sticky" right={0} bgColor={useColorModeValue("#EDF2F7", "#171923")}>
+                                <Td position="sticky" right={0} bgColor={useColorModeValue("#FFFFFF", "#2D3748")}>
                                     <HStack>
                                         <IconButton
                                             aria-label="Delete product"

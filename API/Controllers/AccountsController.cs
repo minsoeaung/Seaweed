@@ -71,7 +71,7 @@ public class AccountsController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<AuthResult>> Login(LoginDto userLoginDto)
     {
-        var user = await _userManager.FindByNameAsync(userLoginDto.UserName);
+        var user = await _userManager.FindByNameAsync(userLoginDto.UserName.Trim());
 
         if (user is null)
             return NotFound();

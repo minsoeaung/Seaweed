@@ -3,6 +3,7 @@ import {ApiClient} from "../../api/apiClient.tsx";
 import {CATEGORIES, PRODUCT_FILTERS} from "../../constants/queryKeys.ts";
 import {NamedApiResource} from "../../types/namedApiResource.ts";
 import {useNavigate} from "react-router-dom";
+import {useToast} from "@chakra-ui/react";
 
 type CreateType = {
     type: "CREATE",
@@ -32,6 +33,7 @@ type UpdateType = {
 export const useCategoryCUD = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
+    const toast = useToast();
 
     return useMutation(
         async (data: CreateType | UpdateType | DeleteType) => {
@@ -53,6 +55,12 @@ export const useCategoryCUD = () => {
         },
         {
             onSuccess: async (_, data) => {
+                toast({
+                    title: 'Success',
+                    status: 'success',
+                    isClosable: true,
+                })
+
                 await queryClient.invalidateQueries({refetchInactive: true, queryKey: PRODUCT_FILTERS});
                 await queryClient.invalidateQueries({refetchInactive: true, queryKey: CATEGORIES});
 
