@@ -54,5 +54,4 @@ jobs:
         key: ${{ secrets.LIGTHSAIL_KEY }}
         source: "API/bin/Release/net7.0/publish/"
         target: "/var/www/myaspnetcore/"
-        rm: true
-        port: 22
+        overwrite: true
