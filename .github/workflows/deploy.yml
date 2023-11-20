@@ -37,7 +37,7 @@ jobs:
       with:
         files: 'API/appsettings.json'
       env:
-        Psql.ConnectionString: ${{ secrets.PSQL_CONNECTIONSTRING }}
+        Psql.connectionString: ${{ secrets.PSQL_CONNECTIONSTRING }}
         Jwt.Key: ${{ secrets.JWT_KEY }}
         Jwt.Issuer: ${{ secrets.JWT_ISSUER }}
 
@@ -56,3 +56,13 @@ jobs:
         source: "API/bin/Release/net7.0/publish/"
         target: "/var/www/myaspnetcore/"
         overwrite: true
+
+    - name: Restart server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.LIGTHSAIL_IP }}
+        username: ${{ secrets.LIGTHSAIL_USERNAME }}
+        key: ${{ secrets.LIGTHSAIL_KEY }}
+        script: |
+          sudo systemctl restart myaspnetcore.service
+
