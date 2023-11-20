@@ -45,6 +45,7 @@ jobs:
       run: |
         cd API
         dotnet publish -c Release
+        cd ..
 
     - name: Copy files to Lightsail instance
       uses: appleboy/scp-action@v0.1.4
@@ -52,6 +53,6 @@ jobs:
         host: ${{ secrets.LIGTHSAIL_IP }}
         username: ${{ secrets.LIGTHSAIL_USERNAME }}
         key: ${{ secrets.LIGTHSAIL_KEY }}
-        source: "Seaweed/API/bin/Release/net7.0/publish/"
+        source: "API/bin/Release/net7.0/publish/"
         target: "/var/www/myaspnetcore/"
         overwrite: true
