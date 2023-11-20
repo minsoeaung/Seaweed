@@ -37,9 +37,9 @@ jobs:
       with:
         files: 'API/appsettings.json'
       env:
-        Psql__ConnectionString: ${{ secrets.PSQL_CONNECTIONSTRING }}
-        Jwt__Key: ${{ secrets.JWT_KEY }}
-        Jwt__Issuer: ${{ secrets.JWT_ISSUER }}
+        Psql.ConnectionString: ${{ secrets.PSQL_CONNECTIONSTRING }}
+        Jwt.Key: ${{ secrets.JWT_KEY }}
+        Jwt.Issuer: ${{ secrets.JWT_ISSUER }}
 
     - name: Publish .NET app
       run: |
