@@ -47,7 +47,7 @@ jobs:
         dotnet publish -c Release
 
     - name: Copy files to Lightsail instance
-      uses: appleboy/scp-action@master
+      uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ secrets.LIGTHSAIL_IP }}
         username: ${{ secrets.LIGTHSAIL_USERNAME }}
