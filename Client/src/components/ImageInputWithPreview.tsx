@@ -1,4 +1,4 @@
-import {Button, Image, Input} from "@chakra-ui/react";
+import {Button, Image, Input, Text} from "@chakra-ui/react";
 import placeholderImg from "../assets/placeholderImage.webp";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 
@@ -54,6 +54,11 @@ export const ImageInputWithPreview = ({src, onInputChange}: Props) => {
                 ref={inputRef}
                 hidden
             />
+            {!!preview && (
+                <Text fontSize='xs'>
+                    "Note: Image updates may take up to 5 minutes to reflect in the UI due to caching."
+                </Text>
+            )}
         </>
     )
 }

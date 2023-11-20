@@ -1,4 +1,5 @@
 using System.Text;
+using Amazon.CloudFront;
 using Amazon.S3;
 using API.Configurations;
 using API.Data;
@@ -52,6 +53,7 @@ builder.Services.Configure<AwsConfig>(builder.Configuration.GetSection("AWS"));
 
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddAWSService<IAmazonS3>();
+builder.Services.AddAWSService<IAmazonCloudFront>();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICartService, CartService>();

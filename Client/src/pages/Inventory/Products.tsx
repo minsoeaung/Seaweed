@@ -130,6 +130,7 @@ const Products = () => {
                                         aspectRatio='4/3'
                                         objectFit='cover'
                                         alt={product.name}
+                                        rounded='lg'
                                     />
                                 </Td>
                                 <Td>{product.sku}</Td>
