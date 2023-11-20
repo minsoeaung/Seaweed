@@ -35,7 +35,7 @@ jobs:
     - name: App Settings Variable Substitution for .NET
       uses: microsoft/variable-substitution@v1
       with:
-        files: 'Seaweed/API/appsettings.json'
+        files: '${{env.DOTNET_ROOT}}/Seaweed/API/appsettings.json'
       env:
         Psql__ConnectionString: ${{ secrets.PSQL_CONNECTIONSTRING }}
         Jwt__Key: ${{ secrets.JWT_KEY }}
