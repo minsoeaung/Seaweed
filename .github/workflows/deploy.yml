@@ -47,11 +47,11 @@ jobs:
         dotnet publish -c Release
 
     - name: Copy files to Lightsail instance
-      uses: appleboy/scp-action@master
+      uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ secrets.LIGHTSAIL_IP }}
         username: ${{ secrets.LIGHTSAIL_USERNAME }}
         key: ${{ secrets.LIGTHSAIL_KEY }}
-        port: 22
         source: "API/bin/Release/net7.0/publish/"
         target: "/var/www/myaspnetcore/"
+        rm: true
