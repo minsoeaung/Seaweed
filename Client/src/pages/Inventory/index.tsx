@@ -9,30 +9,30 @@ import {
     TabList,
     TabPanel,
     TabPanels,
-    Tabs
-} from "@chakra-ui/react";
-import {Link, useSearchParams} from "react-router-dom";
-import {lazy} from "react";
+    Tabs,
+} from '@chakra-ui/react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { lazy } from 'react';
 
-const Products = lazy(() => import("./Products"));
-const Categories = lazy(() => import("./Categories"));
-const Brands = lazy(() => import("./Brands"));
+const Products = lazy(() => import('./Products'));
+const Categories = lazy(() => import('./Categories'));
+const Brands = lazy(() => import('./Brands'));
 
 const tabToCategory = {
-    "0": "product",
-    "1": "brand",
-    "2": "category"
+    '0': 'product',
+    '1': 'brand',
+    '2': 'category',
 } as const;
 
 const Admin = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const tab = searchParams.get("tab") as keyof typeof tabToCategory | null;
+    const tab = searchParams.get('tab') as keyof typeof tabToCategory | null;
 
     const handleTabsChange = (index: number) => {
-        searchParams.set("tab", String(index));
+        searchParams.set('tab', String(index));
         setSearchParams(searchParams);
-    }
+    };
 
     return (
         <Container maxW="7xl">
@@ -40,7 +40,7 @@ const Admin = () => {
                 <Card>
                     <CardBody>
                         <TabList>
-                            <Flex justify='space-between' w='full'>
+                            <Flex justify="space-between" w="full">
                                 <HStack>
                                     <Tab>Products</Tab>
                                     <Tab>Brands</Tab>
@@ -48,10 +48,10 @@ const Admin = () => {
                                 </HStack>
                                 <Button
                                     as={Link}
-                                    to={`0?type=${tabToCategory[tab || "0"]}`}
-                                    variant='solid'
-                                    colorScheme='blue'
-                                    size='sm'
+                                    to={`0?type=${tabToCategory[tab || '0']}`}
+                                    variant="solid"
+                                    colorScheme="blue"
+                                    size="sm"
                                 >
                                     Add
                                 </Button>
@@ -60,20 +60,20 @@ const Admin = () => {
 
                         <TabPanels>
                             <TabPanel>
-                                <Products/>
+                                <Products />
                             </TabPanel>
                             <TabPanel>
-                                <Brands/>
+                                <Brands />
                             </TabPanel>
                             <TabPanel>
-                                <Categories/>
+                                <Categories />
                             </TabPanel>
                         </TabPanels>
                     </CardBody>
                 </Card>
             </Tabs>
         </Container>
-    )
-}
+    );
+};
 
 export default Admin;

@@ -1,3 +1,3 @@
-import {RegisterDto} from "./registerDto.ts";
+import { RegisterDto } from './registerDto.ts';
 
-export type LoginDto = Omit<RegisterDto, "email">
+export type LoginDto = Omit<RegisterDto, 'email'>;

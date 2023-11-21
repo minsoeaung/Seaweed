@@ -4,6 +4,6 @@ export type PagedResponse<T> = {
         totalPages: number;
         pageSize: number;
         totalCount: number;
-    },
-    results: T[]
-}
+    };
+    results: T[];
+};

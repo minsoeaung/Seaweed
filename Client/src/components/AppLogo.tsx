@@ -10,5 +10,5 @@ export const AppLogo = (props: any) => {
                 fill="#2F855A"
             />
         </svg>
-    )
-}
+    );
+};

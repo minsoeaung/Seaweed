@@ -1,4 +1,4 @@
-import {useMyAccount} from "../../hooks/queries/useMyAccount.ts";
+import { useMyAccount } from '../../hooks/queries/useMyAccount.ts';
 import {
     Avatar,
     AvatarBadge,
@@ -11,43 +11,40 @@ import {
     Input,
     Tag,
     Text,
-    VStack
-} from "@chakra-ui/react";
-import {CheckIcon, EditIcon} from "@chakra-ui/icons";
-import AntdSpin from "../../components/AntdSpin";
-import {useUpdateProfilePicture} from "../../hooks/mutations/useUpdateProfilePicture.ts";
-import {useRef} from "react";
+    VStack,
+} from '@chakra-ui/react';
+import { CheckIcon, EditIcon } from '@chakra-ui/icons';
+import AntdSpin from '../../components/AntdSpin';
+import { useUpdateProfilePicture } from '../../hooks/mutations/useUpdateProfilePicture.ts';
+import { useRef } from 'react';
 
 const MyAccount = () => {
-    const {data, isLoading, isError} = useMyAccount();
+    const { data, isLoading, isError } = useMyAccount();
     const inputRef = useRef<HTMLInputElement>(null);
     const mutation = useUpdateProfilePicture();
 
     const updateProfilePicture = async (pic: FileList | null) => {
-        !!pic && await mutation.mutateAsync(pic);
-    }
+        !!pic && (await mutation.mutateAsync(pic));
+    };
 
     if (isLoading) {
-        return <AntdSpin/>
+        return <AntdSpin />;
     }
 
     if (isError) {
-        return <p>Error loading account settings</p>
+        return <p>Error loading account settings</p>;
     }
 
     if (!data) return null;
 
     return (
-        <Box
-            maxW={{base: '3xl', lg: '7xl'}}
-            mx="auto"
-        >
+        <Box maxW={{ base: '3xl', lg: '7xl' }} mx="auto">
             <Card variant="outline">
-                <VStack p={{base: 6, lg: 10}} alignItems="start" spacing={{base: 6, lg: 10}}>
-                    <Heading lineHeight={1.1} fontSize={{base: '2xl', sm: '3xl'}}>
+                <VStack p={{ base: 6, lg: 10 }} alignItems="start" spacing={{ base: 6, lg: 10 }}>
+                    <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
                         My Account
                     </Heading>
-                    <HStack spacing={{base: 2, md: 6}}>
+                    <HStack spacing={{ base: 2, md: 6 }}>
                         <Avatar size="2xl" src={data.profilePicture}>
                             <AvatarBadge
                                 as={IconButton}
@@ -57,27 +54,36 @@ const MyAccount = () => {
                                 colorScheme="facebook"
                                 aria-label="Update profile picture"
                                 isLoading={mutation.isLoading}
-                                icon={<EditIcon/>}
+                                icon={<EditIcon />}
                                 onClick={() => {
                                     inputRef.current?.click();
                                 }}
                             />
-                            <Input ref={inputRef} type='file' accept='image/*' multiple name="profile-picture"
-                                   onChange={e => updateProfilePicture(e.target.files)} hidden/>
+                            <Input
+                                ref={inputRef}
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                name="profile-picture"
+                                onChange={(e) => updateProfilePicture(e.target.files)}
+                                hidden
+                            />
                         </Avatar>
                         <VStack alignItems="start">
                             <Input
                                 defaultValue={data.userName}
                                 placeholder="UserName"
-                                _placeholder={{color: 'gray.500'}}
+                                _placeholder={{ color: 'gray.500' }}
                                 type="text"
                                 isDisabled
                             />
-                            {!(data.roles.length === 1 && data.roles.includes("User")) && (
+                            {!(data.roles.length === 1 && data.roles.includes('User')) && (
                                 <HStack>
                                     <Text fontSize="sm">Account type: </Text>
-                                    {data.roles.map(role => (
-                                        <Tag colorScheme="blue" key={role}>{role}</Tag>
+                                    {data.roles.map((role) => (
+                                        <Tag colorScheme="blue" key={role}>
+                                            {role}
+                                        </Tag>
                                     ))}
                                 </HStack>
                             )}
@@ -87,8 +93,13 @@ const MyAccount = () => {
                         <HStack>
                             <Text>Email</Text>
                             {data.emailConfirmed ? (
-                                <Button leftIcon={<CheckIcon/>} size="xs" variant="ghost" colorScheme="green"
-                                        isDisabled>
+                                <Button
+                                    leftIcon={<CheckIcon />}
+                                    size="xs"
+                                    variant="ghost"
+                                    colorScheme="green"
+                                    isDisabled
+                                >
                                     Verified
                                 </Button>
                             ) : (
@@ -99,29 +110,28 @@ const MyAccount = () => {
                         </HStack>
                         <HStack>
                             <Text color={'gray.500'}>{data.email}</Text>
-                            <IconButton
-                                size="xs"
-                                variant="ghost"
-                                aria-label="Change email"
-                                icon={<EditIcon/>}
-                            />
+                            <IconButton size="xs" variant="ghost" aria-label="Change email" icon={<EditIcon />} />
                         </HStack>
                     </VStack>
                     <VStack align="start">
                         <HStack>
                             <Text>Phone</Text>
-                            {!!data.phoneNumber && (
-                                data.phoneNumber ? (
-                                    <Button leftIcon={<CheckIcon/>} size="xs" variant="ghost" colorScheme="green"
-                                            isDisabled>
+                            {!!data.phoneNumber &&
+                                (data.phoneNumber ? (
+                                    <Button
+                                        leftIcon={<CheckIcon />}
+                                        size="xs"
+                                        variant="ghost"
+                                        colorScheme="green"
+                                        isDisabled
+                                    >
                                         Verified
                                     </Button>
                                 ) : (
                                     <Button size="xs" variant="outline" isDisabled>
                                         Verify
                                     </Button>
-                                )
-                            )}
+                                ))}
                         </HStack>
                         <HStack>
                             {data.phoneNumber ? (
@@ -131,10 +141,9 @@ const MyAccount = () => {
                                         size="xs"
                                         variant="ghost"
                                         aria-label="Change email"
-                                        icon={<EditIcon/>}
+                                        icon={<EditIcon />}
                                     />
                                 </>
-
                             ) : (
                                 <Button size="xs" variant="outline" isDisabled>
                                     Add phone
@@ -145,7 +154,7 @@ const MyAccount = () => {
                 </VStack>
             </Card>
         </Box>
-    )
+    );
 };
 
 export default MyAccount;

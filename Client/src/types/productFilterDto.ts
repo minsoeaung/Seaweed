@@ -1,6 +1,6 @@
-import {NamedApiResource} from "./namedApiResource.ts";
+import { NamedApiResource } from './namedApiResource.ts';
 
 export type ProductFilterDto = {
-    brands: NamedApiResource[]
-    categories: NamedApiResource[]
-}
+    brands: NamedApiResource[];
+    categories: NamedApiResource[];
+};

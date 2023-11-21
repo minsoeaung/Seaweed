@@ -1,7 +1,7 @@
-import {Product} from "./product.ts";
+import { Product } from './product.ts';
 
 export type WishListItem = {
     userId: number;
     productId: number;
-    product: Omit<Product, 'category'>
-}
+    product: Omit<Product, 'category'>;
+};

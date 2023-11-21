@@ -1,8 +1,8 @@
-import {ChakraProvider} from "@chakra-ui/react";
-import {QueryClient, QueryClientProvider} from "react-query";
-import {RouterProvider} from "react-router-dom";
-import router from "./pages/router.tsx";
-import {ReactQueryDevtools} from "react-query/devtools";
+import { ChakraProvider } from '@chakra-ui/react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { RouterProvider } from 'react-router-dom';
+import router from './pages/router.tsx';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -12,20 +12,20 @@ const queryClient = new QueryClient({
             retry: 0,
         },
         mutations: {
-            retry: 0
+            retry: 0,
         },
-    }
-})
+    },
+});
 
 const App = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <ChakraProvider>
-                <RouterProvider router={router}/>
-                <ReactQueryDevtools initialIsOpen={false}/>
+                <RouterProvider router={router} />
+                <ReactQueryDevtools initialIsOpen={false} />
             </ChakraProvider>
         </QueryClientProvider>
-    )
-}
+    );
+};
 
 export default App;

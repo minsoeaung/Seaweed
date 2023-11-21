@@ -1,7 +1,7 @@
 export type AuthResponse = {
     accessToken: string;
-    accountDetails: User
-}
+    accountDetails: User;
+};
 
 export type User = {
     id: number;
@@ -12,4 +12,4 @@ export type User = {
     phoneNumberConfirmed: boolean;
     profilePicture: string;
     roles: string[];
-}
+};

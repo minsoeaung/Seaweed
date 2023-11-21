@@ -1,9 +1,7 @@
-import {Products} from "../../components/Products";
+import { Products } from '../../components/Products';
 
 const CatalogPage = () => {
-    return (
-        <Products/>
-    )
-}
+    return <Products />;
+};
 
 export default CatalogPage;

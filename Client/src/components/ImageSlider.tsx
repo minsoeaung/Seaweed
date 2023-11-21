@@ -1,7 +1,7 @@
-import Slider from "react-slick";
-import {useState} from "react";
-import {Box, IconButton, Image} from "@chakra-ui/react";
-import {ChevronLeftIcon, ChevronRightIcon} from "@chakra-ui/icons";
+import Slider from 'react-slick';
+import { useState } from 'react';
+import { Box, IconButton, Image } from '@chakra-ui/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import placeholderImage from '../assets/placeholderImage.webp';
 
 const settings = {
@@ -14,15 +14,15 @@ const settings = {
     autoplaySpeed: 5000,
     slidesToShow: 1,
     slidesToScroll: 1,
-}
+};
 
 type Props = {
     imgHeight: string;
-    images: string[]
-}
+    images: string[];
+};
 
-export const ImageSlider = ({imgHeight, images = []}: Props) => {
-    const [slider, setSlider] = useState<Slider | null>(null)
+export const ImageSlider = ({ imgHeight, images = [] }: Props) => {
+    const [slider, setSlider] = useState<Slider | null>(null);
 
     return (
         <Box width="full" height="full" position="relative" overflow="hidden">
@@ -44,24 +44,26 @@ export const ImageSlider = ({imgHeight, images = []}: Props) => {
                         colorScheme="whiteAlpha"
                         borderRadius="full"
                         position="absolute"
-                        left='10px'
-                        top='50%'
+                        left="10px"
+                        top="50%"
                         transform={'translate(0%, -50%)'}
                         zIndex={2}
-                        onClick={() => slider?.slickPrev()}>
-                        <ChevronLeftIcon color='gray.700' fontSize='2xl'/>
+                        onClick={() => slider?.slickPrev()}
+                    >
+                        <ChevronLeftIcon color="gray.700" fontSize="2xl" />
                     </IconButton>
                     <IconButton
                         aria-label="right-arrow"
                         colorScheme="whiteAlpha"
                         borderRadius="full"
                         position="absolute"
-                        right='10px'
-                        top='50%'
+                        right="10px"
+                        top="50%"
                         transform={'translate(0%, -50%)'}
                         zIndex={2}
-                        onClick={() => slider?.slickNext()}>
-                        <ChevronRightIcon color='gray.700' fontSize='2xl'/>
+                        onClick={() => slider?.slickNext()}
+                    >
+                        <ChevronRightIcon color="gray.700" fontSize="2xl" />
                     </IconButton>
                 </>
             )}
@@ -69,18 +71,26 @@ export const ImageSlider = ({imgHeight, images = []}: Props) => {
             <Slider {...settings} ref={(slider) => setSlider(slider)}>
                 {images.length > 0 ? (
                     images.map((url, index) => (
-                        <Image src={url} height={imgHeight} key={index} objectFit="cover"
-                               objectPosition="center"
-                               fallbackSrc={placeholderImage}
-                               width="full"/>
+                        <Image
+                            src={url}
+                            height={imgHeight}
+                            key={index}
+                            objectFit="cover"
+                            objectPosition="center"
+                            fallbackSrc={placeholderImage}
+                            width="full"
+                        />
                     ))
                 ) : (
-                    <Image src={placeholderImage} height={imgHeight} objectFit="cover"
-                           objectPosition="center"
-                           width="full"
+                    <Image
+                        src={placeholderImage}
+                        height={imgHeight}
+                        objectFit="cover"
+                        objectPosition="center"
+                        width="full"
                     />
                 )}
             </Slider>
         </Box>
-    )
-}
+    );
+};

@@ -1,8 +1,8 @@
-import {useMutation, useQueryClient} from "react-query";
-import {ApiClient} from "../../api/apiClient.tsx";
-import {ACCOUNT} from "../../constants/queryKeys.ts";
-import {useToast} from "@chakra-ui/react";
-import {User} from "../../types/authResponse.ts";
+import { useMutation, useQueryClient } from 'react-query';
+import { ApiClient } from '../../api/apiClient.tsx';
+import { ACCOUNT } from '../../constants/queryKeys.ts';
+import { useToast } from '@chakra-ui/react';
+import { User } from '../../types/authResponse.ts';
 
 export const useUpdateProfilePicture = () => {
     const queryClient = useQueryClient();
@@ -11,7 +11,7 @@ export const useUpdateProfilePicture = () => {
     return useMutation(
         async (picture: FileList) => {
             const formData = new FormData();
-            formData.set("picture", picture[0]);
+            formData.set('picture', picture[0]);
             return await ApiClient.post<never, never>(`api/Accounts/profile-picture`, formData);
         },
         {
@@ -20,16 +20,16 @@ export const useUpdateProfilePicture = () => {
                     title: 'Success',
                     status: 'success',
                     isClosable: true,
-                })
+                });
 
                 const data = queryClient.getQueryData<User>(ACCOUNT);
                 if (data) {
-                    !data.profilePicture && await queryClient.invalidateQueries(ACCOUNT);
+                    !data.profilePicture && (await queryClient.invalidateQueries(ACCOUNT));
 
-                    data.profilePicture = `${data.profilePicture}?time=${Date.now()}`
+                    data.profilePicture = `${data.profilePicture}?time=${Date.now()}`;
                     queryClient.setQueryData(ACCOUNT, data);
                 }
             },
         }
-    )
-}
+    );
+};

@@ -1,57 +1,61 @@
-import {Box, Button, ButtonGroup, Center, Heading, Image, useColorModeValue, Wrap, WrapItem} from "@chakra-ui/react";
-import AntdSpin from "../../components/AntdSpin";
-import {Fallback} from "../../components/Fallback";
-import {NamedApiResource} from "../../types/namedApiResource.ts";
-import {Link, useSearchParams} from "react-router-dom";
-import {IoIosImages} from "react-icons/io";
-import {EditIcon} from "@chakra-ui/icons";
-import {useBrands} from "../../hooks/queries/useBrands.ts";
+import { Box, Button, ButtonGroup, Center, Heading, Image, useColorModeValue, Wrap, WrapItem } from '@chakra-ui/react';
+import AntdSpin from '../../components/AntdSpin';
+import { Fallback } from '../../components/Fallback';
+import { NamedApiResource } from '../../types/namedApiResource.ts';
+import { Link, useSearchParams } from 'react-router-dom';
+import { IoIosImages } from 'react-icons/io';
+import { EditIcon } from '@chakra-ui/icons';
+import { useBrands } from '../../hooks/queries/useBrands.ts';
 import placeholderImg from '../../assets/placeholderImage.webp';
-import {BRAND_IMAGES} from "../../constants/fileUrls.ts";
+import { BRAND_IMAGES } from '../../constants/fileUrls.ts';
 
-// TODO: try not to duplicate 
+// TODO: try not to duplicate
 const Brands = () => {
-    const {data, isLoading, isFetching} = useBrands();
+    const { data, isLoading, isFetching } = useBrands();
 
     if (isLoading) {
-        return <Center><AntdSpin/></Center>
+        return (
+            <Center>
+                <AntdSpin />
+            </Center>
+        );
     }
 
     if (!data) return null;
 
     return (
         <Box>
-            {isFetching && <Fallback/>}
-            <Wrap spacing='30px'>
-                {data.map(brand => (
+            {isFetching && <Fallback />}
+            <Wrap spacing="30px">
+                {data.map((brand) => (
                     <WrapItem key={brand.id}>
-                        <Brand brand={brand}/>
+                        <Brand brand={brand} />
                     </WrapItem>
                 ))}
             </Wrap>
         </Box>
-    )
-}
+    );
+};
 
-const Brand = ({brand}: { brand: NamedApiResource }) => {
+const Brand = ({ brand }: { brand: NamedApiResource }) => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     return (
         <Box
-            maxW={{base: '100%', sm: '200px'}}
+            maxW={{ base: '100%', sm: '200px' }}
             bg={useColorModeValue('white', 'gray.800')}
             overflow={'hidden'}
-            rounded='xl'
+            rounded="xl"
         >
             <Image
                 src={BRAND_IMAGES + brand.id}
                 fallbackSrc={placeholderImg}
-                height='150px'
-                aspectRatio='4/3'
-                objectFit='cover'
+                height="150px"
+                aspectRatio="4/3"
+                objectFit="cover"
                 alt="Example"
-                rounded='xl'
-                overflow='hidden'
+                rounded="xl"
+                overflow="hidden"
                 mb={4}
             />
             <Center pl={2} pr={2}>
@@ -68,12 +72,12 @@ const Brand = ({brand}: { brand: NamedApiResource }) => {
                 <Center>
                     <ButtonGroup isAttached>
                         <Button
-                            leftIcon={<IoIosImages/>}
-                            variant='ghost'
+                            leftIcon={<IoIosImages />}
+                            variant="ghost"
                             colorScheme="blue"
                             onClick={() => {
-                                searchParams.set("tab", "0");
-                                searchParams.set("brands", brand.name)
+                                searchParams.set('tab', '0');
+                                searchParams.set('brands', brand.name);
                                 setSearchParams(searchParams);
                             }}
                         >
@@ -82,8 +86,8 @@ const Brand = ({brand}: { brand: NamedApiResource }) => {
                         <Button
                             as={Link}
                             to={`${brand.id}?type=brand`}
-                            leftIcon={<EditIcon/>}
-                            variant='ghost'
+                            leftIcon={<EditIcon />}
+                            variant="ghost"
                             colorScheme="blue"
                         >
                             Edit
@@ -92,7 +96,7 @@ const Brand = ({brand}: { brand: NamedApiResource }) => {
                 </Center>
             </Box>
         </Box>
-    )
-}
+    );
+};
 
 export default Brands;

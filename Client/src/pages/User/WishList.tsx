@@ -1,4 +1,4 @@
-import {useWishList} from "../../hooks/queries/useWishList.ts";
+import { useWishList } from '../../hooks/queries/useWishList.ts';
 import {
     AbsoluteCenter,
     AlertDialog,
@@ -28,29 +28,29 @@ import {
     useColorModeValue,
     useDisclosure,
     useMediaQuery,
-    VStack
-} from "@chakra-ui/react";
-import {formatPrice} from "../../utilities/formatPrice.ts";
-import AntdSpin from "../../components/AntdSpin";
-import {DeleteIcon} from "@chakra-ui/icons";
-import React, {useRef} from "react";
-import {useToggleWishList} from "../../hooks/mutations/useToggleWishList.ts";
-import {useCart} from "../../hooks/queries/useCart.ts";
-import {Fallback} from "../../components/Fallback";
-import {AddToCartButton} from "../../components/AddToCartButton.tsx";
-import {PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
+    VStack,
+} from '@chakra-ui/react';
+import { formatPrice } from '../../utilities/formatPrice.ts';
+import AntdSpin from '../../components/AntdSpin';
+import { DeleteIcon } from '@chakra-ui/icons';
+import React, { useRef } from 'react';
+import { useToggleWishList } from '../../hooks/mutations/useToggleWishList.ts';
+import { useCart } from '../../hooks/queries/useCart.ts';
+import { Fallback } from '../../components/Fallback';
+import { AddToCartButton } from '../../components/AddToCartButton.tsx';
+import { PRODUCT_IMAGES } from '../../constants/fileUrls.ts';
 import placeholderImage from '../../assets/placeholderImage.webp';
-import {PriceTag} from "../../components/PriceTag.tsx";
+import { PriceTag } from '../../components/PriceTag.tsx';
 
 const WishListPage = () => {
-    const {isLoading, data, isError, isFetching} = useWishList();
-    const {isOpen, onOpen, onClose} = useDisclosure();
+    const { isLoading, data, isError, isFetching } = useWishList();
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef(null);
-    const [isMobile] = useMediaQuery('(max-width: 400px)')
+    const [isMobile] = useMediaQuery('(max-width: 400px)');
     const productIdToRemoveRef = useRef<number | null>(null);
 
     const mutation = useToggleWishList();
-    const {data: cart} = useCart();
+    const { data: cart } = useCart();
 
     const handleRemoveProduct = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -58,47 +58,46 @@ const WishListPage = () => {
         if (productIdToRemoveRef.current) {
             await mutation.mutateAsync({
                 productId: productIdToRemoveRef.current,
-                type: "REMOVE"
-            })
+                type: 'REMOVE',
+            });
         }
         onClose();
-    }
+    };
 
     if (isLoading) {
         return (
             <AbsoluteCenter axis="both">
-                <AntdSpin/>
+                <AntdSpin />
             </AbsoluteCenter>
-        )
+        );
     }
 
     if (!data) return null;
 
     return (
-        <Box
-            maxW={{base: '3xl', lg: '7xl'}}
-            mx="auto"
-        >
-            {isFetching && <Fallback/>}
+        <Box maxW={{ base: '3xl', lg: '7xl' }} mx="auto">
+            {isFetching && <Fallback />}
             {isMobile ? (
-                <Card variant="outline" px={{base: '4', md: '8', lg: '12'}} py={{base: '6', md: '8', lg: '10'}}>
-                    <Stack spacing={{base: '8', md: '10'}} flex="2">
+                <Card variant="outline" px={{ base: '4', md: '8', lg: '12' }} py={{ base: '6', md: '8', lg: '10' }}>
+                    <Stack spacing={{ base: '8', md: '10' }} flex="2">
                         <Heading fontSize="2xl" fontWeight="extrabold">
                             Wishlist ({data.length} items)
                         </Heading>
 
                         <Stack spacing="6">
                             {data.map((item) => (
-                                <Flex key={item.productId} direction='column' justify="space-between"
-                                      align="center">
-                                    <HStack w='full'>
+                                <Flex key={item.productId} direction="column" justify="space-between" align="center">
+                                    <HStack w="full">
                                         <Image
-                                            width='100px'
-                                            height='100px'
-                                            objectFit='cover'
+                                            width="100px"
+                                            height="100px"
+                                            objectFit="cover"
                                             src={PRODUCT_IMAGES + item.product.id}
-                                            alt='Dan Abramov'
-                                            borderRadius={{base: 'md', md: 'xl'}}
+                                            alt="Dan Abramov"
+                                            borderRadius={{
+                                                base: 'md',
+                                                md: 'xl',
+                                            }}
                                             fallbackSrc={placeholderImage}
                                         />
                                         <VStack alignItems="start">
@@ -106,7 +105,7 @@ const WishListPage = () => {
                                             <Text color={useColorModeValue('gray.600', 'gray.400')} fontSize="sm">
                                                 {item.product.brand.name}
                                             </Text>
-                                            <PriceTag price={item.product.price} currency="USD"/>
+                                            <PriceTag price={item.product.price} currency="USD" />
                                         </VStack>
                                     </HStack>
                                     <Flex
@@ -114,23 +113,32 @@ const WishListPage = () => {
                                         align="center"
                                         width="full"
                                         justify="space-between"
-                                        display={{base: 'flex', md: 'none'}}
+                                        display={{ base: 'flex', md: 'none' }}
                                     >
                                         <Button
                                             variant="ghost"
                                             color={useColorModeValue('red.500', 'red.400')}
                                             onClick={() => {
-                                                productIdToRemoveRef.current = item.productId
+                                                productIdToRemoveRef.current = item.productId;
                                                 onOpen();
                                             }}
                                         >
                                             Remove
                                         </Button>
-                                        <ButtonGroup spacing={4} variant='outline' justifyContent="end">
+                                        <ButtonGroup spacing={4} variant="outline" justifyContent="end">
                                             <AddToCartButton
-                                                buttonProps={{variant: 'ghost', isDisabled: !cart}}
+                                                buttonProps={{
+                                                    variant: 'ghost',
+                                                    isDisabled: !cart,
+                                                }}
                                                 productId={item.product.id}
-                                                isInCart={cart ? cart.cartItems.findIndex(c => c.product.id === item.product.id) >= 0 : false}
+                                                isInCart={
+                                                    cart
+                                                        ? cart.cartItems.findIndex(
+                                                              (c) => c.product.id === item.product.id
+                                                          ) >= 0
+                                                        : false
+                                                }
                                             />
                                         </ButtonGroup>
                                     </Flex>
@@ -142,7 +150,7 @@ const WishListPage = () => {
             ) : (
                 <Card variant="outline">
                     <TableContainer>
-                        <Table variant='simple'>
+                        <Table variant="simple">
                             <Thead>
                                 <Tr>
                                     <Th fontSize={16}>Product name</Th>
@@ -154,24 +162,30 @@ const WishListPage = () => {
                             <Tbody>
                                 {isError ? (
                                     <p>Error loading wishlist.</p>
-                                ) : data && (
-                                    data.map(item => (
+                                ) : (
+                                    data &&
+                                    data.map((item) => (
                                         <Tr key={item.productId}>
                                             <Td>
                                                 <HStack alignItems="start">
                                                     <Image
-                                                        width='70px'
-                                                        height='70px'
-                                                        objectFit='cover'
+                                                        width="70px"
+                                                        height="70px"
+                                                        objectFit="cover"
                                                         src={PRODUCT_IMAGES + item.product.id}
-                                                        alt='Dan Abramov'
-                                                        borderRadius={{base: 'md', md: 'xl'}}
+                                                        alt="Dan Abramov"
+                                                        borderRadius={{
+                                                            base: 'md',
+                                                            md: 'xl',
+                                                        }}
                                                         fallbackSrc={placeholderImage}
                                                     />
                                                     <VStack alignItems="start">
                                                         <b>{item.product.name}</b>
-                                                        <Text color={useColorModeValue('gray.600', 'gray.400')}
-                                                              fontSize="sm">
+                                                        <Text
+                                                            color={useColorModeValue('gray.600', 'gray.400')}
+                                                            fontSize="sm"
+                                                        >
                                                             {item.product.brand.name}
                                                         </Text>
                                                     </VStack>
@@ -180,28 +194,34 @@ const WishListPage = () => {
                                             <Td>{formatPrice(item.product.price)}</Td>
                                             <Td>
                                                 {item.product.quantityInStock === 0 ? (
-                                                    <Tag colorScheme='blackAlpha'>No stock</Tag>
+                                                    <Tag colorScheme="blackAlpha">No stock</Tag>
+                                                ) : item.product.quantityInStock < 10 ? (
+                                                    <Tag colorScheme="red">Low stock</Tag>
                                                 ) : (
-                                                    item.product.quantityInStock < 10
-                                                        ? <Tag colorScheme='red'>Low stock</Tag>
-                                                        : <Tag>In stock</Tag>
+                                                    <Tag>In stock</Tag>
                                                 )}
                                             </Td>
                                             <Td isNumeric>
-                                                <ButtonGroup spacing={4} variant='outline' justifyContent="end">
+                                                <ButtonGroup spacing={4} variant="outline" justifyContent="end">
                                                     <AddToCartButton
                                                         buttonProps={{
-                                                            isDisabled: !cart
+                                                            isDisabled: !cart,
                                                         }}
                                                         productId={item.product.id}
-                                                        isInCart={cart ? cart.cartItems.findIndex(c => c.product.id === item.product.id) >= 0 : false}
+                                                        isInCart={
+                                                            cart
+                                                                ? cart.cartItems.findIndex(
+                                                                      (c) => c.product.id === item.product.id
+                                                                  ) >= 0
+                                                                : false
+                                                        }
                                                     />
                                                     <IconButton
                                                         colorScheme="red"
-                                                        aria-label='Remove from wishlist'
-                                                        icon={<DeleteIcon/>}
+                                                        aria-label="Remove from wishlist"
+                                                        icon={<DeleteIcon />}
                                                         onClick={() => {
-                                                            productIdToRemoveRef.current = item.productId
+                                                            productIdToRemoveRef.current = item.productId;
                                                             onOpen();
                                                         }}
                                                     />
@@ -215,23 +235,22 @@ const WishListPage = () => {
                     </TableContainer>
                 </Card>
             )}
-            <AlertDialog
-                isOpen={isOpen}
-                leastDestructiveRef={cancelRef}
-                onClose={onClose}
-                isCentered
-            >
+            <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} isCentered>
                 <AlertDialogOverlay>
                     <AlertDialogContent>
-                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
                             Are you sure to remove from wishlist?
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <Button ref={cancelRef} onClick={onClose}>
                                 Cancel
                             </Button>
-                            <Button colorScheme='red' onClick={handleRemoveProduct} ml={3}
-                                    isLoading={mutation.isLoading}>
+                            <Button
+                                colorScheme="red"
+                                onClick={handleRemoveProduct}
+                                ml={3}
+                                isLoading={mutation.isLoading}
+                            >
                                 Yes
                             </Button>
                         </AlertDialogFooter>
@@ -239,7 +258,7 @@ const WishListPage = () => {
                 </AlertDialogOverlay>
             </AlertDialog>
         </Box>
-    )
-}
+    );
+};
 
 export default WishListPage;

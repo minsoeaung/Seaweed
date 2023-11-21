@@ -1,4 +1,4 @@
-import {NamedApiResource} from "./namedApiResource.ts";
+import { NamedApiResource } from './namedApiResource.ts';
 
 export type Product = {
     id: number;
@@ -11,4 +11,4 @@ export type Product = {
     category: NamedApiResource;
     brandId: number;
     brand: NamedApiResource;
-}
+};

@@ -9,58 +9,58 @@ import {
     Text,
     Tooltip,
     useColorModeValue,
-} from '@chakra-ui/react'
-import {FavouriteButton} from './FavouriteButton'
-import {PriceTag} from '../PriceTag'
-import {Product} from '../../types/product'
-import {useWishList} from "../../hooks/queries/useWishList.ts";
-import {useCart} from "../../hooks/queries/useCart.ts";
-import {Link} from "react-router-dom";
-import {Rating} from "../Rating.tsx";
-import {AddToCartButton} from "../AddToCartButton.tsx";
-import {PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
+} from '@chakra-ui/react';
+import { FavouriteButton } from './FavouriteButton';
+import { PriceTag } from '../PriceTag';
+import { Product } from '../../types/product';
+import { useWishList } from '../../hooks/queries/useWishList.ts';
+import { useCart } from '../../hooks/queries/useCart.ts';
+import { Link } from 'react-router-dom';
+import { Rating } from '../Rating.tsx';
+import { AddToCartButton } from '../AddToCartButton.tsx';
+import { PRODUCT_IMAGES } from '../../constants/fileUrls.ts';
 import placeholderImage from '../../assets/placeholderImage.webp';
-import {useState} from "react";
+import { useState } from 'react';
 
 interface Props {
-    product: Product
-    rootProps?: StackProps
+    product: Product;
+    rootProps?: StackProps;
 }
 
 export const ProductCard = (props: Props) => {
-    const {product, rootProps} = props
-    const {name, price} = product
+    const { product, rootProps } = props;
+    const { name, price } = product;
     const [imageSrc, setImageSrc] = useState(PRODUCT_IMAGES + product.id);
 
-    const {data: wishList} = useWishList();
-    const {data: cart} = useCart();
+    const { data: wishList } = useWishList();
+    const { data: cart } = useCart();
 
     return (
         <Link to={`/catalog/${product.id}`}>
-            <Stack spacing={{base: '4', md: '5'}} {...rootProps}>
+            <Stack spacing={{ base: '4', md: '5' }} {...rootProps}>
                 <Box position="relative">
                     <AspectRatio ratio={4 / 3}>
                         <Image
                             src={imageSrc}
                             alt={name}
                             draggable="false"
-                            fallback={<Skeleton borderRadius={{base: 'md', md: 'xl'}}/>}
+                            fallback={<Skeleton borderRadius={{ base: 'md', md: 'xl' }} />}
                             onError={() => {
-                                setImageSrc(placeholderImage)
+                                setImageSrc(placeholderImage);
                             }}
-                            borderRadius={{base: 'md', md: 'xl'}}
+                            borderRadius={{ base: 'md', md: 'xl' }}
                         />
                     </AspectRatio>
                     {wishList && (
                         <FavouriteButton
                             iconButtonProps={{
-                                position: "absolute",
-                                top: "4",
-                                right: "4",
-                                "aria-label": `Add ${name} to your favourites`
+                                position: 'absolute',
+                                top: '4',
+                                right: '4',
+                                'aria-label': `Add ${name} to your favourites`,
                             }}
                             productId={product.id}
-                            isChecked={wishList.findIndex(w => w.productId === product.id) >= 0}
+                            isChecked={wishList.findIndex((w) => w.productId === product.id) >= 0}
                         />
                     )}
                 </Box>
@@ -71,10 +71,10 @@ export const ProductCard = (props: Props) => {
                                 {name}
                             </Text>
                         </Tooltip>
-                        <PriceTag price={price} salePrice={0} currency="USD"/>
+                        <PriceTag price={price} salePrice={0} currency="USD" />
                     </Stack>
                     <HStack>
-                        <Rating defaultValue={4} size="sm"/>
+                        <Rating defaultValue={4} size="sm" />
                         <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
                             (12)
                         </Text>
@@ -83,13 +83,13 @@ export const ProductCard = (props: Props) => {
                 <Stack align="center">
                     <AddToCartButton
                         buttonProps={{
-                            isDisabled: !cart
+                            isDisabled: !cart,
                         }}
                         productId={product.id}
-                        isInCart={cart ? cart.cartItems.findIndex(c => c.product.id === product.id) >= 0 : false}
+                        isInCart={cart ? cart.cartItems.findIndex((c) => c.product.id === product.id) >= 0 : false}
                     />
                 </Stack>
             </Stack>
         </Link>
-    )
-}
+    );
+};

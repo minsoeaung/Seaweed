@@ -1,6 +1,6 @@
-import {Icon, IconButton, IconButtonProps, LightMode} from "@chakra-ui/react";
-import {AiFillHeart, AiOutlineHeart} from "react-icons/ai";
-import {useToggleWishList} from "../../hooks/mutations/useToggleWishList.ts";
+import { Icon, IconButton, IconButtonProps, LightMode } from '@chakra-ui/react';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import { useToggleWishList } from '../../hooks/mutations/useToggleWishList.ts';
 
 type Props = {
     isChecked: boolean;
@@ -8,7 +8,7 @@ type Props = {
     iconButtonProps: IconButtonProps;
 };
 
-export const FavouriteButton = ({isChecked, productId, iconButtonProps}: Props) => {
+export const FavouriteButton = ({ isChecked, productId, iconButtonProps }: Props) => {
     const mutation = useToggleWishList();
 
     return (
@@ -18,22 +18,27 @@ export const FavouriteButton = ({isChecked, productId, iconButtonProps}: Props) 
                 bg="white"
                 color="gray.900"
                 size="sm"
-                _hover={{transform: 'scale(1.1)'}}
-                sx={{':hover > svg': {transform: 'scale(1.1)'}}}
+                _hover={{ transform: 'scale(1.1)' }}
+                sx={{ ':hover > svg': { transform: 'scale(1.1)' } }}
                 transition="all 0.15s ease"
-                icon={<Icon as={isChecked ? AiFillHeart : AiOutlineHeart}
-                            transition="all 0.15s ease" color={isChecked ? "red" : ""}/>}
+                icon={
+                    <Icon
+                        as={isChecked ? AiFillHeart : AiOutlineHeart}
+                        transition="all 0.15s ease"
+                        color={isChecked ? 'red' : ''}
+                    />
+                }
                 boxShadow="base"
                 {...iconButtonProps}
                 onClick={async (e) => {
                     e.preventDefault();
                     await mutation.mutateAsync({
-                        type: isChecked ? "REMOVE" : "ADD",
-                        productId
-                    })
+                        type: isChecked ? 'REMOVE' : 'ADD',
+                        productId,
+                    });
                 }}
                 isLoading={mutation.isLoading}
             />
         </LightMode>
-    )
-}
+    );
+};

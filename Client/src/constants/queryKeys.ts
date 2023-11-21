@@ -1,15 +1,15 @@
-export const CATEGORIES = "categories";
+export const CATEGORIES = 'categories';
 
-export const BRANDS = "brands";
+export const BRANDS = 'brands';
 
-export const PRODUCT_FILTERS = "productFilters";
+export const PRODUCT_FILTERS = 'productFilters';
 
-export const PRODUCTS = "products";
+export const PRODUCTS = 'products';
 
-export const WISHLIST = "wishlist";
+export const WISHLIST = 'wishlist';
 
-export const CART = "cart";
+export const CART = 'cart';
 
-export const PRODUCT_DETAILS = "productDetails";
+export const PRODUCT_DETAILS = 'productDetails';
 
-export const ACCOUNT = "account";
+export const ACCOUNT = 'account';

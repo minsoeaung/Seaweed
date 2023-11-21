@@ -1,12 +1,12 @@
-import axios, {InternalAxiosRequestConfig} from "axios";
+import axios, { InternalAxiosRequestConfig } from 'axios';
 
 const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
-    const token = sessionStorage.getItem("jwtToken");
+    const token = sessionStorage.getItem('jwtToken');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
-}
+};
 
 // TODO: improve about "never" -> "ApiClient.post<never, AuthResponse>"
 export const ApiClient = axios.create({
@@ -27,30 +27,31 @@ ApiClient.interceptors.response.use(
             // Very important to return a promise, otherwise react-query get error before this interceptor finished
             return new Promise((resolve, reject) => {
                 axios({
-                    method: "GET",
+                    method: 'GET',
                     url: `${import.meta.env.VITE_ROOT_URL}api/Accounts/renew-tokens`,
                     withCredentials: true,
                     headers: {
-                        Accept: "application/json",
-                    }
-                }).then((response) => {
-                    sessionStorage.setItem("jwtToken", response.data.accessToken);
-                    originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
-
-                    ApiClient(originalRequest)
-                        .then(response => {
-                            resolve(response);
-                        })
-                        .catch(error => {
-                            reject(error);
-                        })
-                }).catch(error => {
-                    reject(error);
+                        Accept: 'application/json',
+                    },
                 })
-            })
+                    .then((response) => {
+                        sessionStorage.setItem('jwtToken', response.data.accessToken);
+                        originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+
+                        ApiClient(originalRequest)
+                            .then((response) => {
+                                resolve(response);
+                            })
+                            .catch((error) => {
+                                reject(error);
+                            });
+                    })
+                    .catch((error) => {
+                        reject(error);
+                    });
+            });
         } else {
             return Promise.reject(error);
         }
     }
 );
-

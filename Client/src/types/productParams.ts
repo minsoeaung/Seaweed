@@ -5,4 +5,4 @@ export type ProductParams = {
     categories: string;
     pageNumber: number;
     pageSize: number;
-}
+};

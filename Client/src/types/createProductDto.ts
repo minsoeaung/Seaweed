@@ -8,4 +8,4 @@ export type CreateProductDto = {
     quantityInStock: number;
     categoryId: number;
     brandId: number;
-}
+};
