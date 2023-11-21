@@ -13,8 +13,8 @@ public static class DbInitializer
         var services = scope.ServiceProvider;
         var context = services.GetRequiredService<StoreContext>();
         var userManager = services.GetRequiredService<UserManager<User>>();
-        await context.Database.EnsureCreatedAsync();
         await context.Database.MigrateAsync();
+        await context.Database.EnsureCreatedAsync();
         await Seeders.Seed(context, userManager);
     }
 }
