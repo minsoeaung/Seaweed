@@ -24,6 +24,7 @@ public static class Seeders
         {
             var superUser = new User
             {
+                Id = 1,
                 UserName = "super",
                 Email = "super@gmail.com",
                 EmailConfirmed = true,
