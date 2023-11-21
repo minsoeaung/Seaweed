@@ -6,7 +6,7 @@ import {Link, useSearchParams} from "react-router-dom";
 import {IoIosImages} from "react-icons/io";
 import {EditIcon} from "@chakra-ui/icons";
 import {useBrands} from "../../hooks/queries/useBrands.ts";
-import placeholderImage from '../../assets/placeholderImage.webp';
+import placeholderImg from '../../assets/placeholderImage.webp';
 import {BRAND_IMAGES} from "../../constants/fileUrls.ts";
 
 // TODO: try not to duplicate 
@@ -38,18 +38,19 @@ const Brand = ({brand}: { brand: NamedApiResource }) => {
 
     return (
         <Box
-            maxW={{base: '100%', sm: '250px'}}
-            overflow={'hidden'}
+            maxW={{base: '100%', sm: '200px'}}
             bg={useColorModeValue('white', 'gray.800')}
+            overflow={'hidden'}
             rounded='xl'
         >
             <Image
                 src={BRAND_IMAGES + brand.id}
-                fallbackSrc={placeholderImage}
-                height='200px'
+                fallbackSrc={placeholderImg}
+                height='150px'
                 aspectRatio='4/3'
                 objectFit='cover'
                 alt="Example"
+                rounded='xl'
                 overflow='hidden'
                 mb={4}
             />

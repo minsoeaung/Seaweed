@@ -20,7 +20,7 @@ export const ProductSortBy = () => {
 
     return (
         <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon/>} px={4} variant="outline">
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon/>} px={4} variant="ghost" size='lg'>
                 Sort
                 by: {sortMenus[(params.get("orderBy") || "_") as keyof typeof sortMenus] || ""}
             </MenuButton>

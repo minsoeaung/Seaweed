@@ -43,7 +43,7 @@ const CartPage = () => {
         >
             {isFetching && <Fallback/>}
             {data && (
-                <Card variant="outline" px={{base: '4', md: '8', lg: '12'}} py={{base: '6', md: '8', lg: '12'}}>
+                <Card variant="outline" px={{base: '4', md: '8', lg: '12'}} py={{base: '6', md: '8', lg: '10'}}>
                     <Stack
                         direction={{base: 'column', lg: 'row'}}
                         align={{lg: 'flex-start'}}
@@ -60,7 +60,6 @@ const CartPage = () => {
                                 ))}
                             </Stack>
                         </Stack>
-
                         <Flex direction="column" align="center" flex="1" position="sticky" top={4}>
                             <CartOrderSummary/>
                             <HStack mt="6" fontWeight="semibold">

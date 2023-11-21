@@ -30,7 +30,7 @@ public static class Seeders
                 NormalizedEmail = "SUPER@GMAIL.COM",
                 NormalizedUserName = "SUPER",
             };
-            await userManager.CreateAsync(superUser, "super_account");
+            await userManager.CreateAsync(superUser, "password");
             await userManager.AddToRoleAsync(superUser, "Super");
         }
 

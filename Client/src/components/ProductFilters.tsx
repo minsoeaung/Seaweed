@@ -81,7 +81,8 @@ export const ProductFilters = () => {
         <>
             <IconButton
                 aria-label="Filter"
-                variant="outline"
+                variant="ghost"
+                size='lg'
                 // variant={filterApplied ? "solid" : "outline"}
                 // colorScheme={filterApplied ? "blue" : "gray"}
                 icon={<AiOutlineFilter/>}

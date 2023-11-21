@@ -37,7 +37,7 @@ const Category = ({category}: { category: NamedApiResource }) => {
 
     return (
         <Box
-            maxW={{base: '100%', sm: '250px'}}
+            maxW={{base: '100%', sm: '200px'}}
             bg={useColorModeValue('white', 'gray.800')}
             overflow={'hidden'}
             rounded='xl'
@@ -45,10 +45,11 @@ const Category = ({category}: { category: NamedApiResource }) => {
             <Image
                 src={CATEGORY_IMAGES + category.id}
                 fallbackSrc={placeholderImg}
-                height='200px'
+                height='150px'
                 aspectRatio='4/3'
                 objectFit='cover'
                 alt="Example"
+                rounded='xl'
                 overflow='hidden'
                 mb={4}
             />

@@ -2,9 +2,9 @@ import {useMyAccount} from "../../hooks/queries/useMyAccount.ts";
 import {
     Avatar,
     AvatarBadge,
+    Box,
     Button,
     Card,
-    Container,
     Heading,
     HStack,
     IconButton,
@@ -30,7 +30,10 @@ const MyAccount = () => {
     if (!data) return null;
 
     return (
-        <Container maxW="7xl">
+        <Box
+            maxW={{base: '3xl', lg: '7xl'}}
+            mx="auto"
+        >
             <Card variant="outline">
                 <VStack p={{base: 6, lg: 10}} alignItems="start" spacing={{base: 6, lg: 10}}>
                     <Heading lineHeight={1.1} fontSize={{base: '2xl', sm: '3xl'}}>
@@ -128,7 +131,7 @@ const MyAccount = () => {
                     </VStack>
                 </VStack>
             </Card>
-        </Container>
+        </Box>
     )
 };
 

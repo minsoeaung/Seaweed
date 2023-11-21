@@ -1,6 +1,7 @@
 import {Box, BoxProps, IconButton, Stack, useColorModeValue} from '@chakra-ui/react'
 import {FaGithub} from "react-icons/fa";
 import {AppLogo} from "./AppLogo.tsx";
+import {Link} from "react-router-dom";
 
 export const Footer = (props: BoxProps) => {
     return (
@@ -21,23 +22,12 @@ export const Footer = (props: BoxProps) => {
                 <p>© {new Date().getFullYear()} Name. All rights reserved.</p>
                 <Stack direction={'row'} spacing={6}>
                     <IconButton
+                        as={Link}
+                        to='https://github.com/minsoeaung/Seaweed'
+                        target='_blank'
                         isRound
                         variant='solid'
-                        colorScheme='teal'
-                        aria-label='Github link'
-                        icon={<FaGithub/>}
-                    />
-                    <IconButton
-                        isRound
-                        variant='solid'
-                        colorScheme='teal'
-                        aria-label='Github link'
-                        icon={<FaGithub/>}
-                    />
-                    <IconButton
-                        isRound
-                        variant='solid'
-                        colorScheme='teal'
+                        colorScheme='linkedin'
                         aria-label='Github link'
                         icon={<FaGithub/>}
                     />

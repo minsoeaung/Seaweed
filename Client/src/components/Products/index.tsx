@@ -36,8 +36,7 @@ export const Products = () => {
         <Box
             maxW="7xl"
             mx="auto"
-            px={{base: '4', md: '8', lg: '12'}}
-            py={{base: '6', md: '8', lg: '12'}}
+            px={{base: '2', md: '8', lg: '12'}}
         >
             {isFetching && (
                 <Fallback/>

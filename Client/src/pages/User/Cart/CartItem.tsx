@@ -8,7 +8,6 @@ import {
     Flex,
     IconButton,
     Select,
-    SelectProps,
     useColorModeValue,
     useDisclosure
 } from '@chakra-ui/react'
@@ -19,22 +18,6 @@ import {useRef} from "react";
 import {useAddToCart} from "../../../hooks/mutations/useAddToCart.ts";
 import {DeleteIcon} from "@chakra-ui/icons";
 import {PRODUCT_IMAGES} from "../../../constants/fileUrls.ts";
-
-const QuantitySelect = (props: SelectProps) => {
-    return (
-        <Select
-            maxW="64px"
-            aria-label="Select quantity"
-            focusBorderColor={useColorModeValue('blue.500', 'blue.200')}
-            {...props}
-        >
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-        </Select>
-    )
-}
 
 export const CartItem = ({cartItem}: { cartItem: CartItemType }) => {
     const {
@@ -65,12 +48,16 @@ export const CartItem = ({cartItem}: { cartItem: CartItemType }) => {
 
             {/* Desktop */}
             <Flex width="full" justify="space-between" display={{base: 'none', md: 'flex'}}>
-                <QuantitySelect
+                <Select
+                    maxW="80px"
+                    aria-label="Select quantity"
                     value={quantity}
-                    onChange={async (e) => {
-                        await handleQuantityChange(+e.currentTarget.value)
-                    }}
-                />
+                    onChange={e => handleQuantityChange(+e.currentTarget.value)}
+                >
+                    {Array(product.quantityInStock).fill('').map((_, index) => (
+                        <option value={`${index + 1}`}>{index + 1}</option>
+                    ))}
+                </Select>
                 <PriceTag price={total} currency="USD"/>
                 <IconButton
                     variant="ghost"
@@ -89,15 +76,20 @@ export const CartItem = ({cartItem}: { cartItem: CartItemType }) => {
                 justify="space-between"
                 display={{base: 'flex', md: 'none'}}
             >
-                <Button variant="ghost" onClick={onOpen}>
-                    Delete
+                <Button variant="ghost" size={{base: 'sm', md: 'md'}} onClick={onOpen}>
+                    Remove
                 </Button>
-                <QuantitySelect
+                <Select
+                    maxW="64px"
+                    aria-label="Select quantity"
+                    focusBorderColor={useColorModeValue('blue.500', 'blue.200')}
                     value={quantity}
-                    onChange={(e) => {
-                        handleQuantityChange?.(+e.currentTarget.value)
-                    }}
-                />
+                    onChange={e => handleQuantityChange(+e.currentTarget.value)}
+                >
+                    {Array(product.quantityInStock).fill('').map((_, index) => (
+                        <option value={`${index + 1}`} key={index}>{index + 1}</option>
+                    ))}
+                </Select>
                 <PriceTag price={total} currency="USD"/>
             </Flex>
             <AlertDialog

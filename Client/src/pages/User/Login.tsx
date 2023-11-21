@@ -54,7 +54,7 @@ const Login = () => {
 
     return (
         <Container>
-            <Stack spacing={8} py={12} px={6}>
+            <Stack spacing={8} py={{base: 6, md: 12}} px={{base: 2, md: 6}}>
                 <Heading fontSize={'3xl'} textAlign={'center'}>
                     Welcome to Shop! Please login.
                 </Heading>
