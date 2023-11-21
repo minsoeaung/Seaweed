@@ -15,9 +15,17 @@ import {
 } from "@chakra-ui/react";
 import {CheckIcon, EditIcon} from "@chakra-ui/icons";
 import AntdSpin from "../../components/AntdSpin";
+import {useUpdateProfilePicture} from "../../hooks/mutations/useUpdateProfilePicture.ts";
+import {useRef} from "react";
 
 const MyAccount = () => {
     const {data, isLoading, isError} = useMyAccount();
+    const inputRef = useRef<HTMLInputElement>(null);
+    const mutation = useUpdateProfilePicture();
+
+    const updateProfilePicture = async (pic: FileList | null) => {
+        !!pic && await mutation.mutateAsync(pic);
+    }
 
     if (isLoading) {
         return <AntdSpin/>
@@ -40,18 +48,23 @@ const MyAccount = () => {
                         My Account
                     </Heading>
                     <HStack spacing={{base: 2, md: 6}}>
-                        <Avatar size="xl" src="https://bit.ly/sage-adebayo">
+                        <Avatar size="2xl" src={data.profilePicture}>
                             <AvatarBadge
                                 as={IconButton}
-                                size="sm"
+                                size="md"
                                 rounded="full"
                                 top="-10px"
-                                colorScheme="blue"
-                                aria-label="Modify Image"
+                                colorScheme="facebook"
+                                aria-label="Update profile picture"
+                                isLoading={mutation.isLoading}
                                 icon={<EditIcon/>}
+                                onClick={() => {
+                                    inputRef.current?.click();
+                                }}
                             />
+                            <Input ref={inputRef} type='file' accept='image/*' multiple name="profile-picture"
+                                   onChange={e => updateProfilePicture(e.target.files)} hidden/>
                         </Avatar>
-
                         <VStack alignItems="start">
                             <Input
                                 defaultValue={data.userName}

@@ -29,6 +29,7 @@ import {AppLogo} from "./AppLogo.tsx";
 import React, {useState} from "react";
 import {useCart} from "../hooks/queries/useCart.ts";
 import {MdOutlineInventory2} from "react-icons/md";
+import {useMyAccount} from "../hooks/queries/useMyAccount.ts";
 
 const Header = () => {
     const {colorMode, toggleColorMode} = useColorMode();
@@ -40,6 +41,7 @@ const Header = () => {
     const navigate = useNavigate();
 
     const {data: cart} = useCart();
+    const {data: account} = useMyAccount();
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -153,10 +155,11 @@ const Header = () => {
                                         rounded={'full'}
                                         variant={'link'}
                                         cursor={'pointer'}
-                                        minW={0}>
+                                        minW={0}
+                                    >
                                         <Avatar
                                             size={'sm'}
-                                            src={'https://avatars.dicebear.com/api/male/username.svg'}
+                                            src={account?.profilePicture}
                                         />
                                     </MenuButton>
                                     <MenuList alignItems={'center'}>
@@ -164,7 +167,7 @@ const Header = () => {
                                         <Center>
                                             <Avatar
                                                 size={'2xl'}
-                                                src={'https://avatars.dicebear.com/api/male/username.svg'}
+                                                src={account?.profilePicture}
                                             />
                                         </Center>
                                         <br/>

@@ -1,4 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using API.Configurations;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
 using API.Entities;
@@ -9,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace API.Controllers;
 
@@ -19,12 +22,17 @@ public class AccountsController : ControllerBase
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
+    private readonly IImageService _imageService;
+    private readonly AwsConfig _awsConfig;
 
-    public AccountsController(UserManager<User> userManager, ITokenService tokenService, IMapper mapper)
+    public AccountsController(UserManager<User> userManager, ITokenService tokenService, IMapper mapper,
+        IImageService imageService, IOptions<AwsConfig> awsConfig)
     {
         _userManager = userManager;
         _tokenService = tokenService;
         _mapper = mapper;
+        _imageService = imageService;
+        _awsConfig = awsConfig.Value;
     }
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -42,6 +50,30 @@ public class AccountsController : ControllerBase
         var roles = await _userManager.GetRolesAsync(user);
 
         return _mapper.Map<AccountDetails>((user, roles.AsEnumerable()));
+    }
+
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost("profile-picture")]
+    public async Task<ActionResult> UpdateProfilePicture([Required] [FromForm] IFormFile picture)
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        if (email is null)
+            return BadRequest();
+
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user is null)
+            return BadRequest();
+
+        await _imageService.UploadImageAsync(user.Id, picture, ImageFolders.UserImages);
+
+        // ProfilePicture is always the same, only the pic is changed.
+        if (user.ProfilePicture == null)
+        {
+            user.ProfilePicture = $"{_awsConfig.DistributionDomainName}/{ImageFolders.UserImages}/{user.Id}";
+            await _userManager.UpdateAsync(user);
+        }
+
+        return NoContent();
     }
 
     [Authorize(Roles = "Super")]
@@ -63,7 +95,7 @@ public class AccountsController : ControllerBase
         if (!result.Succeeded)
             return BadRequest();
 
-        await _userManager.AddToRoleAsync(user, "Admin");
+        await _userManager.AddToRolesAsync(user, new List<string> { "Admin", "User" });
 
         return Ok();
     }

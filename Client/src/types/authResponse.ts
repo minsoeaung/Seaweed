@@ -10,5 +10,6 @@ export type User = {
     phoneNumber: string;
     emailConfirmed: boolean;
     phoneNumberConfirmed: boolean;
+    profilePicture: string;
     roles: string[];
 }

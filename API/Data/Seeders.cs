@@ -31,7 +31,7 @@ public static class Seeders
                 NormalizedUserName = "SUPER",
             };
             await userManager.CreateAsync(superUser, "password");
-            await userManager.AddToRoleAsync(superUser, "Super");
+            await userManager.AddToRolesAsync(superUser, new List<string> { "Super", "User", "Admin" });
         }
 
         if (!context.Products.Any())

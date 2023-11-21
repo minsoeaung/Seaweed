@@ -122,7 +122,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.CreateDbIfNotExists();
+app.CreateDbIfNotExistsAndSeed();
 
 app.MapFallbackToFile("index.html");
 

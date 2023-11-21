@@ -6,6 +6,7 @@ public class AccountDetails
     public string Email { get; set; } = string.Empty;
     public string UserName { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
+    public string ProfilePicture { get; set; } = string.Empty;
     public bool EmailConfirmed { get; set; }
     public bool PhoneNumberConfirmed { get; set; }
     public IEnumerable<string> Roles { get; set; } = new List<string>();
