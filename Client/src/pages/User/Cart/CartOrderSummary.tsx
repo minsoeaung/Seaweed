@@ -1,4 +1,4 @@
-import {Button, Flex, Heading, Link, Stack, Text, useColorModeValue as mode,} from '@chakra-ui/react'
+import {Button, Flex, Heading, Link, Stack, Text, Tooltip, useColorModeValue as mode,} from '@chakra-ui/react'
 import {FaArrowRight} from 'react-icons/fa'
 import {formatPrice} from '../../../utilities/formatPrice'
 import {ReactNode} from 'react'
@@ -53,9 +53,12 @@ export const CartOrderSummary = () => {
                     </Text>
                 </Flex>
             </Stack>
-            <Button colorScheme="blue" size="lg" fontSize="md" rightIcon={<FaArrowRight/>}>
-                Checkout
-            </Button>
+            <Tooltip label="This feature has not been implemented yet."
+                     aria-label='This feature has not been implemented yet.'>
+                <Button colorScheme="blue" size="lg" fontSize="md" rightIcon={<FaArrowRight/>}>
+                    Checkout
+                </Button>
+            </Tooltip>
         </Stack>
     )
 }

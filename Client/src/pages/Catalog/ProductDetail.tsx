@@ -9,13 +9,15 @@ import {
     Box,
     Button,
     Card,
-    Container,
     Flex,
     Heading,
     HStack,
     Icon,
+    Stack,
     Text,
+    useColorModeValue,
     useDisclosure,
+    useMediaQuery,
     VStack
 } from "@chakra-ui/react";
 import {useProductDetails} from "../../hooks/queries/useProductDetails.ts";
@@ -23,15 +25,15 @@ import {WarningTwoIcon} from "@chakra-ui/icons";
 import {Rating} from "../../components/Rating.tsx";
 import {ImageSlider} from "../../components/ImageSlider.tsx";
 import {PriceTag} from "../../components/PriceTag.tsx";
-import {AddToCartButton} from "../../components/AddToCartButton.tsx";
 import {useCart} from "../../hooks/queries/useCart.ts";
 import {useWishList} from "../../hooks/queries/useWishList.ts";
 import AntdSpin from "../../components/AntdSpin";
-import {AiFillHeart, AiOutlineHeart} from "react-icons/ai";
+import {AiOutlineHeart} from "react-icons/ai";
 import {useToggleWishList} from "../../hooks/mutations/useToggleWishList.ts";
 import {PRODUCT_IMAGES} from "../../constants/fileUrls.ts";
 import {useRef} from "react";
 import {useAuth} from "../../context/AuthContext.tsx";
+import {AddToCartButton} from "../../components/AddToCartButton.tsx";
 
 type Params = {
     id: string;
@@ -39,15 +41,20 @@ type Params = {
 
 const ProductDetailPage = () => {
     const {id} = useParams<Params>();
-    const {data, isLoading, isError} = useProductDetails(id);
-    const cancelRef = useRef(null);
     const {isOpen, onOpen, onClose} = useDisclosure();
+
+    const {data, isLoading, isError} = useProductDetails(id);
     const {data: cart} = useCart();
     const {data: wishList} = useWishList();
-    const favoriteMutation = useToggleWishList();
-    const navigate = useNavigate();
     const {user} = useAuth();
 
+    const favoriteMutation = useToggleWishList();
+    const navigate = useNavigate();
+    const cancelRef = useRef(null);
+
+    const [isMobile] = useMediaQuery('(max-width: 400px)');
+
+    const goToLoginPage = () => navigate("/login");
 
     if (isLoading) {
         return (
@@ -77,13 +84,18 @@ const ProductDetailPage = () => {
 
     const isInCart = cart ? cart.cartItems.findIndex(c => c.product.id === data.id) >= 0 : false;
     const isFavorite = wishList ? wishList.findIndex(w => w.productId === data.id) >= 0 : false;
-    const goToLoginPage = () => navigate("/login");
 
     return (
-        <Container maxWidth="7xl">
-            <Card variant="outline" p={8}>
-                <Flex justifyContent="space-between">
-                    <Box width="50%" pr={{base: 0, sm: 4, lg: 8}}>
+        <Box
+            maxW={{base: '3xl', lg: '7xl'}}
+            mx="auto"
+        >
+            <Card variant="outline" p={{base: 6, lg: 12}}>
+                <Flex justifyContent="space-between" direction={{base: 'column', lg: 'row'}}>
+                    <Box width="100%" height="30vh" mb={8} display={{base: 'block', lg: 'none'}}>
+                        <ImageSlider imgHeight="50vh" images={[PRODUCT_IMAGES + data.id]}/>
+                    </Box>
+                    <Box width={{base: '100%', lg: '50%'}} pr={{base: 0, sm: 4, lg: 8}}>
                         <VStack alignItems="start">
                             <HStack>
                                 <Rating max={5} defaultValue={3}/>
@@ -93,25 +105,27 @@ const ProductDetailPage = () => {
                             </HStack>
                             <Heading
                                 mt={1}
-                                fontSize={{base: '1xl', sm: '2xl', lg: '3xl'}}>
+                                fontSize={{base: '1xl', sm: '2xl', lg: '4xl'}}
+                            >
                                 {data.name}
                             </Heading>
                             <Text color={'gray.500'}>By {data.brand.name}</Text>
-                            <PriceTag currency="USD" price={data.price} priceProps={{fontSize: "3xl"}}/>
-                            <Text fontSize='lg' mt={2}>{data.description}</Text>
+                            <PriceTag currency="USD" price={data.price} priceProps={{fontSize: "2xl"}}/>
+                            <Text fontSize='lg' mt={2}
+                                  color={useColorModeValue("gray.600", "gray.400")}>{data.description}</Text>
                             <br/>
-                            <HStack w="full">
+                            <Stack w="full" direction='row'>
                                 <AddToCartButton
                                     buttonProps={{
-                                        width: {base: "full", md: "50%", lg: "50%"},
+                                        width: '50%',
+                                        isDisabled: !cart
                                     }}
                                     productId={data.id}
                                     isInCart={isInCart}
                                 />
                                 <Button
-                                    leftIcon={<Icon as={isFavorite ? AiFillHeart : AiOutlineHeart}
-                                                    transition="all 0.15s ease" color={isFavorite ? "red" : ""}/>}
-                                    colorScheme='blue'
+                                    leftIcon={<Icon as={AiOutlineHeart}/>}
+                                    colorScheme={isFavorite ? 'red' : 'blue'}
                                     width="50%"
                                     variant={'outline'}
                                     onClick={async (e) => {
@@ -127,13 +141,18 @@ const ProductDetailPage = () => {
                                         }
                                     }}
                                     isLoading={favoriteMutation.isLoading}
+                                    style={{
+                                        whiteSpace: "normal",
+                                        wordWrap: "break-word",
+                                        overflow: "hidden"
+                                    }}
                                 >
-                                    {isFavorite ? "In favorite" : "Favorite"}
+                                    {isFavorite ? (isMobile ? "Remove" : "Remove from favorite") : "Favorite"}
                                 </Button>
-                            </HStack>
+                            </Stack>
                         </VStack>
                     </Box>
-                    <Box width="50%" height="50vh">
+                    <Box width="50%" height="50vh" display={{base: 'none', lg: 'block'}}>
                         <ImageSlider imgHeight="50vh" images={[PRODUCT_IMAGES + data.id]}/>
                     </Box>
                 </Flex>
@@ -160,7 +179,7 @@ const ProductDetailPage = () => {
                     </AlertDialogContent>
                 </AlertDialogOverlay>
             </AlertDialog>
-        </Container>
+        </Box>
     )
 }
 

@@ -1,6 +1,6 @@
 import Slider from "react-slick";
 import {useState} from "react";
-import {Box, IconButton, Image, useBreakpointValue} from "@chakra-ui/react";
+import {Box, IconButton, Image} from "@chakra-ui/react";
 import {ChevronLeftIcon, ChevronRightIcon} from "@chakra-ui/icons";
 import placeholderImage from '../assets/placeholderImage.webp';
 
@@ -24,9 +24,6 @@ type Props = {
 export const ImageSlider = ({imgHeight, images = []}: Props) => {
     const [slider, setSlider] = useState<Slider | null>(null)
 
-    const top = useBreakpointValue({base: '90%', md: '50%'})
-    const side = useBreakpointValue({base: '30%', md: '10px'})
-
     return (
         <Box width="full" height="full" position="relative" overflow="hidden">
             {/* CSS files for react-slick */}
@@ -44,27 +41,27 @@ export const ImageSlider = ({imgHeight, images = []}: Props) => {
                 <>
                     <IconButton
                         aria-label="left-arrow"
-                        colorScheme="messenger"
+                        colorScheme="whiteAlpha"
                         borderRadius="full"
                         position="absolute"
-                        left={side}
-                        top={top}
+                        left='10px'
+                        top='50%'
                         transform={'translate(0%, -50%)'}
                         zIndex={2}
                         onClick={() => slider?.slickPrev()}>
-                        <ChevronLeftIcon/>
+                        <ChevronLeftIcon color='gray.700' fontSize='2xl'/>
                     </IconButton>
                     <IconButton
                         aria-label="right-arrow"
-                        colorScheme="messenger"
+                        colorScheme="whiteAlpha"
                         borderRadius="full"
                         position="absolute"
-                        right={side}
-                        top={top}
+                        right='10px'
+                        top='50%'
                         transform={'translate(0%, -50%)'}
                         zIndex={2}
                         onClick={() => slider?.slickNext()}>
-                        <ChevronRightIcon/>
+                        <ChevronRightIcon color='gray.700' fontSize='2xl'/>
                     </IconButton>
                 </>
             )}
@@ -72,13 +69,13 @@ export const ImageSlider = ({imgHeight, images = []}: Props) => {
             <Slider {...settings} ref={(slider) => setSlider(slider)}>
                 {images.length > 0 ? (
                     images.map((url, index) => (
-                        <Image src={url} rounded="xl" height={imgHeight} key={index} objectFit="cover"
+                        <Image src={url} height={imgHeight} key={index} objectFit="cover"
                                objectPosition="center"
                                fallbackSrc={placeholderImage}
                                width="full"/>
                     ))
                 ) : (
-                    <Image src={placeholderImage} rounded="xl" height={imgHeight} objectFit="cover"
+                    <Image src={placeholderImage} height={imgHeight} objectFit="cover"
                            objectPosition="center"
                            width="full"
                     />

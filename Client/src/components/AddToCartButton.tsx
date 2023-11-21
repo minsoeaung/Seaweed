@@ -31,7 +31,7 @@ export const AddToCartButton = ({isInCart, productId, buttonProps}: Props) => {
     return (
         <>
             <Button
-                colorScheme="blue"
+                colorScheme={isInCart ? 'red' : 'blue'}
                 width="full"
                 variant="outline"
                 {...buttonProps}
@@ -48,9 +48,8 @@ export const AddToCartButton = ({isInCart, productId, buttonProps}: Props) => {
                     }
                 }}
                 isLoading={mutation.isLoading}
-                isDisabled={isInCart}
             >
-                {isInCart ? "In cart" : "Add to cart"}
+                {isInCart ? "Remove from cart" : "Add to cart"}
             </Button>
             <AlertDialog
                 isOpen={isOpen}

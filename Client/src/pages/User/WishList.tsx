@@ -128,7 +128,7 @@ const WishListPage = () => {
                                         </Button>
                                         <ButtonGroup spacing={4} variant='outline' justifyContent="end">
                                             <AddToCartButton
-                                                buttonProps={{variant: 'ghost'}}
+                                                buttonProps={{variant: 'ghost', isDisabled: !cart}}
                                                 productId={item.product.id}
                                                 isInCart={cart ? cart.cartItems.findIndex(c => c.product.id === item.product.id) >= 0 : false}
                                             />
@@ -190,6 +190,9 @@ const WishListPage = () => {
                                             <Td isNumeric>
                                                 <ButtonGroup spacing={4} variant='outline' justifyContent="end">
                                                     <AddToCartButton
+                                                        buttonProps={{
+                                                            isDisabled: !cart
+                                                        }}
                                                         productId={item.product.id}
                                                         isInCart={cart ? cart.cartItems.findIndex(c => c.product.id === item.product.id) >= 0 : false}
                                                     />

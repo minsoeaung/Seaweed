@@ -82,6 +82,9 @@ export const ProductCard = (props: Props) => {
                 </Stack>
                 <Stack align="center">
                     <AddToCartButton
+                        buttonProps={{
+                            isDisabled: !cart
+                        }}
                         productId={product.id}
                         isInCart={cart ? cart.cartItems.findIndex(c => c.product.id === product.id) >= 0 : false}
                     />

@@ -82,7 +82,7 @@ const Header = () => {
                         </InputLeftElement>
                         <Input
                             type='search'
-                            placeholder='What are you looking for?'
+                            placeholder={isMobile ? 'Search' : 'What are you looking for?'}
                             autoComplete='off'
                             name='search'
                             value={searchInputValue}
