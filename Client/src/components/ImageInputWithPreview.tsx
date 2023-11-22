@@ -1,4 +1,4 @@
-import { Button, Image, Input, Text } from '@chakra-ui/react';
+import { Button, Image, Input, Text, useToast } from '@chakra-ui/react';
 import placeholderImg from '../assets/placeholderImage.webp';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
@@ -12,11 +12,25 @@ export const ImageInputWithPreview = ({ src, onInputChange }: Props) => {
 
     const inputRef = useRef<HTMLInputElement>(null);
 
+    const toast = useToast();
+
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
+        const maxSize = 1024 * 1024; // 1MB
 
         if (files?.length) {
-            setPreview(URL.createObjectURL(files[0]));
+            const file = files[0];
+            if (file.size > maxSize) {
+                toast({
+                    title: 'Picture Size Cannot Be More Than 1MB',
+                    status: 'warning',
+                    isClosable: true,
+                    position: 'top',
+                });
+
+                return;
+            }
+            setPreview(URL.createObjectURL(file));
             onInputChange(files);
         }
     };
