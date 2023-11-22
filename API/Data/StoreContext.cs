@@ -12,13 +12,9 @@ public class StoreContext : IdentityDbContext<User, UserRole, int>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<User>()
-            .OwnsOne<RefreshToken>(u => u.RefreshToken, ownedNavigationBuilder =>
-            {
-                ownedNavigationBuilder
-                    .HasIndex(r => r.Token)
-                    .IsUnique();
-            });
+        builder.Entity<UserSession>()
+            .HasIndex(u => u.RefreshToken)
+            .IsUnique();
 
         builder.Entity<Brand>()
             .HasIndex(b => b.Name)
@@ -39,4 +35,5 @@ public class StoreContext : IdentityDbContext<User, UserRole, int>
     public DbSet<Brand> Brands => Set<Brand>();
     public DbSet<WishList> WishLists => Set<WishList>();
     public DbSet<CartItem> CartItems => Set<CartItem>();
+    public DbSet<UserSession> UserSessions => Set<UserSession>();
 }

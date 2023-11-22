@@ -58,6 +58,7 @@ builder.Services.AddAWSService<IAmazonCloudFront>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IUserLoginService, UserLoginService>();
 
 builder.Services.AddIdentityCore<User>(options =>
     {

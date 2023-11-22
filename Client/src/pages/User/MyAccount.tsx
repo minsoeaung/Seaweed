@@ -5,6 +5,7 @@ import {
     Box,
     Button,
     Card,
+    Center,
     Heading,
     HStack,
     IconButton,
@@ -12,11 +13,13 @@ import {
     Tag,
     Text,
     VStack,
+    Wrap,
 } from '@chakra-ui/react';
 import { CheckIcon, EditIcon } from '@chakra-ui/icons';
 import AntdSpin from '../../components/AntdSpin';
 import { useUpdateProfilePicture } from '../../hooks/mutations/useUpdateProfilePicture.ts';
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 const MyAccount = () => {
     const { data, isLoading, isError } = useMyAccount();
@@ -32,7 +35,16 @@ const MyAccount = () => {
     }
 
     if (isError) {
-        return <p>Error loading account settings</p>;
+        return (
+            <Center>
+                <VStack mt={8}>
+                    <p>Session expired. Please login again.</p>
+                    <Button as={Link} to="/login" variant="solid" colorScheme="blue">
+                        Login
+                    </Button>
+                </VStack>
+            </Center>
+        );
     }
 
     if (!data) return null;
@@ -80,11 +92,13 @@ const MyAccount = () => {
                             {!(data.roles.length === 1 && data.roles.includes('User')) && (
                                 <HStack>
                                     <Text fontSize="sm">Account type: </Text>
-                                    {data.roles.map((role) => (
-                                        <Tag colorScheme="blue" key={role}>
-                                            {role}
-                                        </Tag>
-                                    ))}
+                                    <Wrap>
+                                        {data.roles.map((role) => (
+                                            <Tag colorScheme="blue" key={role}>
+                                                {role}
+                                            </Tag>
+                                        ))}
+                                    </Wrap>
                                 </HStack>
                             )}
                         </VStack>

@@ -25,7 +25,7 @@ import { FiShoppingCart } from 'react-icons/fi';
 import { RxPerson } from 'react-icons/rx';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
-import { AppLogo } from './AppLogo.tsx';
+import { AppLogo, AppLogoSlim } from './AppLogo.tsx';
 import React, { useState } from 'react';
 import { useCart } from '../hooks/queries/useCart.ts';
 import { MdOutlineInventory2 } from 'react-icons/md';
@@ -69,7 +69,17 @@ const Header = () => {
             }}
         >
             <Flex h={12} alignItems={'center'} justifyContent={'space-between'}>
-                {(isMobile ? !searchBoxVisible : true) && (
+                {isMobile ? (
+                    searchBoxVisible ? (
+                        <Link to="/">
+                            <AppLogoSlim />
+                        </Link>
+                    ) : (
+                        <Link to="/">
+                            <AppLogo />
+                        </Link>
+                    )
+                ) : (
                     <Link to="/">
                         <AppLogo />
                     </Link>

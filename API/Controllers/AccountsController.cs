@@ -4,7 +4,6 @@ using API.Configurations;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
 using API.Entities;
-using API.Extensions;
 using API.Services;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,15 +22,17 @@ public class AccountsController : ControllerBase
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
     private readonly IImageService _imageService;
+    private readonly IUserLoginService _loginService;
     private readonly AwsConfig _awsConfig;
 
     public AccountsController(UserManager<User> userManager, ITokenService tokenService, IMapper mapper,
-        IImageService imageService, IOptions<AwsConfig> awsConfig)
+        IImageService imageService, IOptions<AwsConfig> awsConfig, IUserLoginService loginService)
     {
         _userManager = userManager;
         _tokenService = tokenService;
         _mapper = mapper;
         _imageService = imageService;
+        _loginService = loginService;
         _awsConfig = awsConfig.Value;
     }
 
@@ -104,103 +105,66 @@ public class AccountsController : ControllerBase
     public async Task<ActionResult<AuthResult>> Login(LoginDto userLoginDto)
     {
         var user = await _userManager.FindByNameAsync(userLoginDto.UserName.Trim());
-
-        if (user is null)
-            return NotFound();
+        if (user is null) return NotFound();
 
         var passwordValid = await _userManager.CheckPasswordAsync(user, userLoginDto.Password);
+        if (!passwordValid) return BadRequest();
 
-        if (!passwordValid)
-            return BadRequest();
+        var userLogin = await _loginService.LoginAsync(user);
+
+        await _loginService.TryDeleteLoginRecord(Request.Cookies["refreshToken"]);
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        var refreshToken = _tokenService.GenerateRefreshToken();
-        user.RefreshToken = refreshToken;
-        await _userManager.UpdateAsync(user);
-        _tokenService.SetRefreshTokenInCookies(refreshToken, Response);
-
-        var accountDetails = _mapper.Map<AccountDetails>((user, roles.AsEnumerable()));
-        var accessToken = _tokenService.GenerateAccessToken(user, roles);
+        _tokenService.SetRefreshTokenInCookies(_mapper.Map<RefreshToken>(userLogin), Response);
 
         return new AuthResult
         {
-            AccessToken = accessToken.AccessToken,
-            AccountDetails = accountDetails
+            AccessToken = _tokenService.GenerateAccessToken(user, roles).AccessToken,
+            AccountDetails = _mapper.Map<AccountDetails>((user, roles.AsEnumerable()))
         };
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResult>> Register(RegisterDto model)
+    public async Task<ActionResult<AuthResult>> Register(RegisterDto dto)
     {
-        var user = new User()
-        {
-            UserName = model.UserName,
-            Email = model.Email,
-            SecurityStamp = Guid.NewGuid().ToString(),
-        };
-
-        var refreshToken = _tokenService.GenerateRefreshToken();
-        user.RefreshToken = refreshToken;
-
-        var result = await _userManager.CreateAsync(user, model.Password);
-        if (!result.Succeeded)
+        var userLogin = await _loginService.RegisterAndLoginAsync(dto.UserName, dto.Email, dto.Password);
+        if (userLogin == null)
             return BadRequest();
 
-        _tokenService.SetRefreshTokenInCookies(refreshToken, Response);
-        await _userManager.AddToRoleAsync(user, "User");
-
         var roles = new List<string>() { "User" };
-        var createdUser = await _userManager.FindByNameAsync(user.UserName);
+        await _userManager.AddToRolesAsync(userLogin.User, roles);
 
-        var accountDetails = _mapper.Map<AccountDetails>((createdUser, roles.AsEnumerable()));
-        var accessToken = _tokenService.GenerateAccessToken(createdUser!, roles);
+        _tokenService.SetRefreshTokenInCookies(_mapper.Map<RefreshToken>(userLogin), Response);
+
+        await _loginService.TryDeleteLoginRecord(Request.Cookies["refreshToken"]);
 
         return new AuthResult
         {
-            AccessToken = accessToken.AccessToken,
-            AccountDetails = accountDetails
+            AccessToken = _tokenService.GenerateAccessToken(userLogin.User, roles).AccessToken,
+            AccountDetails = _mapper.Map<AccountDetails>((userLogin.User, roles.AsEnumerable()))
         };
     }
 
     [HttpGet("renew-tokens")]
     public async Task<ActionResult<TokenResult>> Refresh()
     {
-        var refreshToken = Request.Cookies["refreshToken"];
-        if (refreshToken is null)
+        var userLogin = await _loginService.RenewToken(Request.Cookies["refreshToken"]);
+        if (userLogin == null)
             return BadRequest();
 
-        var user = await _userManager.FindByRefreshTokenAsync(refreshToken);
-        if (user is null)
-            return BadRequest();
+        _tokenService.SetRefreshTokenInCookies(_mapper.Map<RefreshToken>(userLogin), Response);
 
-        if (user.RefreshToken.ExpiredAt < DateTime.UtcNow)
-            return BadRequest();
-
-        var newRefreshToken = _tokenService.GenerateRefreshToken();
-        user.RefreshToken = newRefreshToken;
-        await _userManager.UpdateAsync(user);
-        _tokenService.SetRefreshTokenInCookies(newRefreshToken, Response);
-
-        var roles = await _userManager.GetRolesAsync(user);
-
-        return _tokenService.GenerateAccessToken(user, roles);
+        return _tokenService.GenerateAccessToken(userLogin.User, await _userManager.GetRolesAsync(userLogin.User));
     }
 
     [HttpGet("logout")]
     public async Task<IActionResult> Logout()
     {
-        var refreshToken = Request.Cookies["refreshToken"];
-        if (refreshToken is null)
-            return Ok();
-
-        var user = await _userManager.FindByRefreshTokenAsync(refreshToken);
-        if (user is null)
-            return Ok();
+        await _loginService.TryDeleteLoginRecord(Request.Cookies["refreshToken"]);
 
         _tokenService.DeleteRefreshTokenInCookies(Response);
-        user.RefreshToken.Token = null;
-        await _userManager.UpdateAsync(user);
+
         return Ok();
     }
 }
