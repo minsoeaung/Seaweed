@@ -1,31 +1,18 @@
-import {
-    AbsoluteCenter,
-    Box,
-    Card,
-    Center,
-    Flex,
-    Heading,
-    HStack,
-    Link,
-    Stack,
-    useColorModeValue,
-} from '@chakra-ui/react';
+import { AbsoluteCenter, Box, Card, Flex, Heading, HStack, Link, Stack, useColorModeValue } from '@chakra-ui/react';
 import { useCart } from '../../../hooks/queries/useCart.ts';
 import { CartItem } from './CartItem.tsx';
 import { CartOrderSummary } from './CartOrderSummary.tsx';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import AntdSpin from '../../../components/AntdSpin';
 import { Fallback } from '../../../components/Fallback';
+import { ErrorDisplay } from '../../../components/ErrorDisplay.tsx';
+import { ApiError } from '../../../types/apiError.ts';
 
 const CartPage = () => {
-    const { isLoading, isFetching, data, isError } = useCart();
+    const { isLoading, isFetching, data, isError, error } = useCart();
 
     if (isError) {
-        return (
-            <Center mt={10}>
-                <p>Error loading cart items.</p>
-            </Center>
-        );
+        return <ErrorDisplay error={error as unknown as ApiError} />;
     }
 
     if (isLoading) {

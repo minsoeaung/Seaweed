@@ -90,6 +90,9 @@ export const useProductCUD = () => {
 
                 if (data.type === 'UPDATE') await queryClient.invalidateQueries([PRODUCT_DETAILS, String(data.id)]);
             },
+            // onError: (error) => {
+            //     console.log(error, 'from query');
+            // },
         }
     );
 };

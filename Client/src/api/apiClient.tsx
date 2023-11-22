@@ -43,15 +43,15 @@ ApiClient.interceptors.response.use(
                                 resolve(response);
                             })
                             .catch((error) => {
-                                reject(error);
+                                reject(error.response?.data);
                             });
                     })
                     .catch((error) => {
-                        reject(error);
+                        reject(error.response?.data);
                     });
             });
         } else {
-            return Promise.reject(error);
+            return Promise.reject(error.response?.data);
         }
     }
 );

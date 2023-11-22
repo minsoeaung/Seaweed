@@ -191,13 +191,17 @@ const Header = () => {
                                             Cart {!!cart?.cartItems.length && `(${cart.cartItems.length})`}
                                         </MenuItem>
                                         {user.roles.some((role) => ['Admin', 'Super'].includes(role)) && (
-                                            <MenuItem
-                                                as={Link}
-                                                to="/inventory?pageSize=10"
-                                                icon={<Icon as={MdOutlineInventory2} />}
-                                            >
-                                                Inventory
-                                            </MenuItem>
+                                            <>
+                                                <MenuDivider />
+                                                <MenuItem
+                                                    as={Link}
+                                                    to="/inventory?pageSize=10"
+                                                    icon={<Icon as={MdOutlineInventory2} />}
+                                                    fontWeight="bold"
+                                                >
+                                                    Inventory
+                                                </MenuItem>
+                                            </>
                                         )}
                                         <MenuDivider />
                                         <MenuItem onClick={logout} color="red.500">

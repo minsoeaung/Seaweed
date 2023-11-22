@@ -31,8 +31,9 @@ public class ExceptionMiddleware
             var response = new ProblemDetails()
             {
                 Status = StatusCodes.Status500InternalServerError,
-                Detail = _env.IsDevelopment() ? ex.StackTrace : null,
+                Detail = _env.IsDevelopment() ? ex.StackTrace : "Something went wrong.",
                 Title = ex.Message,
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1"
             };
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };

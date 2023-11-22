@@ -6,6 +6,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogOverlay,
+    Box,
     Button,
     Card,
     CardBody,
@@ -42,6 +43,8 @@ import { useBrands } from '../../hooks/queries/useBrands.ts';
 import { useProductCUD } from '../../hooks/mutations/useProductCUD.ts';
 import { ImageInputWithPreview } from '../../components/ImageInputWithPreview.tsx';
 import { BRAND_IMAGES, CATEGORY_IMAGES, PRODUCT_IMAGES } from '../../constants/fileUrls.ts';
+import { ErrorDisplay } from '../../components/ErrorDisplay.tsx';
+import { ApiError } from '../../types/apiError.ts';
 
 const validType = ['category', 'brand', 'product'] as const;
 
@@ -308,6 +311,14 @@ const ProductEdit = ({ id }: { id: number }) => {
                     )
                 )}
             </Flex>
+            {!!mutation.error && (
+                <>
+                    <br />
+                    <Box>
+                        <ErrorDisplay error={mutation.error as ApiError} />
+                    </Box>
+                </>
+            )}
             <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} isCentered>
                 <AlertDialogOverlay>
                     <AlertDialogContent>
