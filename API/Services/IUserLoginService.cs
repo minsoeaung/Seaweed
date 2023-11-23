@@ -8,7 +8,5 @@ public interface IUserLoginService
 
     Task<UserSession> LoginAsync(User user);
 
-    Task<UserSession?> RegisterAndLoginAsync(string username, string email, string password);
-
     Task<UserSession?> RenewToken(string? currentToken);
 }

@@ -1,7 +1,6 @@
 import {
     Box,
     Button,
-    Container,
     FormControl,
     FormLabel,
     Heading,
@@ -20,6 +19,8 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import { useMutation } from 'react-query';
 import { LoginDto } from '../../types/loginDto.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
+import { ErrorDisplay } from '../../components/ErrorDisplay.tsx';
+import { ApiError } from '../../types/apiError.ts';
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -55,7 +56,7 @@ const Login = () => {
     );
 
     return (
-        <Container>
+        <Box maxW="xl" mx="auto">
             <Stack spacing={8} py={{ base: 6, md: 12 }} px={{ base: 2, md: 6 }}>
                 <Heading fontSize={'3xl'} textAlign={'center'}>
                     Welcome to Shop! Please login.
@@ -88,7 +89,7 @@ const Login = () => {
                             <Stack pt={2}>
                                 <Button
                                     type="submit"
-                                    loadingText="Submitting"
+                                    loadingText="Logging in..."
                                     isLoading={loginMutation.isLoading}
                                     size="lg"
                                     bg={'blue.400'}
@@ -97,9 +98,17 @@ const Login = () => {
                                         bg: 'blue.600',
                                     }}
                                 >
-                                    Login
+                                   Login
                                 </Button>
                             </Stack>
+                            {!!loginMutation.error && (
+                                <>
+                                    <br />
+                                    <Box>
+                                        <ErrorDisplay error={loginMutation.error as ApiError} />
+                                    </Box>
+                                </>
+                            )}
                             <Stack pt={6}>
                                 <Text align={'center'}>
                                     New member?{' '}
@@ -113,7 +122,7 @@ const Login = () => {
                     </form>
                 </Box>
             </Stack>
-        </Container>
+        </Box>
     );
 };
 

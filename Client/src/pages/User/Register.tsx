@@ -1,8 +1,8 @@
 import {
     Box,
     Button,
-    Container,
     FormControl,
+    FormHelperText,
     FormLabel,
     Heading,
     IconButton,
@@ -20,6 +20,8 @@ import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { RegisterDto } from '../../types/registerDto.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
+import { ErrorDisplay } from '../../components/ErrorDisplay.tsx';
+import { ApiError } from '../../types/apiError.ts';
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -56,7 +58,7 @@ const Register = () => {
     );
 
     return (
-        <Container>
+        <Box maxW="xl" mx="auto">
             <Stack spacing={8} py={{ base: 6, md: 12 }} px={{ base: 2, md: 6 }}>
                 <Heading fontSize={'3xl'} textAlign={'center'}>
                     Create Your Account
@@ -72,6 +74,7 @@ const Register = () => {
                                     value={formValues.userName}
                                     onChange={handleFormValueChange('userName')}
                                 />
+                                <FormHelperText>4-50 characters, A-Z, a-z, 0-9 only.</FormHelperText>
                             </FormControl>
                             <FormControl id="email" isRequired>
                                 <FormLabel>Email address</FormLabel>
@@ -94,11 +97,12 @@ const Register = () => {
                                         />
                                     </InputRightElement>
                                 </InputGroup>
+                                <FormHelperText>Minimum 6 characters.</FormHelperText>
                             </FormControl>
                             <Stack pt={2}>
                                 <Button
                                     type="submit"
-                                    loadingText="Submitting"
+                                    loadingText="Signing up..."
                                     isLoading={registerMutation.isLoading}
                                     size="lg"
                                     bg={'blue.400'}
@@ -110,6 +114,14 @@ const Register = () => {
                                     Sign up
                                 </Button>
                             </Stack>
+                            {!!registerMutation.error && (
+                                <>
+                                    <br />
+                                    <Box>
+                                        <ErrorDisplay error={registerMutation.error as ApiError} />
+                                    </Box>
+                                </>
+                            )}
                             <Stack pt={6}>
                                 <Text align={'center'}>
                                     Already a user?{' '}
@@ -123,7 +135,7 @@ const Register = () => {
                     </form>
                 </Box>
             </Stack>
-        </Container>
+        </Box>
     );
 };
 

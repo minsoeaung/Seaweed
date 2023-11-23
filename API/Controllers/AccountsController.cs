@@ -105,10 +105,19 @@ public class AccountsController : ControllerBase
     public async Task<ActionResult<AuthResult>> Login(LoginDto userLoginDto)
     {
         var user = await _userManager.FindByNameAsync(userLoginDto.UserName.Trim());
-        if (user is null) return NotFound();
+        if (user is null)
+        {
+            ModelState.AddModelError("Username", "Account not found. Please check your username and try again.");
+            return ValidationProblem();
+        }
 
         var passwordValid = await _userManager.CheckPasswordAsync(user, userLoginDto.Password);
-        if (!passwordValid) return BadRequest();
+        if (!passwordValid)
+        {
+            ModelState.AddModelError("Password",
+                "Password is incorrect. Verify your password and attempt login again.");
+            return ValidationProblem();
+        }
 
         var userLogin = await _loginService.LoginAsync(user);
 
@@ -128,21 +137,37 @@ public class AccountsController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<AuthResult>> Register(RegisterDto dto)
     {
-        var userLogin = await _loginService.RegisterAndLoginAsync(dto.UserName, dto.Email, dto.Password);
-        if (userLogin == null)
-            return BadRequest();
+        var user = new User()
+        {
+            UserName = dto.UserName.Trim(),
+            Email = dto.Email,
+            SecurityStamp = Guid.NewGuid().ToString(),
+        };
+
+        var userResult = await _userManager.CreateAsync(user, dto.Password);
+        if (!userResult.Succeeded)
+        {
+            foreach (var identityError in userResult.Errors)
+            {
+                ModelState.AddModelError(identityError.Code, identityError.Description);
+            }
+
+            return ValidationProblem();
+        }
 
         var roles = new List<string>() { "User" };
-        await _userManager.AddToRolesAsync(userLogin.User, roles);
+        await _userManager.AddToRolesAsync(user, roles);
 
-        _tokenService.SetRefreshTokenInCookies(_mapper.Map<RefreshToken>(userLogin), Response);
+        var userSession = await _loginService.LoginAsync(user);
+
+        _tokenService.SetRefreshTokenInCookies(_mapper.Map<RefreshToken>(userSession), Response);
 
         await _loginService.TryDeleteLoginRecord(Request.Cookies["refreshToken"]);
 
         return new AuthResult
         {
-            AccessToken = _tokenService.GenerateAccessToken(userLogin.User, roles).AccessToken,
-            AccountDetails = _mapper.Map<AccountDetails>((userLogin.User, roles.AsEnumerable()))
+            AccessToken = _tokenService.GenerateAccessToken(userSession.User, roles).AccessToken,
+            AccountDetails = _mapper.Map<AccountDetails>((userSession.User, roles.AsEnumerable()))
         };
     }
 
