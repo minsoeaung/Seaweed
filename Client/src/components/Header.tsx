@@ -24,12 +24,12 @@ import { LuHeart } from 'react-icons/lu';
 import { FiShoppingCart } from 'react-icons/fi';
 import { RxPerson } from 'react-icons/rx';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.tsx';
 import { AppLogo, AppLogoSlim } from './AppLogo.tsx';
 import React, { useState } from 'react';
 import { useCart } from '../hooks/queries/useCart.ts';
 import { MdOutlineInventory2 } from 'react-icons/md';
 import { useMyAccount } from '../hooks/queries/useMyAccount.ts';
+import { useAuth } from '../context/AuthContext.tsx';
 
 const Header = () => {
     const { colorMode, toggleColorMode } = useColorMode();
@@ -180,7 +180,7 @@ const Header = () => {
                                     >
                                         <Avatar size={'sm'} src={account?.profilePicture} />
                                     </MenuButton>
-                                    <MenuList alignItems={'center'}>
+                                    <MenuList alignItems={'center'} zIndex={3}>
                                         <br />
                                         <Center>
                                             <Avatar size={'2xl'} src={account?.profilePicture} />

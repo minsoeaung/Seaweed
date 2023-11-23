@@ -36,13 +36,13 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const logout = async () => {
-        await ApiClient.get('api/Accounts/logout');
         sessionStorage.removeItem('jwtToken');
         queryClient.clear();
         setUser(null);
         if (window.location.pathname.includes('user/')) {
             navigate('/');
         }
+        await ApiClient.get('api/Accounts/logout');
     };
 
     const register = async (body: RegisterDto) => {
