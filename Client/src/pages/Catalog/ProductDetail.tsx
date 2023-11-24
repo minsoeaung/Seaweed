@@ -9,11 +9,16 @@ import {
     Box,
     Button,
     Card,
+    Divider,
     Flex,
     Heading,
     HStack,
     Icon,
+    Spinner,
     Stack,
+    Stat,
+    StatHelpText,
+    StatNumber,
     Text,
     useColorModeValue,
     useDisclosure,
@@ -34,6 +39,10 @@ import { PRODUCT_IMAGES } from '../../constants/fileUrls.ts';
 import { useRef } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { AddToCartButton } from '../../components/AddToCartButton.tsx';
+import { Reviews } from '../../components/Reviews.tsx';
+import { WriteAReviewModalButton } from '../../components/WriteAReviewModalButton.tsx';
+import { ReviewItem } from '../../components/ReviewItem.tsx';
+import { useMyReview } from '../../hooks/queries/useMyReview.ts';
 
 type Params = {
     id: string;
@@ -53,6 +62,8 @@ const ProductDetailPage = () => {
     const cancelRef = useRef(null);
 
     const [isMobile] = useMediaQuery('(max-width: 400px)');
+
+    const { data: myReview, isLoading: myReviewLoading } = useMyReview(id);
 
     const goToLoginPage = () => navigate('/login');
 
@@ -94,10 +105,10 @@ const ProductDetailPage = () => {
                     </Box>
                     <Box width={{ base: '100%', lg: '50%' }} pr={{ base: 0, sm: 4, lg: 8 }}>
                         <VStack alignItems="start">
-                            <HStack>
-                                <Rating max={5} defaultValue={3} />
-                                <Text color={'gray.500'}>12 Reviews</Text>
-                            </HStack>
+                            {/*<HStack>*/}
+                            {/*    <Rating max={5} defaultValue={3} />*/}
+                            {/*    <Text color={'gray.500'}>12 Reviews</Text>*/}
+                            {/*</HStack>*/}
                             <Heading mt={1} fontSize={{ base: '1xl', sm: '2xl', lg: '4xl' }}>
                                 {data.name}
                             </Heading>
@@ -149,6 +160,30 @@ const ProductDetailPage = () => {
                         <ImageSlider imgHeight="50vh" images={[PRODUCT_IMAGES + data.id]} />
                     </Box>
                 </Flex>
+                <br />
+                <Divider />
+                <Text fontWeight="bold" fontSize="2xl" my={3}>
+                    Ratings and reviews
+                </Text>
+                <Stat>
+                    <StatNumber>
+                        <HStack>
+                            <Text>4.5</Text>
+                            <Rating defaultValue={4} max={5} />
+                        </HStack>
+                    </StatNumber>
+                    <StatHelpText>Based on 12 reviews</StatHelpText>
+                </Stat>
+                <HStack>
+                    {/*<Button>See all reviews</Button>*/}
+                    {!myReview && !myReviewLoading && user && <WriteAReviewModalButton productId={Number(id)} />}
+                </HStack>
+                <Box mt={2}>
+                    <Box my={7}>
+                        {myReviewLoading ? <Spinner /> : !!myReview && <ReviewItem data={myReview} ownByUser />}
+                    </Box>
+                    <Reviews />
+                </Box>
             </Card>
             <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} isCentered>
                 <AlertDialogOverlay>

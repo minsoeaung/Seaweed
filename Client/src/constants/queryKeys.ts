@@ -13,3 +13,7 @@ export const CART = 'cart';
 export const PRODUCT_DETAILS = 'productDetails';
 
 export const ACCOUNT = 'account';
+
+export const REVIEWS = 'reviews';
+
+export const MY_REVIEW = "myReview";

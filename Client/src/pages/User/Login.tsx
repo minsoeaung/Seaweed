@@ -16,7 +16,7 @@ import {
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { LoginDto } from '../../types/loginDto.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { ErrorDisplay } from '../../components/ErrorDisplay.tsx';
@@ -31,6 +31,7 @@ const Login = () => {
 
     const { login } = useAuth();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -50,6 +51,7 @@ const Login = () => {
         },
         {
             onSuccess: () => {
+                queryClient.clear();
                 navigate('/catalog');
             },
         }
@@ -98,7 +100,7 @@ const Login = () => {
                                         bg: 'blue.600',
                                     }}
                                 >
-                                   Login
+                                    Login
                                 </Button>
                             </Stack>
                             {!!loginMutation.error && (
