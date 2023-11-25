@@ -7,6 +7,8 @@ export type Product = {
     description: string;
     price: number;
     quantityInStock: number;
+    averageRating: number;
+    numOfRatings: number;
     categoryId: number;
     category: NamedApiResource;
     brandId: number;

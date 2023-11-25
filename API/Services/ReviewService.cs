@@ -38,19 +38,27 @@ public class ReviewService : IReviewService
 
     public async Task<ProductReview?> CreateOrUpdateReview(int userId, int productId, int rating, string reviewComment)
     {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null) return null;
+
+        var product = await _context.Products.FindAsync(productId);
+        if (product == null) return null;
+
         var existingReview = await GetReview(userId, productId);
+
         if (existingReview != null)
         {
+            product.UpdateRating(existingReview.Rating, rating);
             existingReview.Review = reviewComment;
             existingReview.Rating = rating;
+
+            // Both must succeed or fail
             _context.ProductReviews.Update(existingReview);
+            _context.Products.Update(product);
+
             await _context.SaveChangesAsync();
             return existingReview;
         }
-
-        var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null)
-            return null;
 
         var newReview = new ProductReview
         {
@@ -63,19 +71,31 @@ public class ReviewService : IReviewService
             UpdatedAt = DateTime.UtcNow,
         };
 
-        await _context.ProductReviews.AddAsync(newReview);
-        await _context.SaveChangesAsync();
+        product.AddNewRating(rating);
 
+        // Both must succeed or fail
+        await _context.ProductReviews.AddAsync(newReview);
+        _context.Products.Update(product);
+
+        await _context.SaveChangesAsync();
         return newReview;
     }
 
     public async Task DeleteReview(int userId, int productId)
     {
         var review = await GetReview(userId, productId);
-
         if (review == null) return;
 
+        var product = await _context.Products.FindAsync(productId);
+        if (product == null) return;
+        product.RemoveRating(review.Rating);
+
+        // Both must succeed or fail
         _context.ProductReviews.Remove(review);
+        _context.Products.Update(product);
+
+        // SaveChanges is guaranteed to either completely succeed, or leave the database unmodified if an error occurs
+        // https://learn.microsoft.com/en-us/ef/core/saving/transactions#default-transaction-behavior
         await _context.SaveChangesAsync();
     }
 }

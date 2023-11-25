@@ -29,7 +29,7 @@ interface Props {
 
 export const ProductCard = (props: Props) => {
     const { product, rootProps } = props;
-    const { name, price } = product;
+    const { name, price, averageRating, numOfRatings } = product;
     const [imageSrc, setImageSrc] = useState(PRODUCT_IMAGES + product.id);
 
     const { data: wishList } = useWishList();
@@ -71,12 +71,12 @@ export const ProductCard = (props: Props) => {
                                 {name}
                             </Text>
                         </Tooltip>
-                        <PriceTag price={price} salePrice={0} currency="USD" />
+                        <PriceTag price={price} currency="USD" />
                     </Stack>
                     <HStack>
-                        <Rating defaultValue={4} size="sm" />
+                        <Rating max={5} defaultValue={averageRating} size="sm" />
                         <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
-                            (12)
+                            ({numOfRatings})
                         </Text>
                     </HStack>
                 </Stack>

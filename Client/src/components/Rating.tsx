@@ -8,10 +8,10 @@ interface Props {
     rootProps?: StackProps;
 }
 
-export const Rating = (props: Props) => {
-    const { defaultValue = 0, max = 5, size = 'md', rootProps } = props;
+export const Rating = ({ defaultValue = 0, max = 5, size = 'md', rootProps }: Props) => {
     const color = useColorModeValue('gray.200', 'gray.600');
     const activeColor = useColorModeValue('blue.500', 'blue.200');
+    
     return (
         <HStack spacing="0.5" {...rootProps}>
             {Array.from({ length: max })

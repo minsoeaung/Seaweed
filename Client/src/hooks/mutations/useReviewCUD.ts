@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query';
 import { useToast } from '@chakra-ui/react';
 import { ApiClient } from '../../api/apiClient.tsx';
-import { MY_REVIEW } from '../../constants/queryKeys.ts';
+import { MY_REVIEW, PRODUCT_DETAILS } from '../../constants/queryKeys.ts';
 import { Review } from '../../types/review.ts';
 
 type Payload = {
@@ -48,8 +48,10 @@ export const useReviewCUD = () => {
                 if (data.type === 'DELETE') {
                     // queryClient.removeQueries() do not trigger re-render
                     queryClient.setQueryData([MY_REVIEW, String(data.productId)], null);
+                    await queryClient.invalidateQueries([PRODUCT_DETAILS, String(data.productId)]);
                 } else {
                     queryClient.setQueryData([MY_REVIEW, String(data.payload.productId)], response);
+                    await queryClient.invalidateQueries([PRODUCT_DETAILS, String(data.payload.productId)]);
                 }
             },
         }

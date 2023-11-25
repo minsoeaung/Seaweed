@@ -1,4 +1,3 @@
-using System.Net;
 using API.Data;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
@@ -74,7 +73,7 @@ public class ProductsController : ControllerBase
         _storeContext.Products.Remove(product);
         await _storeContext.SaveChangesAsync();
         await _imageService.DeleteImageAsync(product.Id, ImageFolders.ProductImages);
-        
+
         return NoContent();
     }
 
@@ -97,22 +96,28 @@ public class ProductsController : ControllerBase
 
     [Authorize(Roles = "Super,Admin")]
     [HttpPut("{id}")]
-    public async Task<ActionResult<Product>> UpdateProduct(int id, [FromForm] CreateProductDto productDto)
+    public async Task<ActionResult<Product>> UpdateProduct(int id, [FromForm] CreateProductDto dto)
     {
-        var product = await _storeContext.Products.AnyAsync(p => p.Id == id);
-        if (!product) return NotFound();
+        var product = await _storeContext.Products.FindAsync(id);
+        if (product == null) return NotFound();
 
-        var newProduct = _mapper.Map<Product>(productDto);
-        newProduct.Id = id; // ***
-        _storeContext.Entry(newProduct).State = EntityState.Modified;
+        product.Name = dto.Name;
+        product.Sku = dto.Sku;
+        product.Description = dto.Description;
+        product.Price = dto.Price;
+        product.QuantityInStock = dto.QuantityInStock;
+        product.CategoryId = dto.CategoryId;
+        product.BrandId = dto.BrandId;
+
+        _storeContext.Entry(product).State = EntityState.Modified;
 
         var updates = await _storeContext.SaveChangesAsync();
         if (updates > 0)
         {
-            if (productDto.Picture != null)
-                await _imageService.UploadImageAsync(id, productDto.Picture, ImageFolders.ProductImages);
+            if (dto.Picture != null)
+                await _imageService.UploadImageAsync(id, dto.Picture, ImageFolders.ProductImages);
 
-            return newProduct;
+            return product;
         }
 
         return BadRequest();

@@ -162,11 +162,11 @@ const ProductDetailPage = () => {
                     <Stat>
                         <StatNumber>
                             <HStack>
-                                <Text>4.5</Text>
-                                <Rating defaultValue={4} max={5} />
+                                <Text>{data.averageRating.toFixed(1)}</Text>
+                                <Rating defaultValue={data.averageRating} max={5} />
                             </HStack>
                         </StatNumber>
-                        <StatHelpText>Based on 12 reviews</StatHelpText>
+                        <StatHelpText>Based on {data.numOfRatings} reviews</StatHelpText>
                     </Stat>
                     <HStack>
                         <Button rightIcon={<ChevronRightIcon />} as={Link} to={`/catalog/${id}/reviews`}>
