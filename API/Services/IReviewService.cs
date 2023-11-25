@@ -1,10 +1,11 @@
 using API.Entities;
+using API.RequestHelpers;
 
 namespace API.Services;
 
 public interface IReviewService
 {
-    Task<IEnumerable<ProductReview>> GetReviewsExceptOwnedByUserId(int userId, int productId);
+    Task<PagedList<ProductReview>> GetReviews(int productId, int pageNumber, int pageSize);
 
     Task<ProductReview?> GetReview(int userId, int productId);
 

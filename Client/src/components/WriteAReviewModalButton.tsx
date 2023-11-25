@@ -50,9 +50,9 @@ export const WriteAReviewModalButton = ({ productId }: Props) => {
             <Button variant="solid" colorScheme="blue" onClick={onOpen}>
                 Write a review
             </Button>
-            <Modal isOpen={isOpen} onClose={onClose}>
+            <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent maxWidth={{ base: '95%', md: 'md' }}>
                     <ModalHeader>Write a review</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
@@ -72,6 +72,8 @@ export const WriteAReviewModalButton = ({ productId }: Props) => {
                             placeholder="Your comment"
                             value={review}
                             onChange={(e) => setReview(e.target.value)}
+                            height="25vh"
+                            maxLength={500}
                         />
                     </ModalBody>
 

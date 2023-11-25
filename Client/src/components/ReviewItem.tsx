@@ -24,16 +24,17 @@ import {
     ModalOverlay,
     Radio,
     RadioGroup,
+    Tag,
     Text,
     Textarea,
     useColorModeValue,
     useDisclosure,
 } from '@chakra-ui/react';
 import { Rating } from './Rating.tsx';
-import { CiMenuKebab } from 'react-icons/ci';
 import { Review } from '../types/review.ts';
 import { useRef, useState } from 'react';
 import { useReviewCUD } from '../hooks/mutations/useReviewCUD.ts';
+import { DeleteIcon, EditIcon, HamburgerIcon } from '@chakra-ui/icons';
 
 type Props = {
     data: Review;
@@ -78,24 +79,34 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
     };
 
     return (
-        <Box maxWidth="xl">
+        <Box p={{ base: 2, md: 4 }}>
             <Flex justifyContent="space-between">
                 <HStack>
                     <Avatar size={'sm'} src={userProfilePicture} />
                     <Text>{userName}</Text>
+                    {ownByUser && <Tag colorScheme="blue">* Your review</Tag>}
                 </HStack>
                 {ownByUser && (
                     <>
-                        <Menu>
-                            <MenuButton as={IconButton} icon={<CiMenuKebab />} variant="ghost" />
+                        <Menu autoSelect={false}>
+                            <MenuButton
+                                as={IconButton}
+                                aria-label="Review actions"
+                                icon={<HamburgerIcon />}
+                                variant="ghost"
+                            />
                             <MenuList>
-                                <MenuItem onClick={onOpen}>Edit</MenuItem>
-                                <MenuItem onClick={onDeleteOpen}>Delete</MenuItem>
+                                <MenuItem onClick={onOpen} icon={<EditIcon />}>
+                                    Edit
+                                </MenuItem>
+                                <MenuItem onClick={onDeleteOpen} icon={<DeleteIcon />}>
+                                    Delete
+                                </MenuItem>
                             </MenuList>
                         </Menu>
-                        <Modal isOpen={isOpen} onClose={onClose}>
+                        <Modal isOpen={isOpen} onClose={onClose} isCentered>
                             <ModalOverlay />
-                            <ModalContent>
+                            <ModalContent maxWidth={{ base: '95%', md: 'md' }}>
                                 <ModalHeader>Edit review</ModalHeader>
                                 <ModalCloseButton />
                                 <ModalBody>
@@ -116,6 +127,8 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
                                         placeholder="Your comment"
                                         value={reviewValue}
                                         onChange={(e) => setReviewValue(e.target.value)}
+                                        height="25vh"
+                                        maxLength={500}
                                     />
                                 </ModalBody>
 
@@ -132,13 +145,18 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
                                 </ModalFooter>
                             </ModalContent>
                         </Modal>
-                        <AlertDialog isOpen={isDeleteOpen} leastDestructiveRef={cancelRef} onClose={onDeleteClose}>
+                        <AlertDialog
+                            isOpen={isDeleteOpen}
+                            leastDestructiveRef={cancelRef}
+                            onClose={onDeleteClose}
+                            isCentered
+                        >
                             <AlertDialogOverlay>
-                                <AlertDialogContent>
+                                <AlertDialogContent maxWidth={{ base: '95%', md: 'md' }}>
                                     <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                                        Delete review
+                                        Deleting your review
                                     </AlertDialogHeader>
-                                    <AlertDialogBody>Are you sure?</AlertDialogBody>
+                                    <AlertDialogBody>Are you sure you want to proceed?</AlertDialogBody>
                                     <AlertDialogFooter>
                                         <Button ref={cancelRef} onClick={onDeleteClose}>
                                             Cancel

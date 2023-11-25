@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
     AbsoluteCenter,
     AlertDialog,
@@ -9,13 +9,12 @@ import {
     Box,
     Button,
     Card,
+    CardBody,
     Divider,
     Flex,
     Heading,
     HStack,
     Icon,
-    Spinner,
-    Stack,
     Stat,
     StatHelpText,
     StatNumber,
@@ -26,7 +25,7 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import { useProductDetails } from '../../hooks/queries/useProductDetails.ts';
-import { WarningTwoIcon } from '@chakra-ui/icons';
+import { ChevronRightIcon, WarningTwoIcon } from '@chakra-ui/icons';
 import { Rating } from '../../components/Rating.tsx';
 import { ImageSlider } from '../../components/ImageSlider.tsx';
 import { PriceTag } from '../../components/PriceTag.tsx';
@@ -98,92 +97,92 @@ const ProductDetailPage = () => {
 
     return (
         <Box maxW={{ base: '3xl', lg: '7xl' }} mx="auto">
-            <Card variant="outline" p={{ base: 6, lg: 12 }}>
+            <Card variant="outline">
                 <Flex justifyContent="space-between" direction={{ base: 'column', lg: 'row' }}>
                     <Box width="100%" height="30vh" mb={8} display={{ base: 'block', lg: 'none' }}>
                         <ImageSlider imgHeight="50vh" images={[PRODUCT_IMAGES + data.id]} />
                     </Box>
-                    <Box width={{ base: '100%', lg: '50%' }} pr={{ base: 0, sm: 4, lg: 8 }}>
-                        <VStack alignItems="start">
-                            {/*<HStack>*/}
-                            {/*    <Rating max={5} defaultValue={3} />*/}
-                            {/*    <Text color={'gray.500'}>12 Reviews</Text>*/}
-                            {/*</HStack>*/}
-                            <Heading mt={1} fontSize={{ base: '1xl', sm: '2xl', lg: '4xl' }}>
-                                {data.name}
-                            </Heading>
-                            <Text color={'gray.500'}>By {data.brand.name}</Text>
-                            <PriceTag currency="USD" price={data.price} priceProps={{ fontSize: '2xl' }} />
-                            <Text fontSize="lg" mt={2} color={useColorModeValue('gray.600', 'gray.400')}>
-                                {data.description}
-                            </Text>
-                            <br />
-                            <Stack w="full" direction="row">
-                                <AddToCartButton
-                                    buttonProps={{
-                                        width: '50%',
-                                        isDisabled: !cart,
-                                    }}
-                                    productId={data.id}
-                                    isInCart={isInCart}
-                                />
-                                <Button
-                                    leftIcon={<Icon as={AiOutlineHeart} />}
-                                    colorScheme={isFavorite ? 'red' : 'blue'}
-                                    width="50%"
-                                    variant={'outline'}
-                                    onClick={async (e) => {
-                                        e.preventDefault();
+                    <CardBody>
+                        <Box pr={{ base: 0, sm: 4, lg: 8 }}>
+                            <VStack alignItems="start">
+                                <Heading fontSize={{ base: '1xl', sm: '2xl', lg: '4xl' }}>{data.name}</Heading>
+                                <Text color={'gray.500'}>By {data.brand.name}</Text>
+                                <PriceTag currency="USD" price={data.price} priceProps={{ fontSize: '2xl' }} />
+                                <Text fontSize="lg" mt={2} color={useColorModeValue('gray.600', 'gray.400')}>
+                                    {data.description}
+                                </Text>
+                                <HStack w="full" mt={4}>
+                                    <AddToCartButton
+                                        buttonProps={{
+                                            width: '50%',
+                                            isDisabled: !cart,
+                                        }}
+                                        productId={data.id}
+                                        isInCart={isInCart}
+                                    />
+                                    <Button
+                                        leftIcon={<Icon as={AiOutlineHeart} />}
+                                        colorScheme={isFavorite ? 'red' : 'blue'}
+                                        width="50%"
+                                        variant={'outline'}
+                                        onClick={async (e) => {
+                                            e.preventDefault();
 
-                                        if (user) {
-                                            await favoriteMutation.mutateAsync({
-                                                type: isFavorite ? 'REMOVE' : 'ADD',
-                                                productId: data.id,
-                                            });
-                                        } else {
-                                            onOpen();
-                                        }
-                                    }}
-                                    isLoading={favoriteMutation.isLoading}
-                                    style={{
-                                        whiteSpace: 'normal',
-                                        wordWrap: 'break-word',
-                                        overflow: 'hidden',
-                                    }}
-                                >
-                                    {isFavorite ? (isMobile ? 'Remove' : 'Remove from favorite') : 'Favorite'}
-                                </Button>
-                            </Stack>
-                        </VStack>
-                    </Box>
+                                            if (user) {
+                                                await favoriteMutation.mutateAsync({
+                                                    type: isFavorite ? 'REMOVE' : 'ADD',
+                                                    productId: data.id,
+                                                });
+                                            } else {
+                                                onOpen();
+                                            }
+                                        }}
+                                        isLoading={favoriteMutation.isLoading}
+                                        style={{
+                                            whiteSpace: 'normal',
+                                            wordWrap: 'break-word',
+                                            overflow: 'hidden',
+                                        }}
+                                    >
+                                        {isFavorite ? (isMobile ? 'Remove' : 'Remove from favorite') : 'Favorite'}
+                                    </Button>
+                                </HStack>
+                            </VStack>
+                        </Box>
+                    </CardBody>
                     <Box width="50%" height="50vh" display={{ base: 'none', lg: 'block' }}>
                         <ImageSlider imgHeight="50vh" images={[PRODUCT_IMAGES + data.id]} />
                     </Box>
                 </Flex>
-                <br />
                 <Divider />
-                <Text fontWeight="bold" fontSize="2xl" my={3}>
-                    Ratings and reviews
-                </Text>
-                <Stat>
-                    <StatNumber>
-                        <HStack>
-                            <Text>4.5</Text>
-                            <Rating defaultValue={4} max={5} />
-                        </HStack>
-                    </StatNumber>
-                    <StatHelpText>Based on 12 reviews</StatHelpText>
-                </Stat>
-                <HStack>
-                    {/*<Button>See all reviews</Button>*/}
-                    {!myReview && !myReviewLoading && user && <WriteAReviewModalButton productId={Number(id)} />}
-                </HStack>
-                <Box mt={2}>
-                    <Box my={7}>
-                        {myReviewLoading ? <Spinner /> : !!myReview && <ReviewItem data={myReview} ownByUser />}
+                <CardBody>
+                    <Text fontWeight="bold" fontSize="2xl" my={3}>
+                        Ratings and reviews
+                    </Text>
+                    <Stat>
+                        <StatNumber>
+                            <HStack>
+                                <Text>4.5</Text>
+                                <Rating defaultValue={4} max={5} />
+                            </HStack>
+                        </StatNumber>
+                        <StatHelpText>Based on 12 reviews</StatHelpText>
+                    </Stat>
+                    <HStack>
+                        <Button rightIcon={<ChevronRightIcon />} as={Link} to={`/catalog/${id}/reviews`}>
+                            See all reviews
+                        </Button>
+                        {!myReview && !myReviewLoading && user && <WriteAReviewModalButton productId={Number(id)} />}
+                    </HStack>
+                    <Box mt={2}>
+                        {!!myReview && (
+                            <Box my={7}>
+                                <ReviewItem data={myReview} ownByUser />
+                            </Box>
+                        )}
+                        <Reviews firstPageOnly />
                     </Box>
-                    <Reviews />
-                </Box>
+                </CardBody>
             </Card>
             <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} isCentered>
                 <AlertDialogOverlay>

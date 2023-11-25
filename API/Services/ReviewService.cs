@@ -1,5 +1,6 @@
 using API.Data;
 using API.Entities;
+using API.RequestHelpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,14 +17,16 @@ public class ReviewService : IReviewService
         _userManager = userManager;
     }
 
-    public async Task<IEnumerable<ProductReview>> GetReviewsExceptOwnedByUserId(int userId, int productId)
+    public async Task<PagedList<ProductReview>> GetReviews(int productId, int pageNumber, int pageSize)
     {
-        return await _context.ProductReviews
+        var query = _context.ProductReviews
             .Include(r => r.User)
-            .Where(r => r.ProductId == productId && r.UserId != userId)
-            .OrderBy(r => r.UpdatedAt)
+            .Where(r => r.ProductId == productId)
+            .OrderBy(r => r.CreatedAt)
             .AsNoTracking()
-            .ToListAsync();
+            .AsQueryable();
+
+        return await PagedList<ProductReview>.ToPagedList(query, pageNumber, pageSize);
     }
 
     public async Task<ProductReview?> GetReview(int userId, int productId)

@@ -25,13 +25,42 @@ public class ReviewsController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ReviewResponse>>> GetReviews(int productId)
+    public async Task<ActionResult<PagedResponse<ReviewResponse>>> GetReviews(int productId, int pageNumber = 1,
+        int pageSize = 10)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        int.TryParse(userId, out int validUserId);
+        var reviews = await _reviewService.GetReviews(productId, pageNumber, pageSize);
 
-        var reviews = await _reviewService.GetReviewsExceptOwnedByUserId(validUserId, productId);
-        return Ok(_mapper.Map<IEnumerable<ReviewResponse>>(reviews));
+        return new PagedResponse<ReviewResponse>
+        {
+            Pagination = reviews.MetaData,
+            Results = _mapper.Map<IEnumerable<ReviewResponse>>(reviews)
+        };
+
+        // List<ReviewResponse> reviews = new List<ReviewResponse>();
+        // var faker = new Faker<ReviewResponse>();
+        // faker.RuleFor(f => f.CreatedAt, DateTime.UtcNow);
+        // faker.RuleFor(f => f.UpdatedAt, DateTime.UtcNow);
+        // faker.RuleFor(f => f.UserId, f => f.Random.Number(100, 100000));
+        // faker.RuleFor(f => f.ProductId, f => f.Random.Number(100, 100000));
+        // faker.RuleFor(f => f.Rating, f => f.Random.Number(1, 5));
+        // faker.RuleFor(f => f.Review, f => f.Lorem.Sentences(5));
+        // faker.RuleFor(f => f.UserName, f => f.Person.UserName);
+        // faker.RuleFor(f => f.UserProfilePicture, f => f.Internet.Avatar());
+        // reviews = faker.Generate(28);
+        //
+        // var filteredReviews = reviews.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+        //
+        // return new PagedResponse<ReviewResponse>
+        // {
+        //     Pagination = new MetaData
+        //     {
+        //         CurrentPage = pageNumber,
+        //         TotalCount = reviews.Count,
+        //         TotalPages = (reviews.Count / pageSize) + ((reviews.Count % pageSize) > 0 ? 1 : 0),
+        //         PageSize = pageSize
+        //     },
+        //     Results = filteredReviews
+        // };
     }
 
 

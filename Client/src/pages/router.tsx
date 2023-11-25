@@ -10,6 +10,7 @@ const Register = lazy(() => import('./User/Register'));
 const Login = lazy(() => import('./User/Login'));
 const CatalogPage = lazy(() => import('./Catalog'));
 const ProductDetailPage = lazy(() => import('./Catalog/ProductDetail'));
+const ProductReviewsPage = lazy(() => import('./Catalog/ProductReviews'));
 const WishListPage = lazy(() => import('./User/WishList'));
 const CartPage = lazy(() => import('./User/Cart/index.tsx'));
 const MyAccountPage = lazy(() => import('./User/MyAccount'));
@@ -37,6 +38,7 @@ const router = createBrowserRouter([
             { path: 'login', element: <Login /> },
             { path: 'catalog', element: <CatalogPage /> },
             { path: 'catalog/:id', element: <ProductDetailPage /> },
+            { path: 'catalog/:id/reviews', element: <ProductReviewsPage /> },
             {
                 path: 'user',
                 element: <ProtectedRoute onlyFor={['User']} />,
