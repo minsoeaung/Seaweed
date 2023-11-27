@@ -37,4 +37,7 @@ public class StoreContext : IdentityDbContext<User, UserRole, int>
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<UserSession> UserSessions => Set<UserSession>();
     public DbSet<ProductReview> ProductReviews => Set<ProductReview>();
+    public DbSet<Address> Addresses => Set<Address>();
+    public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
+    public DbSet<Country> Countries => Set<Country>();
 }

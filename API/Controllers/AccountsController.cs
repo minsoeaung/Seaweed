@@ -90,6 +90,7 @@ public class AccountsController : ControllerBase
             UserName = model.UserName,
             Email = model.Email,
             SecurityStamp = Guid.NewGuid().ToString(),
+            UserAddress = new UserAddress()
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -142,6 +143,7 @@ public class AccountsController : ControllerBase
             UserName = dto.UserName.Trim(),
             Email = dto.Email,
             SecurityStamp = Guid.NewGuid().ToString(),
+            UserAddress = new UserAddress()
         };
 
         var userResult = await _userManager.CreateAsync(user, dto.Password);

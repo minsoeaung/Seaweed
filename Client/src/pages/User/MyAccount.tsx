@@ -20,11 +20,14 @@ import AntdSpin from '../../components/AntdSpin';
 import { useUpdateProfilePicture } from '../../hooks/mutations/useUpdateProfilePicture.ts';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useAddresses } from '../../hooks/queries/useAddresses.ts';
 
 const MyAccount = () => {
     const { data, isLoading, isError } = useMyAccount();
     const inputRef = useRef<HTMLInputElement>(null);
     const mutation = useUpdateProfilePicture();
+
+    const {} = useAddresses();
 
     const updateProfilePicture = async (pic: FileList | null) => {
         !!pic && (await mutation.mutateAsync(pic));

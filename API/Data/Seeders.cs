@@ -1,6 +1,7 @@
 using API.Entities;
 using Bogus;
 using Microsoft.AspNetCore.Identity;
+using Nager.Country;
 
 namespace API.Data;
 
@@ -74,6 +75,23 @@ public static class Seeders
             await context.Brands.AddRangeAsync(Brands);
             await context.Categories.AddRangeAsync(Categories);
             await context.Products.AddRangeAsync(Products);
+        }
+
+        if (!context.Countries.Any())
+        {
+            var countryProvider = new CountryProvider();
+            var countries = countryProvider.GetCountries();
+
+            foreach (var countryInfo in countries)
+            {
+                var country = new Country
+                {
+                    Name = countryInfo.CommonName,
+                    Alpha2Code = countryInfo.Alpha2Code.ToString()
+                };
+
+                context.Countries.Add(country);
+            }
         }
 
         await context.SaveChangesAsync();

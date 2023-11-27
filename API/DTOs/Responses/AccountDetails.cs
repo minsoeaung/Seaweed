@@ -1,3 +1,5 @@
+using API.Entities;
+
 namespace API.DTOs.Responses;
 
 public class AccountDetails

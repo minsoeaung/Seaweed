@@ -3,6 +3,7 @@ using System;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Data.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20231126153927_UserHasManyAddresses")]
+    partial class UserHasManyAddresses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,14 +64,9 @@ namespace API.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("UserAddressId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
-
-                    b.HasIndex("UserAddressId");
 
                     b.ToTable("Addresses");
                 });
@@ -146,11 +144,6 @@ namespace API.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Alpha2Code")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -317,16 +310,20 @@ namespace API.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DefaultAddressId")
+                    b.Property<int>("AddressId")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserAddresses");
                 });
@@ -517,12 +514,6 @@ namespace API.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("API.Entities.UserAddress", null)
-                        .WithMany("Addresses")
-                        .HasForeignKey("UserAddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Country");
                 });
 
@@ -585,13 +576,19 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.UserAddress", b =>
                 {
-                    b.HasOne("API.Entities.User", "User")
-                        .WithOne("UserAddress")
-                        .HasForeignKey("API.Entities.UserAddress", "UserId")
+                    b.HasOne("API.Entities.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("API.Entities.User", null)
+                        .WithMany("UserAddresses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("API.Entities.UserSession", b =>
@@ -677,13 +674,7 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.User", b =>
                 {
-                    b.Navigation("UserAddress")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("API.Entities.UserAddress", b =>
-                {
-                    b.Navigation("Addresses");
+                    b.Navigation("UserAddresses");
                 });
 #pragma warning restore 612, 618
         }
