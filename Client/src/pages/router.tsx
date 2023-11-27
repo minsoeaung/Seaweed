@@ -14,6 +14,8 @@ const ProductReviewsPage = lazy(() => import('./Catalog/ProductReviews'));
 const WishListPage = lazy(() => import('./User/WishList'));
 const CartPage = lazy(() => import('./User/Cart/index.tsx'));
 const MyAccountPage = lazy(() => import('./User/MyAccount'));
+const NewAddressPage = lazy(() => import('./User/NewAddress'));
+const EditAddressPage = lazy(() => import('./User/EditAddress'));
 const InventoryPage = lazy(() => import('./Inventory'));
 const InventoryDetails = lazy(() => import('./Inventory/Details'));
 
@@ -54,6 +56,14 @@ const router = createBrowserRouter([
                     {
                         path: 'my-account',
                         element: <MyAccountPage />,
+                    },
+                    {
+                        path: 'my-account/new-address',
+                        element: <NewAddressPage />,
+                    },
+                    {
+                        path: 'my-account/edit-address',
+                        element: <EditAddressPage />,
                     },
                 ],
             },

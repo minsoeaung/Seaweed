@@ -14,6 +14,7 @@ import {
     Text,
     VStack,
     Wrap,
+    WrapItem,
 } from '@chakra-ui/react';
 import { CheckIcon, EditIcon } from '@chakra-ui/icons';
 import AntdSpin from '../../components/AntdSpin';
@@ -21,16 +22,17 @@ import { useUpdateProfilePicture } from '../../hooks/mutations/useUpdateProfileP
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAddresses } from '../../hooks/queries/useAddresses.ts';
+import { AddressCard } from '../../components/AddressCard.tsx';
 
 const MyAccount = () => {
     const { data, isLoading, isError } = useMyAccount();
     const inputRef = useRef<HTMLInputElement>(null);
-    const mutation = useUpdateProfilePicture();
+    const updateProfileMutation = useUpdateProfilePicture();
 
-    const {} = useAddresses();
+    const { data: addresses } = useAddresses();
 
     const updateProfilePicture = async (pic: FileList | null) => {
-        !!pic && (await mutation.mutateAsync(pic));
+        !!pic && (await updateProfileMutation.mutateAsync(pic));
     };
 
     if (isLoading) {
@@ -68,7 +70,7 @@ const MyAccount = () => {
                                 top="-10px"
                                 colorScheme="facebook"
                                 aria-label="Update profile picture"
-                                isLoading={mutation.isLoading}
+                                isLoading={updateProfileMutation.isLoading}
                                 icon={<EditIcon />}
                                 onClick={() => {
                                     inputRef.current?.click();
@@ -167,6 +169,26 @@ const MyAccount = () => {
                                 </Button>
                             )}
                         </HStack>
+                    </VStack>
+                    <VStack align="start">
+                        <Text>Shipping address</Text>
+                        <Button
+                            variant="solid"
+                            colorScheme="blue"
+                            size="sm"
+                            as={Link}
+                            to="/user/my-account/new-address"
+                        >
+                            Add a new address
+                        </Button>
+                        <Wrap>
+                            {Array.isArray(addresses) &&
+                                addresses.map((address) => (
+                                    <WrapItem key={address.id}>
+                                        <AddressCard data={address} />
+                                    </WrapItem>
+                                ))}
+                        </Wrap>
                     </VStack>
                 </VStack>
             </Card>

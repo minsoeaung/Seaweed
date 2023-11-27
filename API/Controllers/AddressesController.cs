@@ -103,9 +103,9 @@ public class AddressesController : ControllerBase
     }
 
     [HttpPut("change-default-address")]
-    public async Task<ActionResult> UpdateDefaultAddress(int addressId)
+    public async Task<ActionResult> UpdateDefaultAddress(int id)
     {
-        var userAddress = await _service.UpdateDefaultAddress(GetUserId(), addressId);
+        var userAddress = await _service.UpdateDefaultAddress(GetUserId(), id);
         return userAddress == null ? NotFound() : NoContent();
     }
 

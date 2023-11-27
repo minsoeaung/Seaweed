@@ -19,3 +19,5 @@ export const REVIEWS = 'reviews';
 export const MY_REVIEW = 'myReview';
 
 export const ADDRESSES = 'addresses';
+
+export const COUNTRIES = 'countries';

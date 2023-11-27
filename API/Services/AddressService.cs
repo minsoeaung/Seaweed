@@ -73,7 +73,16 @@ public class AddressService : IAddressService
             .AsNoTracking()
             .FirstOrDefaultAsync(ua => ua.UserId == userId);
         if (userAddress == null)
-            return null;
+        {
+            userAddress = new UserAddress
+            {
+                UserId = userId,
+                DefaultAddressId = 0,
+                Addresses = new List<Address>()
+            };
+            await _context.UserAddresses.AddAsync(userAddress);
+            await _context.SaveChangesAsync();
+        }
 
         var address = new Address
         {
