@@ -13,6 +13,8 @@ const ProductDetailPage = lazy(() => import('./Catalog/ProductDetail'));
 const ProductReviewsPage = lazy(() => import('./Catalog/ProductReviews'));
 const WishListPage = lazy(() => import('./User/WishList'));
 const CartPage = lazy(() => import('./User/Cart/index.tsx'));
+const CheckoutPage = lazy(() => import('./User/Checkout'));
+const MyOrdersPage = lazy(() => import('./User/MyOrders'));
 const MyAccountPage = lazy(() => import('./User/MyAccount'));
 const NewAddressPage = lazy(() => import('./User/NewAddress'));
 const EditAddressPage = lazy(() => import('./User/EditAddress'));
@@ -52,6 +54,14 @@ const router = createBrowserRouter([
                     {
                         path: 'cart',
                         element: <CartPage />,
+                    },
+                    {
+                        path: 'cart/checkout',
+                        element: <CheckoutPage />,
+                    },
+                    {
+                        path: 'my-orders',
+                        element: <MyOrdersPage />,
                     },
                     {
                         path: 'my-account',

@@ -41,6 +41,7 @@ import { AddToCartButton } from '../../components/AddToCartButton.tsx';
 import { PRODUCT_IMAGES } from '../../constants/fileUrls.ts';
 import placeholderImage from '../../assets/placeholderImage.webp';
 import { PriceTag } from '../../components/PriceTag.tsx';
+import { Link as ReactRouterLink } from 'react-router-dom';
 
 const WishListPage = () => {
     const { isLoading, data, isError, isFetching } = useWishList();
@@ -85,6 +86,14 @@ const WishListPage = () => {
                         </Heading>
 
                         <Stack spacing="6">
+                            {data.length === 0 && (
+                                <VStack spacing={6} minHeight="50vh">
+                                    <Text>Your wishlist is empty</Text>
+                                    <Button variant="solid" colorScheme="blue" as={ReactRouterLink} to="/catalog">
+                                        Continue shopping
+                                    </Button>
+                                </VStack>
+                            )}
                             {data.map((item) => (
                                 <Flex key={item.productId} direction="column" justify="space-between" align="center">
                                     <HStack w="full">
@@ -233,6 +242,14 @@ const WishListPage = () => {
                             </Tbody>
                         </Table>
                     </TableContainer>
+                    {data.length === 0 && (
+                        <VStack spacing={6} minHeight="50vh" justify="center">
+                            <Text>Your wishlist is empty</Text>
+                            <Button variant="solid" colorScheme="blue" as={ReactRouterLink} to="/catalog">
+                                Continue shopping
+                            </Button>
+                        </VStack>
+                    )}
                 </Card>
             )}
             <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} isCentered>

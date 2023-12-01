@@ -9,9 +9,10 @@ import { useSetDefaultAddress } from '../../hooks/mutations/useSetDefaultAddress
 
 type Props = {
     address?: AddressDetails;
+    onActionSuccess?: () => void;
 };
 
-export const AddressForm = ({ address }: Props) => {
+export const AddressForm = ({ address, onActionSuccess }: Props) => {
     const [formValues, setFormValues] = useState<CreateAddressDto>({
         unitNumber: address?.unitNumber || '',
         streetNumber: address?.streetNumber || '',
@@ -43,10 +44,9 @@ export const AddressForm = ({ address }: Props) => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        const onSuccess = async (res: AddressDetails | undefined) => {
-            if (!address?.isDefault && isDefault && res) {
-                await defaultAddressMutation.mutateAsync(res.id);
-            }
+        const afterSuccess = async (res: AddressDetails | undefined) => {
+            res && (await defaultAddressMutation.mutateAsync(isDefault ? res.id : 0));
+            typeof onActionSuccess === 'function' && onActionSuccess();
         };
 
         if (TYPE === 'CREATE') {
@@ -54,18 +54,16 @@ export const AddressForm = ({ address }: Props) => {
                 .mutateAsync({
                     type: 'CREATE',
                     payload: formValues,
-                    pushOnSuccess: '/user/my-account',
                 })
-                .then(onSuccess);
+                .then(afterSuccess);
         } else if (TYPE === 'UPDATE') {
             await mutation
                 .mutateAsync({
                     type: 'UPDATE',
                     id: address?.id!,
                     payload: formValues,
-                    pushOnSuccess: '/user/my-account',
                 })
-                .then(onSuccess);
+                .then(afterSuccess);
         }
     };
 
@@ -165,9 +163,9 @@ export const AddressForm = ({ address }: Props) => {
                     <Checkbox isChecked={isDefault} onChange={(e) => setIsDefault(e.target.checked)}>
                         Set as default shipping address
                     </Checkbox>
-                    <ButtonGroup variant="solid" spacing="6">
+                    <ButtonGroup variant="solid" spacing="6" mb={4}>
                         <Button colorScheme="blue" type="submit" isLoading={mutation.isLoading}>
-                            {TYPE === 'CREATE' ? 'Submit' : 'Save changes'}
+                            {TYPE === 'CREATE' ? 'Add' : 'Save changes'}
                         </Button>
                         <Button as={Link} to="/user/my-account">
                             Cancel

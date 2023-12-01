@@ -2,7 +2,7 @@ using API.Entities;
 
 namespace API.DTOs.Responses;
 
-public class CartResponse
+public class CartDetails
 {
     public double Total => CartItems.Sum(c => c.Total);
     public IEnumerable<CartItemWithTotal> CartItems { get; set; } = new List<CartItemWithTotal>();

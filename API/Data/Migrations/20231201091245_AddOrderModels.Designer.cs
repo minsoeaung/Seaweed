@@ -3,6 +3,7 @@ using System;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Data.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20231201091245_AddOrderModels")]
+    partial class AddOrderModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -652,13 +655,11 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.Order", b =>
                 {
-                    b.HasOne("API.Entities.User", "User")
-                        .WithMany("Orders")
+                    b.HasOne("API.Entities.User", null)
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("API.Entities.OrderAddress", b =>
@@ -833,8 +834,6 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.User", b =>
                 {
-                    b.Navigation("Orders");
-
                     b.Navigation("UserAddress")
                         .IsRequired();
                 });

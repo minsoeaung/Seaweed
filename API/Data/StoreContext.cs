@@ -40,4 +40,7 @@ public class StoreContext : IdentityDbContext<User, UserRole, int>
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
     public DbSet<Country> Countries => Set<Country>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<OrderAddress> OrderAddresses => Set<OrderAddress>();
 }

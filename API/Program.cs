@@ -61,6 +61,7 @@ builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddIdentityCore<User>(options =>
     {

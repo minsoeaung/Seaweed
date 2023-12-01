@@ -1,4 +1,17 @@
-import { AbsoluteCenter, Box, Card, Flex, Heading, HStack, Link, Stack, useColorModeValue } from '@chakra-ui/react';
+import {
+    AbsoluteCenter,
+    Box,
+    Button,
+    Card,
+    Flex,
+    Heading,
+    HStack,
+    Link,
+    Stack,
+    Text,
+    useColorModeValue,
+    VStack,
+} from '@chakra-ui/react';
 import { useCart } from '../../../hooks/queries/useCart.ts';
 import { CartItem } from './CartItem.tsx';
 import { CartOrderSummary } from './CartOrderSummary.tsx';
@@ -43,20 +56,30 @@ const CartPage = () => {
                                     <CartItem key={item.id} cartItem={item} />
                                 ))}
                             </Stack>
+                            {data.cartItems.length === 0 && (
+                                <VStack spacing={6} minHeight="50vh">
+                                    <Text>Shopping cart is empty</Text>
+                                    <Button variant="solid" colorScheme="blue" as={ReactRouterLink} to="/catalog">
+                                        Continue shopping
+                                    </Button>
+                                </VStack>
+                            )}
                         </Stack>
-                        <Flex direction="column" align="center" flex="1" position="sticky" top={4}>
-                            <CartOrderSummary />
-                            <HStack mt="6" fontWeight="semibold">
-                                <p>or</p>
-                                <Link
-                                    as={ReactRouterLink}
-                                    to="/catalog"
-                                    color={useColorModeValue('blue.500', 'blue.200')}
-                                >
-                                    Continue shopping
-                                </Link>
-                            </HStack>
-                        </Flex>
+                        {data.cartItems.length > 0 && (
+                            <Flex direction="column" align="center" flex="1" position="sticky" top={4}>
+                                <CartOrderSummary />
+                                <HStack mt="6" fontWeight="semibold">
+                                    <p>or</p>
+                                    <Link
+                                        as={ReactRouterLink}
+                                        to="/catalog"
+                                        color={useColorModeValue('blue.500', 'blue.200')}
+                                    >
+                                        Continue shopping
+                                    </Link>
+                                </HStack>
+                            </Flex>
+                        )}
                     </Stack>
                 </Card>
             )}

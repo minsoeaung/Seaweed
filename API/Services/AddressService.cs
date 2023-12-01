@@ -136,11 +136,18 @@ public class AddressService : IAddressService
         if (userAddress == null)
             return null;
 
-        var address = await _context.Addresses.FindAsync(newDefaultAddressId);
-        if (address == null)
-            return null;
+        if (newDefaultAddressId == 0)
+        {
+            userAddress.DefaultAddressId = 0;
+        }
+        else
+        {
+            var address = await _context.Addresses.FindAsync(newDefaultAddressId);
+            if (address == null)
+                return null;
 
-        userAddress.DefaultAddressId = address.Id;
+            userAddress.DefaultAddressId = address.Id;
+        }
 
         _context.UserAddresses.Update(userAddress);
         await _context.SaveChangesAsync();

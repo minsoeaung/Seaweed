@@ -30,6 +30,7 @@ import { useCart } from '../hooks/queries/useCart.ts';
 import { MdOutlineInventory2 } from 'react-icons/md';
 import { useMyAccount } from '../hooks/queries/useMyAccount.ts';
 import { useAuth } from '../context/AuthContext.tsx';
+import { IoDocumentTextOutline } from 'react-icons/io5';
 
 const Header = () => {
     const { colorMode, toggleColorMode } = useColorMode();
@@ -71,16 +72,16 @@ const Header = () => {
             <Flex h={12} alignItems={'center'} justifyContent={'space-between'}>
                 {isMobile ? (
                     searchBoxVisible ? (
-                        <Link to="/">
+                        <Link to="/catalog">
                             <AppLogoSlim />
                         </Link>
                     ) : (
-                        <Link to="/">
+                        <Link to="/catalog">
                             <AppLogo />
                         </Link>
                     )
                 ) : (
-                    <Link to="/">
+                    <Link to="/catalog">
                         <AppLogo />
                     </Link>
                 )}
@@ -191,14 +192,21 @@ const Header = () => {
                                         </Center>
                                         <br />
                                         <MenuDivider />
-                                        <MenuItem as={Link} to="/user/my-account" icon={<SettingsIcon />}>
-                                            My Account
+                                        <MenuItem
+                                            as={Link}
+                                            to="/user/my-orders"
+                                            icon={<Icon as={IoDocumentTextOutline} />}
+                                        >
+                                            My Orders
                                         </MenuItem>
                                         <MenuItem as={Link} to="/user/wishlist" icon={<Icon as={LuHeart} />}>
-                                            Wishlist
+                                            Wish List
                                         </MenuItem>
                                         <MenuItem as={Link} to="/user/cart" icon={<Icon as={FiShoppingCart} />}>
                                             Cart {!!cart?.cartItems.length && `(${cart.cartItems.length})`}
+                                        </MenuItem>
+                                        <MenuItem as={Link} to="/user/my-account" icon={<SettingsIcon />}>
+                                            My Account
                                         </MenuItem>
                                         {user.roles.some((role) => ['Admin', 'Super'].includes(role)) && (
                                             <>

@@ -4,11 +4,11 @@ using Mapster;
 
 namespace API.Mappings;
 
-public class CartResponseMapping : IRegister
+public class CartDetailsMapping : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<IEnumerable<CartItem>, CartResponse>()
+        config.NewConfig<IEnumerable<CartItem>, CartDetails>()
             .Map(dest => dest.CartItems, src => src);
     }
 }

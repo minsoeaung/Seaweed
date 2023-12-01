@@ -23,14 +23,14 @@ public class CartController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<CartResponse>> GetCartItems()
+    public async Task<ActionResult<CartDetails>> GetCartItems()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null)
             return BadRequest();
 
         var cartItems = await _cartService.GetCartItemsAsync(int.Parse(userId));
-        return _mapper.Map<CartResponse>(cartItems);
+        return _mapper.Map<CartDetails>(cartItems);
     }
 
     [HttpPost]
