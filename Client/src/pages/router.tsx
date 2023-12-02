@@ -1,7 +1,6 @@
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import Root from './Root';
 import { lazy } from 'react';
-import HomePage from './Home';
 import NotFoundPage from './NotFound';
 import { useAuth } from '../context/AuthContext.tsx';
 
@@ -36,7 +35,7 @@ const router = createBrowserRouter([
         path: '/',
         element: <Root />,
         children: [
-            { path: '', element: <HomePage /> },
+            { path: '', element: <CatalogPage /> },
             { path: 'about', element: <About /> },
             { path: 'register', element: <Register /> },
             { path: 'login', element: <Login /> },
