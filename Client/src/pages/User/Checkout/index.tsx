@@ -92,7 +92,7 @@ const CheckoutPage = () => {
     };
 
     const handleOrder = async () => {
-        if (useNewAddress) {
+        if (useNewAddress || addresses?.length === 0) {
             for (const key in formValues) {
                 const value = formValues[key as keyof CreateAddressDto];
                 if (REQUIRED_ADDRESS_FIELDS.includes(key) && !value) {
@@ -107,6 +107,8 @@ const CheckoutPage = () => {
 
             await orderMutation.mutateAsync({
                 address: formValues,
+                isDefault: isDefault,
+                addressId: null,
             });
         } else {
             if (!selectedAddress) {
@@ -120,6 +122,7 @@ const CheckoutPage = () => {
 
             await orderMutation.mutateAsync({
                 addressId: selectedAddress.id,
+                address: null,
             });
         }
     };
@@ -246,7 +249,7 @@ const CheckoutPage = () => {
                         <RadioGroup onChange={setRadioInputValue} value={radioInputValue}>
                             <Stack direction="column" gap={8}>
                                 {addresses?.map((add) => (
-                                    <Radio value={String(add.id)}>
+                                    <Radio key={add.id} value={String(add.id)}>
                                         <Box pl={4}>
                                             <Address address={add} />
                                         </Box>
@@ -337,7 +340,7 @@ const CheckoutAddressForm = ({ values, onValuesChange, isDefault, setIsDefault }
                     >
                         {Array.isArray(countries) &&
                             countries.map((country) => (
-                                <option value={country.id} key={country.id}>
+                                <option key={country.id} value={country.id}>
                                     {country.name}
                                 </option>
                             ))}
