@@ -6,6 +6,7 @@ import {
     AlertDialogHeader,
     AlertDialogOverlay,
     Avatar,
+    Badge,
     Box,
     Button,
     Flex,
@@ -24,7 +25,6 @@ import {
     ModalOverlay,
     Radio,
     RadioGroup,
-    Tag,
     Text,
     Textarea,
     useColorModeValue,
@@ -80,11 +80,15 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
 
     return (
         <Box p={{ base: 2, md: 4 }}>
-            <Flex justifyContent="space-between">
+            <Flex justifyContent="space-between" align="center">
                 <HStack>
                     <Avatar size={'sm'} src={userProfilePicture} />
                     <Text>{userName}</Text>
-                    {ownByUser && <Tag colorScheme="blue">* Your review</Tag>}
+                    {ownByUser && (
+                        <Badge colorScheme="blue" size={{ base: 'xs', md: 'md' }}>
+                            * Your review
+                        </Badge>
+                    )}
                 </HStack>
                 {ownByUser && (
                     <>
@@ -94,6 +98,8 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
                                 aria-label="Review actions"
                                 icon={<HamburgerIcon />}
                                 variant="ghost"
+                                colorScheme="blue"
+                                size={{ base: 'xs', md: 'md' }}
                             />
                             <MenuList>
                                 <MenuItem onClick={onOpen} icon={<EditIcon />}>
@@ -178,7 +184,7 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
             </Flex>
             <HStack mt={2} spacing={4}>
                 <Rating max={5} defaultValue={rating} />
-                <Text fontWeight="light" color={useColorModeValue('gray.600', 'gray.400')}>
+                <Text color={useColorModeValue('gray.600', 'gray.400')}>
                     {new Date(updatedAt)
                         .toLocaleDateString('my-MM', {
                             weekday: 'long',

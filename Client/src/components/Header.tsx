@@ -31,6 +31,7 @@ import { MdOutlineInventory2 } from 'react-icons/md';
 import { useMyAccount } from '../hooks/queries/useMyAccount.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { IoDocumentTextOutline } from 'react-icons/io5';
+import { useWishList } from '../hooks/queries/useWishList.ts';
 
 const Header = () => {
     const { colorMode, toggleColorMode } = useColorMode();
@@ -41,6 +42,7 @@ const Header = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
+    const { data: wishList } = useWishList();
     const { data: cart } = useCart();
     const { data: account } = useMyAccount();
 
@@ -121,7 +123,32 @@ const Header = () => {
                         />
 
                         {user && !isMobile && (
-                            <Button as={Link} to="/user/wishlist" rightIcon={<Icon as={LuHeart} />} variant="ghost">
+                            <Button
+                                as={Link}
+                                to="/user/wishlist"
+                                variant="ghost"
+                                rightIcon={
+                                    <>
+                                        <Icon as={LuHeart} />
+                                        {!!wishList?.length && (
+                                            <Box
+                                                as={'span'}
+                                                position={'absolute'}
+                                                top="-2px"
+                                                right={'4px'}
+                                                fontSize={'0.8rem'}
+                                                bgColor={'red'}
+                                                color="white"
+                                                borderRadius={'xl'}
+                                                zIndex={9999}
+                                                p={'2px'}
+                                            >
+                                                {wishList.length}
+                                            </Box>
+                                        )}
+                                    </>
+                                }
+                            >
                                 Wishlist
                             </Button>
                         )}
@@ -161,7 +188,7 @@ const Header = () => {
                                                         zIndex={9999}
                                                         p={'2px'}
                                                     >
-                                                        {cart?.cartItems.length}
+                                                        {cart.cartItems.length}
                                                     </Box>
                                                 )}
                                             </>
@@ -200,7 +227,7 @@ const Header = () => {
                                             My Orders
                                         </MenuItem>
                                         <MenuItem as={Link} to="/user/wishlist" icon={<Icon as={LuHeart} />}>
-                                            Wish List
+                                            Wish List {!!wishList?.length && `(${wishList.length})`}
                                         </MenuItem>
                                         <MenuItem as={Link} to="/user/cart" icon={<Icon as={FiShoppingCart} />}>
                                             Cart {!!cart?.cartItems.length && `(${cart.cartItems.length})`}

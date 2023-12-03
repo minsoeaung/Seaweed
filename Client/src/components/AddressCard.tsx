@@ -39,7 +39,7 @@ export const AddressCard = ({ data }: Props) => {
 
     return (
         <>
-            <Card variant="elevated" width={{ base: 'xs', md: 'md' }} position="relative" height="100%">
+            <Card variant="elevated" width={{ base: '2xs', md: 'md' }} position="relative" height="100%">
                 <Text color="orange.500" position="absolute" right={2} top={1}>
                     {data.isDefault && 'Default address'}
                 </Text>

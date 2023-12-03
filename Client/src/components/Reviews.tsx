@@ -1,10 +1,12 @@
-import { Box, Button, Center, Spinner, Text } from '@chakra-ui/react';
+import { Box, Center, Text, useColorModeValue } from '@chakra-ui/react';
 import { ReviewItem } from './ReviewItem.tsx';
 import { useParams } from 'react-router-dom';
 import { useReviews } from '../hooks/queries/useReviews.ts';
 import AntdSpin from './AntdSpin';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useMyReview } from '../hooks/queries/useMyReview.ts';
+import { useEffect, useState } from 'react';
+import { useIsVisible } from '../hooks/useIsVisible.ts';
 
 type Props = {
     firstPageOnly?: boolean;
@@ -14,7 +16,14 @@ export const Reviews = ({ firstPageOnly }: Props) => {
     const { id } = useParams();
     const { user } = useAuth();
 
-    const { data, status, isFetchingNextPage, hasNextPage, isFetching, fetchNextPage } = useReviews(id);
+    const [lastElementRef, setLastElementRef] = useState<Element | null>(null);
+    const isVisible = useIsVisible(lastElementRef);
+
+    const { data, status, isFetchingNextPage, hasNextPage, isLoading, isFetching, fetchNextPage } = useReviews(id);
+
+    useEffect(() => {
+        if (isVisible && hasNextPage && !isFetchingNextPage) void fetchNextPage();
+    }, [isVisible]);
 
     const { data: myReview } = useMyReview(id);
 
@@ -49,20 +58,17 @@ export const Reviews = ({ firstPageOnly }: Props) => {
                     <Text>This product has not been reviewed yet.</Text>
                 </Center>
             )}
-            {!firstPageOnly && reviews.length >= 10 && (
-                <>
-                    <Center>
-                        <Button onClick={() => fetchNextPage()} isDisabled={!hasNextPage || isFetchingNextPage}>
-                            {isFetchingNextPage
-                                ? 'Loading more...'
-                                : hasNextPage
-                                  ? 'Load More'
-                                  : 'Nothing more to load'}
-                        </Button>
-                    </Center>
-                    <Center py={5}>{isFetching && !isFetchingNextPage ? <Spinner /> : null}</Center>
-                </>
+            {!hasNextPage && reviews.length >= 10 && (
+                <Center>
+                    <Text color={useColorModeValue('gray.600', 'gray.400')}>No more reviews available.</Text>
+                </Center>
             )}
+            {(isFetchingNextPage || isFetching || isLoading) && (
+                <Center>
+                    <AntdSpin />
+                </Center>
+            )}
+            <div ref={setLastElementRef} />
         </>
     );
 };

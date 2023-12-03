@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
+using API.RequestHelpers;
 using API.Services;
+using Bogus;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -49,7 +51,7 @@ public class ReviewsController : ControllerBase
         // reviews = faker.Generate(28);
         //
         // var filteredReviews = reviews.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-        //
+        // Thread.Sleep(2 * 1000);
         // return new PagedResponse<ReviewResponse>
         // {
         //     Pagination = new MetaData

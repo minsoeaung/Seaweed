@@ -3,11 +3,11 @@ import Root from './Root';
 import { lazy } from 'react';
 import NotFoundPage from './NotFound';
 import { useAuth } from '../context/AuthContext.tsx';
+import CatalogPage from './Catalog';
 
 const About = lazy(() => import('./About'));
 const Register = lazy(() => import('./User/Register'));
 const Login = lazy(() => import('./User/Login'));
-const CatalogPage = lazy(() => import('./Catalog'));
 const ProductDetailPage = lazy(() => import('./Catalog/ProductDetail'));
 const ProductReviewsPage = lazy(() => import('./Catalog/ProductReviews'));
 const WishListPage = lazy(() => import('./User/WishList'));

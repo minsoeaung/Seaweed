@@ -110,31 +110,31 @@ export const AddressForm = ({ address, onActionSuccess }: Props) => {
                             />
                         </VStack>
                     </Flex>
-                    <VStack align="start">
+                    <VStack align="start" width="full">
                         <Text>Address line 1</Text>
                         <Input
                             placeholder="Address line 1"
-                            w={{ base: 'xs', md: 'lg' }}
+                            w={{ base: 'full', md: 'lg' }}
                             name="addressLine1"
                             value={formValues.addressLine1}
                             onChange={handleFormValueChange('addressLine1')}
                         />
                     </VStack>
-                    <VStack align="start">
+                    <VStack align="start" width="full">
                         <Text>Address line 2</Text>
                         <Input
                             placeholder="Address line 2 (optional)"
-                            w={{ base: 'xs', md: 'lg' }}
+                            w={{ base: 'full', md: 'lg' }}
                             name="addressLine2"
                             value={formValues.addressLine2}
                             onChange={handleFormValueChange('addressLine2')}
                         />
                     </VStack>
-                    <VStack align="start">
+                    <VStack align="start" width="full">
                         <Text>Postal code</Text>
                         <Input
                             placeholder="Postal code"
-                            w={{ base: 'xs', md: 'lg' }}
+                            w={{ base: 'full', md: 'lg' }}
                             name="postalCodes"
                             value={formValues.postalCodes}
                             onChange={handleFormValueChange('postalCodes')}

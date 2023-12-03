@@ -1,4 +1,4 @@
-import { Box, BoxProps, IconButton, Stack, useColorModeValue } from '@chakra-ui/react';
+import { Box, BoxProps, Button, IconButton, Stack, Text, useColorModeValue, VStack } from '@chakra-ui/react';
 import { FaGithub } from 'react-icons/fa';
 import { AppLogo } from './AppLogo.tsx';
 import { Link } from 'react-router-dom';
@@ -22,7 +22,22 @@ export const Footer = (props: BoxProps) => {
                 align={{ base: 'center', md: 'center' }}
             >
                 <AppLogo />
-                <p>© {new Date().getFullYear()} Name. All rights reserved.</p>
+                <VStack align="start" spacing={0}>
+                    <Text>© {new Date().getFullYear()} Seaweed. All rights reserved.</Text>
+                    <Text color={useColorModeValue('gray.600', 'gray.400')}>
+                        Built with React, ASP.NET Core Web API, and PostgreSQL. (
+                        <Button
+                            variant="link"
+                            colorScheme="blue"
+                            as={Link}
+                            target="_blank"
+                            to="https://github.com/minsoeaung/Seaweed"
+                        >
+                            View source
+                        </Button>
+                        )
+                    </Text>
+                </VStack>
                 <Stack direction={'row'} spacing={6}>
                     <IconButton
                         as={Link}
