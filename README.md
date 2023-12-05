@@ -25,6 +25,14 @@ An e-commerce application for a gadget store created with ASP.NET Core 7.0 Web A
 - **Content Delivery Network (CDN):** AWS CloudFront
 - **Platform:** AWS Lightsail
 
+## Todo
+
+- [ ] **Password Reset**
+- [ ] **Account Deletion** 
+- [ ] **Username/Email/Phone Edit**
+- [ ] **Google Login**
+- [ ] **Seller Reply to Review**
+
 ## Steps to run the app
 1. TODO: fill this
 
