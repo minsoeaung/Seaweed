@@ -40,6 +40,9 @@ jobs:
         Psql.connectionString: ${{ secrets.PSQL_CONNECTIONSTRING }}
         Jwt.Key: ${{ secrets.JWT_KEY }}
         Jwt.Issuer: ${{ secrets.JWT_ISSUER }}
+        Mail.Mail: ${{ secrets.MAIL_ID }}
+        Mail.DisplayName: ${{ secrets.MAIL_DISPLAY_NAME }}
+        Mail.Password: ${{ secrets.MAIL_PASSWORD }}
 
     - name: Publish .NET app
       run: |
