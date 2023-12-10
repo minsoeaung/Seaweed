@@ -20,6 +20,9 @@ const EditAddressPage = lazy(() => import('./User/EditAddress'));
 const InventoryPage = lazy(() => import('./Inventory'));
 const InventoryDetails = lazy(() => import('./Inventory/Details'));
 
+const ForgotPasswordPage = lazy(() => import('./ForgotPassword'));
+const ResetPasswordPage = lazy(() => import('./ResetPassword'));
+
 const ProtectedRoute = ({ onlyFor }: { onlyFor: string[] }) => {
     const { user } = useAuth();
 
@@ -42,6 +45,8 @@ const router = createBrowserRouter([
             { path: 'catalog', element: <CatalogPage /> },
             { path: 'catalog/:id', element: <ProductDetailPage /> },
             { path: 'catalog/:id/reviews', element: <ProductReviewsPage /> },
+            { path: 'forgot-password', element: <ForgotPasswordPage /> },
+            { path: 'reset-password', element: <ResetPasswordPage /> },
             {
                 path: 'user',
                 element: <ProtectedRoute onlyFor={['User']} />,

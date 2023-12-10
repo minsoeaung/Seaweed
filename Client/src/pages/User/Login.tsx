@@ -2,6 +2,7 @@ import {
     Box,
     Button,
     FormControl,
+    FormHelperText,
     FormLabel,
     Heading,
     IconButton,
@@ -87,6 +88,17 @@ const Login = () => {
                                         />
                                     </InputRightElement>
                                 </InputGroup>
+                                <FormHelperText textAlign="right">
+                                    <Button
+                                        as={ReactRouterLink}
+                                        to="/forgot-password"
+                                        variant="link"
+                                        colorScheme="blue"
+                                        size="sm"
+                                    >
+                                        Forgot password?
+                                    </Button>
+                                </FormHelperText>
                             </FormControl>
                             <Stack pt={2}>
                                 <Button

@@ -27,7 +27,7 @@ An e-commerce application for a gadget store created with ASP.NET Core 7.0 Web A
 
 ## Todo
 
-- [ ] **Password Reset**
+- [x] **Password Reset**
 - [x] **Account Deletion** 
 - [x] **Username Edit**
 - [ ] **Google Login**

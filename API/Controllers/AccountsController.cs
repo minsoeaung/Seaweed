@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using System.Web;
 using API.Configurations;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Options;
 
 namespace API.Controllers;
 
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/[controller]")]
 public class AccountsController : ControllerBase
@@ -39,7 +41,6 @@ public class AccountsController : ControllerBase
         _awsConfig = awsConfig.Value;
     }
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpGet("me")]
     public async Task<ActionResult<AccountDetails>> Me()
     {
@@ -56,7 +57,6 @@ public class AccountsController : ControllerBase
         return _mapper.Map<AccountDetails>((user, roles.AsEnumerable()));
     }
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPost("profile-picture")]
     public async Task<ActionResult> UpdateProfilePicture([Required] [FromForm] IFormFile picture)
     {
@@ -105,6 +105,7 @@ public class AccountsController : ControllerBase
         return Ok();
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<AuthResult>> Login(LoginDto userLoginDto)
     {
@@ -138,6 +139,7 @@ public class AccountsController : ControllerBase
         };
     }
 
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult<AuthResult>> Register(RegisterDto dto)
     {
@@ -211,7 +213,6 @@ public class AccountsController : ControllerBase
             : BadRequest(result.Errors);
     }
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPost("send-verification-mail")]
     public async Task<ActionResult> SendConfirmEmailLink()
     {
@@ -235,11 +236,10 @@ public class AccountsController : ControllerBase
                   );
 
         await _mailService.SendMailAsync(user.Email ?? string.Empty, "Verify your email address",
-            $"Hi, {user.UserName}. Please click the link below to verify your email address: <br/> {url}");
+            $"Hi, {user.UserName}. Please click the link below to verify your email address: <br/><br/> {url}");
         return Ok();
     }
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPost("username")]
     public async Task<ActionResult> UpdateUsername([StringLength(50, MinimumLength = 4,
             ErrorMessage = "Username must have a minimum length of 4 and a maximum length of 50.")]
@@ -292,5 +292,43 @@ public class AccountsController : ControllerBase
         }
 
         return ValidationProblem();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("reset-password")]
+    public async Task<ActionResult> ResetPassword(ResetPasswordDto dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+        if (user == null) return NotFound();
+
+        var result = await _userManager.ResetPasswordAsync(user, HttpUtility.UrlDecode(dto.Token), dto.NewPassword);
+        if (result.Succeeded) return Ok();
+
+        foreach (var identityError in result.Errors)
+        {
+            ModelState.AddModelError(identityError.Code, identityError.Description);
+        }
+
+        return ValidationProblem();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("send-reset-password-mail")]
+    public async Task<ActionResult> SendResetPasswordMail(string email, string clientUrl)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            ModelState.AddModelError("NotFound", "No account was found for the provided email address.");
+            return ValidationProblem();
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        var url = $"{clientUrl}?token={HttpUtility.UrlEncode(token)}&email={email}";
+
+        await _mailService.SendMailAsync(user.Email ?? string.Empty, "Password Reset Request",
+            $"Hi, {user.UserName}. Please click the link below to reset your password: <br/><br/> <a href=\"{url}\" target=\"_blank\">[{clientUrl}]</a> <br/><br/> The link will expire in 24h. If the link has expired, you can initiate another password reset request.\n");
+        return Ok();
     }
 }
