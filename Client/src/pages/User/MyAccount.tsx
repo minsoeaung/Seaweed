@@ -1,35 +1,19 @@
 import { useMyAccount } from '../../hooks/queries/useMyAccount.ts';
-import {
-    Avatar,
-    AvatarBadge,
-    Box,
-    Button,
-    Card,
-    Center,
-    Heading,
-    HStack,
-    IconButton,
-    Input,
-    Tag,
-    Text,
-    VStack,
-    Wrap,
-    WrapItem,
-} from '@chakra-ui/react';
-import { CheckIcon, EditIcon } from '@chakra-ui/icons';
+import { Avatar, AvatarBadge, Box, Button, Card, Center, Heading, IconButton, Input, VStack } from '@chakra-ui/react';
+import { EditIcon } from '@chakra-ui/icons';
 import AntdSpin from '../../components/AntdSpin';
 import { useUpdateProfilePicture } from '../../hooks/mutations/useUpdateProfilePicture.ts';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { useAddresses } from '../../hooks/queries/useAddresses.ts';
-import { AddressCard } from '../../components/AddressCard.tsx';
+import { MyEmail } from '../../components/MyEmail.tsx';
+import { MyShippingAddresses } from '../../components/MyShippingAddresses.tsx';
+import { MyUsername } from '../../components/MyUsername.tsx';
+import { MyDeleteAccount } from '../../components/MyDeleteAccount.tsx';
 
 const MyAccount = () => {
     const { data, isLoading, isError } = useMyAccount();
     const inputRef = useRef<HTMLInputElement>(null);
     const updateProfileMutation = useUpdateProfilePicture();
-
-    const { data: addresses } = useAddresses();
 
     const updateProfilePicture = async (pic: FileList | null) => {
         !!pic && (await updateProfileMutation.mutateAsync(pic));
@@ -61,135 +45,34 @@ const MyAccount = () => {
                     <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
                         My Account
                     </Heading>
-                    <HStack spacing={{ base: 2, md: 6 }}>
-                        <Avatar size="2xl" src={data.profilePicture}>
-                            <AvatarBadge
-                                as={IconButton}
-                                size="md"
-                                rounded="full"
-                                top="-10px"
-                                colorScheme="facebook"
-                                aria-label="Update profile picture"
-                                isLoading={updateProfileMutation.isLoading}
-                                icon={<EditIcon />}
-                                onClick={() => {
-                                    inputRef.current?.click();
-                                }}
-                            />
-                            <Input
-                                ref={inputRef}
-                                type="file"
-                                accept="image/*"
-                                multiple
-                                name="profile-picture"
-                                onChange={(e) => updateProfilePicture(e.target.files)}
-                                hidden
-                            />
-                        </Avatar>
-                        <VStack alignItems="start">
-                            <Input
-                                defaultValue={data.userName}
-                                placeholder="UserName"
-                                _placeholder={{ color: 'gray.500' }}
-                                type="text"
-                                isDisabled
-                            />
-                            {!(data.roles.length === 1 && data.roles.includes('User')) && (
-                                <HStack>
-                                    <Text fontSize="sm">Account type: </Text>
-                                    <Wrap>
-                                        {data.roles.map((role) => (
-                                            <Tag colorScheme="blue" key={role}>
-                                                {role}
-                                            </Tag>
-                                        ))}
-                                    </Wrap>
-                                </HStack>
-                            )}
-                        </VStack>
-                    </HStack>
-                    <VStack align="start">
-                        <HStack>
-                            <Text>Email</Text>
-                            {data.emailConfirmed ? (
-                                <Button
-                                    leftIcon={<CheckIcon />}
-                                    size="xs"
-                                    variant="ghost"
-                                    colorScheme="green"
-                                    isDisabled
-                                >
-                                    Verified
-                                </Button>
-                            ) : (
-                                <Button size="xs" variant="outline" isDisabled>
-                                    Verify
-                                </Button>
-                            )}
-                        </HStack>
-                        <HStack>
-                            <Text color={'gray.500'}>{data.email}</Text>
-                            <IconButton size="xs" variant="ghost" aria-label="Change email" icon={<EditIcon />} />
-                        </HStack>
-                    </VStack>
-                    <VStack align="start">
-                        <HStack>
-                            <Text>Phone</Text>
-                            {!!data.phoneNumber &&
-                                (data.phoneNumber ? (
-                                    <Button
-                                        leftIcon={<CheckIcon />}
-                                        size="xs"
-                                        variant="ghost"
-                                        colorScheme="green"
-                                        isDisabled
-                                    >
-                                        Verified
-                                    </Button>
-                                ) : (
-                                    <Button size="xs" variant="outline" isDisabled>
-                                        Verify
-                                    </Button>
-                                ))}
-                        </HStack>
-                        <HStack>
-                            {data.phoneNumber ? (
-                                <>
-                                    <Text color={'gray.500'}>{data.phoneNumber}</Text>
-                                    <IconButton
-                                        size="xs"
-                                        variant="ghost"
-                                        aria-label="Change email"
-                                        icon={<EditIcon />}
-                                    />
-                                </>
-                            ) : (
-                                <Button size="xs" variant="outline" isDisabled>
-                                    Add phone
-                                </Button>
-                            )}
-                        </HStack>
-                    </VStack>
-                    <VStack align="start">
-                        <Text>Shipping address</Text>
-                        <Button
-                            variant="solid"
-                            colorScheme="blue"
-                            size="sm"
-                            as={Link}
-                            to="/user/my-account/new-address"
-                        >
-                            Add a new address
-                        </Button>
-                        <Wrap>
-                            {Array.isArray(addresses) &&
-                                addresses.map((address) => (
-                                    <WrapItem key={address.id}>
-                                        <AddressCard data={address} />
-                                    </WrapItem>
-                                ))}
-                        </Wrap>
-                    </VStack>
+                    <Avatar size="2xl" src={data.profilePicture}>
+                        <AvatarBadge
+                            as={IconButton}
+                            size={{ base: 'sm', md: 'md' }}
+                            rounded="full"
+                            top="-10px"
+                            colorScheme="facebook"
+                            aria-label="Update profile picture"
+                            isLoading={updateProfileMutation.isLoading}
+                            icon={<EditIcon />}
+                            onClick={() => {
+                                inputRef.current?.click();
+                            }}
+                        />
+                        <Input
+                            ref={inputRef}
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            name="profile-picture"
+                            onChange={(e) => updateProfilePicture(e.target.files)}
+                            hidden
+                        />
+                    </Avatar>
+                    <MyUsername />
+                    <MyEmail />
+                    <MyShippingAddresses />
+                    <MyDeleteAccount />
                 </VStack>
             </Card>
         </Box>

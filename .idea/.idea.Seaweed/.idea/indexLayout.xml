@@ -4,7 +4,9 @@
     <attachedFolders>
       <Path>Client</Path>
     </attachedFolders>
-    <explicitIncludes />
+    <explicitIncludes>
+      <Path>Client</Path>
+    </explicitIncludes>
     <explicitExcludes />
   </component>
 </project>

@@ -1,8 +1,8 @@
 export type Review = {
     productId: number;
     userId: number;
-    userName: string;
-    userProfilePicture: string;
+    userName: string | null;
+    userProfilePicture: string | null;
 
     rating: number;
     review: string;

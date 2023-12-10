@@ -82,6 +82,8 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult<Product>> CreateProduct([FromForm] CreateProductDto productDto)
     {
         var product = _mapper.Map<Product>(productDto);
+        product.AverageRating = 0;
+        product.NumOfRatings = 0;
         await _storeContext.Products.AddAsync(product);
         var result = await _storeContext.SaveChangesAsync();
 

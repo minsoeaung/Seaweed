@@ -20,8 +20,8 @@ public class ReviewService : IReviewService
     public async Task<PagedList<ProductReview>> GetReviews(int productId, int pageNumber, int pageSize)
     {
         var query = _context.ProductReviews
-            .Include(r => r.User)
             .Where(r => r.ProductId == productId)
+            .Include(r => r.User)
             .OrderBy(r => r.CreatedAt)
             .AsNoTracking()
             .AsQueryable();

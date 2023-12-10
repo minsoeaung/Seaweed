@@ -8,6 +8,7 @@ using API.Extensions;
 using API.Middlewares;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -50,6 +51,7 @@ builder.Services.AddDbContext<StoreContext>(opt => opt.UseNpgsql(builder.Configu
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<AwsConfig>(builder.Configuration.GetSection("AWS"));
+builder.Services.Configure<MailConfig>(builder.Configuration.GetSection("Mail"));
 
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddAWSService<IAmazonS3>();
@@ -62,6 +64,7 @@ builder.Services.AddScoped<IUserLoginService, UserLoginService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IMailService, MailService>();
 
 builder.Services.AddIdentityCore<User>(options =>
     {
@@ -76,7 +79,8 @@ builder.Services.AddIdentityCore<User>(options =>
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
     })
     .AddRoles<UserRole>()
-    .AddEntityFrameworkStores<StoreContext>();
+    .AddEntityFrameworkStores<StoreContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>
     {

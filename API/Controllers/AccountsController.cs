@@ -24,15 +24,18 @@ public class AccountsController : ControllerBase
     private readonly IImageService _imageService;
     private readonly IUserLoginService _loginService;
     private readonly AwsConfig _awsConfig;
+    private readonly IMailService _mailService;
 
     public AccountsController(UserManager<User> userManager, ITokenService tokenService, IMapper mapper,
-        IImageService imageService, IOptions<AwsConfig> awsConfig, IUserLoginService loginService)
+        IImageService imageService, IOptions<AwsConfig> awsConfig, IUserLoginService loginService,
+        IMailService mailService)
     {
         _userManager = userManager;
         _tokenService = tokenService;
         _mapper = mapper;
         _imageService = imageService;
         _loginService = loginService;
+        _mailService = mailService;
         _awsConfig = awsConfig.Value;
     }
 
@@ -193,5 +196,101 @@ public class AccountsController : ControllerBase
         _tokenService.DeleteRefreshTokenInCookies(Response);
 
         return Ok();
+    }
+
+    [HttpGet("verify-email")]
+    public async Task<ActionResult> ConfirmEmail(string userId, string token)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return NotFound();
+
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+        return result.Succeeded
+            ? Ok("Your email is verified.\nRefresh your page to see changes.")
+            : BadRequest(result.Errors);
+    }
+
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost("send-verification-mail")]
+    public async Task<ActionResult> SendConfirmEmailLink()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return BadRequest();
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return NotFound();
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        var url = Request.Scheme +
+                  "://" +
+                  Request.Host +
+                  Url.Action(
+                      nameof(ConfirmEmail),
+                      "Accounts",
+                      new { userId = user.Id, token }
+                  );
+
+        await _mailService.SendMailAsync(user.Email ?? string.Empty, "Verify your email address",
+            $"Hi, {user.UserName}. Please click the link below to verify your email address: <br/> {url}");
+        return Ok();
+    }
+
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost("username")]
+    public async Task<ActionResult> UpdateUsername([StringLength(50, MinimumLength = 4,
+            ErrorMessage = "Username must have a minimum length of 4 and a maximum length of 50.")]
+        string username)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return BadRequest();
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return NotFound();
+
+        user.UserName = username.Trim();
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (result.Succeeded)
+            return Ok();
+
+        foreach (var identityError in result.Errors)
+        {
+            ModelState.AddModelError(identityError.Code, identityError.Description);
+        }
+
+        return ValidationProblem();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteAccount(string id, string password)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user is null)
+            return NotFound();
+
+        var passwordValid = await _userManager.CheckPasswordAsync(user, password);
+        if (!passwordValid)
+        {
+            ModelState.AddModelError("Invalid password", "Your password is not correct.");
+            return ValidationProblem();
+        }
+
+        var result = await _userManager.DeleteAsync(user);
+        if (result.Succeeded)
+            return Ok();
+
+        foreach (var identityError in result.Errors)
+        {
+            ModelState.AddModelError(identityError.Code, identityError.Description);
+        }
+
+        return ValidationProblem();
     }
 }

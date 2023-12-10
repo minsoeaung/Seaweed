@@ -82,8 +82,8 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
         <Box p={{ base: 2, md: 4 }}>
             <Flex justifyContent="space-between" align="center">
                 <HStack>
-                    <Avatar size={'sm'} src={userProfilePicture} />
-                    <Text>{userName}</Text>
+                    <Avatar size={'sm'} src={userProfilePicture || undefined} />
+                    <Text>{userName || '[Deleted account]'}</Text>
                     {ownByUser && (
                         <Badge colorScheme="blue" size={{ base: 'xs', md: 'md' }}>
                             * Your review

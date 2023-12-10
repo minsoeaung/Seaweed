@@ -13,17 +13,22 @@
         <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.300" />
         <PackageReference Include="AWSSDK.S3" Version="3.7.300.3" />
         <PackageReference Include="Bogus" Version="34.0.2" />
+        <PackageReference Include="MailKit" Version="4.3.0" />
         <PackageReference Include="Mapster" Version="7.4.0" />
         <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.13" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.13" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.14" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.13"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.13">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.14">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.14" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.14" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.14">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.11" />
         <PackageReference Include="Nager.Country" Version="4.0.0" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11" />

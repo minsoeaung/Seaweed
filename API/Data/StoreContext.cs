@@ -27,6 +27,18 @@ public class StoreContext : IdentityDbContext<User, UserRole, int>
         builder.Entity<WishList>()
             .HasKey(nameof(WishList.UserId), nameof(WishList.ProductId));
 
+        builder.Entity<ProductReview>()
+            .HasOne(pr => pr.Product)
+            .WithMany()
+            .HasForeignKey(p => p.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<ProductReview>()
+            .HasOne(u => u.User)
+            .WithMany()
+            .HasForeignKey(u => u.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         base.OnModelCreating(builder);
     }
 
