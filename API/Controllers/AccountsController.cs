@@ -190,6 +190,7 @@ public class AccountsController : ControllerBase
         return _tokenService.GenerateAccessToken(userLogin.User, await _userManager.GetRolesAsync(userLogin.User));
     }
 
+    [AllowAnonymous]
     [HttpGet("logout")]
     public async Task<IActionResult> Logout()
     {
@@ -200,6 +201,7 @@ public class AccountsController : ControllerBase
         return Ok();
     }
 
+    [AllowAnonymous]
     [HttpGet("verify-email")]
     public async Task<ActionResult> ConfirmEmail(string userId, string token)
     {
