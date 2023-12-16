@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Web;
+using API.ApiErrors;
 using API.Configurations;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
 using API.Entities;
 using API.Services;
+using ErrorOr;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +20,7 @@ namespace API.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/[controller]")]
-public class AccountsController : ControllerBase
+public class AccountsController : BaseApiController
 {
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
@@ -52,9 +54,7 @@ public class AccountsController : ControllerBase
         if (user is null)
             return BadRequest();
 
-        var roles = await _userManager.GetRolesAsync(user);
-
-        return _mapper.Map<AccountDetails>((user, roles.AsEnumerable()));
+        return _mapper.Map<AccountDetails>((user, await _userManager.GetRolesAsync(user)));
     }
 
     [HttpPost("profile-picture")]
@@ -101,7 +101,6 @@ public class AccountsController : ControllerBase
             return BadRequest();
 
         await _userManager.AddToRolesAsync(user, new List<string> { "Admin", "User" });
-
         return Ok();
     }
 
@@ -109,33 +108,30 @@ public class AccountsController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<AuthResult>> Login(LoginDto userLoginDto)
     {
+        List<Error> errors = new();
+
         var user = await _userManager.FindByNameAsync(userLoginDto.UserName.Trim());
         if (user is null)
         {
-            ModelState.AddModelError("Username", "Account not found. Please check your username and try again.");
-            return ValidationProblem();
+            errors.Add(Errors.User.NotFoundUsername);
+            return Problem(errors);
         }
 
         var passwordValid = await _userManager.CheckPasswordAsync(user, userLoginDto.Password);
         if (!passwordValid)
         {
-            ModelState.AddModelError("Password",
-                "Password is incorrect. Verify your password and attempt login again.");
-            return ValidationProblem();
+            errors.Add(Errors.User.IncorrectPassword);
+            return Problem(errors);
         }
 
         var userLogin = await _loginService.LoginAsync(user);
-
-        await _loginService.TryDeleteLoginRecord(Request.Cookies["refreshToken"]);
-
-        var roles = await _userManager.GetRolesAsync(user);
-
         _tokenService.SetRefreshTokenInCookies(_mapper.Map<RefreshToken>(userLogin), Response);
 
+        var roles = await _userManager.GetRolesAsync(user);
         return new AuthResult
         {
             AccessToken = _tokenService.GenerateAccessToken(user, roles).AccessToken,
-            AccountDetails = _mapper.Map<AccountDetails>((user, roles.AsEnumerable()))
+            AccountDetails = _mapper.Map<AccountDetails>((user, roles))
         };
     }
 
@@ -143,7 +139,7 @@ public class AccountsController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<AuthResult>> Register(RegisterDto dto)
     {
-        var user = new User()
+        var user = new User
         {
             UserName = dto.UserName.Trim(),
             Email = dto.Email,
@@ -155,46 +151,53 @@ public class AccountsController : ControllerBase
         if (!userResult.Succeeded)
         {
             foreach (var identityError in userResult.Errors)
-            {
                 ModelState.AddModelError(identityError.Code, identityError.Description);
-            }
 
             return ValidationProblem();
         }
 
-        var roles = new List<string>() { "User" };
+        IList<string> roles = new List<string> { "User" };
         await _userManager.AddToRolesAsync(user, roles);
 
         var userSession = await _loginService.LoginAsync(user);
-
         _tokenService.SetRefreshTokenInCookies(_mapper.Map<RefreshToken>(userSession), Response);
-
-        await _loginService.TryDeleteLoginRecord(Request.Cookies["refreshToken"]);
 
         return new AuthResult
         {
             AccessToken = _tokenService.GenerateAccessToken(userSession.User, roles).AccessToken,
-            AccountDetails = _mapper.Map<AccountDetails>((userSession.User, roles.AsEnumerable()))
+            AccountDetails = _mapper.Map<AccountDetails>((userSession.User, roles))
         };
     }
 
+    [AllowAnonymous]
     [HttpGet("renew-tokens")]
     public async Task<ActionResult<TokenResult>> Refresh()
     {
-        var userLogin = await _loginService.RenewToken(Request.Cookies["refreshToken"]);
-        if (userLogin == null)
-            return BadRequest();
+        var refreshToken = Request.Cookies["refreshToken"];
+        if (refreshToken == null)
+            return Problem(new List<Error> { Errors.User.InvalidRefreshToken });
 
-        _tokenService.SetRefreshTokenInCookies(_mapper.Map<RefreshToken>(userLogin), Response);
+        var userSessionOrError = await _loginService.RenewToken(refreshToken);
 
-        return _tokenService.GenerateAccessToken(userLogin.User, await _userManager.GetRolesAsync(userLogin.User));
+        if (userSessionOrError.IsError)
+            return Problem(userSessionOrError.Errors);
+
+        _tokenService.SetRefreshTokenInCookies(_mapper.Map<RefreshToken>(userSessionOrError.Value), Response);
+
+        var user = userSessionOrError.Value.User;
+
+        return _tokenService.GenerateAccessToken(user, await _userManager.GetRolesAsync(user));
     }
 
     [AllowAnonymous]
     [HttpGet("logout")]
     public async Task<IActionResult> Logout()
     {
-        await _loginService.TryDeleteLoginRecord(Request.Cookies["refreshToken"]);
+        var refreshToken = Request.Cookies["refreshToken"];
+        if (refreshToken == null)
+            return Problem(new List<Error> { Errors.User.InvalidRefreshToken });
+
+        await _loginService.TryDeleteLoginRecord(refreshToken);
 
         _tokenService.DeleteRefreshTokenInCookies(Response);
 
@@ -207,12 +210,16 @@ public class AccountsController : ControllerBase
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
-            return NotFound();
+            return Problem(new List<Error> { Errors.User.NotFound });
 
         var result = await _userManager.ConfirmEmailAsync(user, token);
-        return result.Succeeded
-            ? Ok("Your email is verified.\nRefresh your page to see changes.")
-            : BadRequest(result.Errors);
+        if (result.Succeeded)
+            return Ok("Your email is verified.\nPlease refresh your page to see changes.");
+
+        var errors = result.Errors
+            .Select(identityError => Error.Validation(identityError.Code, identityError.Description)).ToList();
+
+        return Problem(errors);
     }
 
     [HttpPost("send-verification-mail")]
@@ -220,11 +227,11 @@ public class AccountsController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null)
-            return BadRequest();
+            return Unauthorized();
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
-            return NotFound();
+            return Problem(new List<Error> { Errors.User.NotFound });
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
@@ -249,11 +256,11 @@ public class AccountsController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null)
-            return BadRequest();
+            return Unauthorized();
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
-            return NotFound();
+            return Problem(new List<Error> { Errors.User.NotFound });
 
         user.UserName = username.Trim();
 
@@ -262,12 +269,9 @@ public class AccountsController : ControllerBase
         if (result.Succeeded)
             return Ok();
 
-        foreach (var identityError in result.Errors)
-        {
-            ModelState.AddModelError(identityError.Code, identityError.Description);
-        }
-
-        return ValidationProblem();
+        var errors = result.Errors
+            .Select(identityError => Error.Validation(identityError.Code, identityError.Description)).ToList();
+        return Problem(errors);
     }
 
     [HttpDelete("{id}")]
@@ -275,25 +279,22 @@ public class AccountsController : ControllerBase
     {
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
-            return NotFound();
+            return Problem(new List<Error> { Errors.User.NotFound });
 
         var passwordValid = await _userManager.CheckPasswordAsync(user, password);
         if (!passwordValid)
-        {
-            ModelState.AddModelError("Invalid password", "Your password is not correct.");
-            return ValidationProblem();
-        }
+            return Problem(new List<Error> { Errors.User.IncorrectPassword });
 
         var result = await _userManager.DeleteAsync(user);
         if (result.Succeeded)
-            return Ok();
-
-        foreach (var identityError in result.Errors)
         {
-            ModelState.AddModelError(identityError.Code, identityError.Description);
+            await _imageService.DeleteImageAsync(user.Id, ImageFolders.UserImages);
+            return Ok();
         }
 
-        return ValidationProblem();
+        var errors = result.Errors
+            .Select(identityError => Error.Validation(identityError.Code, identityError.Description)).ToList();
+        return Problem(errors);
     }
 
     [AllowAnonymous]
@@ -301,17 +302,15 @@ public class AccountsController : ControllerBase
     public async Task<ActionResult> ResetPassword(ResetPasswordDto dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
-        if (user == null) return NotFound();
+        if (user == null)
+            return Problem(new List<Error> { Errors.User.NotFoundEmail });
 
         var result = await _userManager.ResetPasswordAsync(user, HttpUtility.UrlDecode(dto.Token), dto.NewPassword);
         if (result.Succeeded) return Ok();
 
-        foreach (var identityError in result.Errors)
-        {
-            ModelState.AddModelError(identityError.Code, identityError.Description);
-        }
-
-        return ValidationProblem();
+        var errors = result.Errors
+            .Select(identityError => Error.Validation(identityError.Code, identityError.Description)).ToList();
+        return Problem(errors);
     }
 
     [AllowAnonymous]
@@ -320,10 +319,7 @@ public class AccountsController : ControllerBase
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
-        {
-            ModelState.AddModelError("NotFound", "No account was found for the provided email address.");
-            return ValidationProblem();
-        }
+            return Problem(new List<Error> { Errors.User.NotFoundEmail });
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 

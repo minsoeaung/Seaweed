@@ -1,5 +1,7 @@
+using API.ApiErrors;
 using API.Data;
 using API.Entities;
+using ErrorOr;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,23 +20,20 @@ public class UserLoginService : IUserLoginService
         _userManager = userManager;
     }
 
-    public async Task<UserSession?> RenewToken(string? currentToken)
+    public async Task<ErrorOr<UserSession>> RenewToken(string refreshToken)
     {
-        if (currentToken == null)
-            return null;
-
         var userLogin = await _context.UserSessions
             .Include(l => l.User)
-            .FirstOrDefaultAsync(l => l.RefreshToken == currentToken);
+            .FirstOrDefaultAsync(l => l.RefreshToken == refreshToken);
 
         if (userLogin == null)
-            return null;
+            return Errors.User.InvalidRefreshToken;
 
         if (userLogin.RefreshTokenExpiredAt < DateTime.UtcNow)
         {
             _context.UserSessions.Remove(userLogin);
             await _context.SaveChangesAsync();
-            return null;
+            return Errors.User.ExpiredToken;
         }
 
         var newRefreshToken = _tokenService.GenerateRefreshToken();
@@ -48,16 +47,13 @@ public class UserLoginService : IUserLoginService
         return userLogin;
     }
 
-    public async Task TryDeleteLoginRecord(string? refreshToken)
+    public async Task TryDeleteLoginRecord(string refreshToken)
     {
-        if (refreshToken != null)
+        var existing = await _context.UserSessions.FirstOrDefaultAsync(l => l.RefreshToken == refreshToken);
+        if (existing != null)
         {
-            var existing = await _context.UserSessions.FirstOrDefaultAsync(l => l.RefreshToken == refreshToken);
-            if (existing != null)
-            {
-                _context.UserSessions.Remove(existing);
-                await _context.SaveChangesAsync();
-            }
+            _context.UserSessions.Remove(existing);
+            await _context.SaveChangesAsync();
         }
     }
 

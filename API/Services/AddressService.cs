@@ -1,5 +1,7 @@
+using API.ApiErrors;
 using API.Data;
 using API.Entities;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
@@ -13,7 +15,7 @@ public class AddressService : IAddressService
         _context = context;
     }
 
-    public async Task<UserAddress> GetUserAddress(int userId, int addressId)
+    public async Task<UserAddress> GetUserAddressAsync(int userId, int addressId)
     {
         var userAddress = await _context.UserAddresses
             .Include(u => u.Addresses.Where(a => addressId == 0 || a.Id == addressId))
@@ -23,6 +25,8 @@ public class AddressService : IAddressService
 
         if (userAddress == null)
         {
+            // For backward compatibility purpose
+            // Newly created user will have a row in table for this entity
             return new UserAddress
             {
                 Addresses = new List<Address>(),
@@ -34,18 +38,18 @@ public class AddressService : IAddressService
         return userAddress;
     }
 
-    public async Task<Address?> UpdateAddress(int addressId, string unitNumber, string streetNumber,
+    public async Task<ErrorOr<Address>> UpdateAddressAsync(int addressId, string unitNumber, string streetNumber,
         string addrLine1,
         string addrLine2,
         string postalCodes, string city, string region, int countryId)
     {
         var address = await _context.Addresses.FindAsync(addressId);
         if (address == null)
-            return null;
+            return Errors.Address.NotFound;
 
         var country = await _context.Countries.FindAsync(countryId);
         if (country == null)
-            return null;
+            return Errors.Country.NotFound;
 
         address.UnitNumber = unitNumber;
         address.StreetNumber = streetNumber;
@@ -61,17 +65,19 @@ public class AddressService : IAddressService
         return address;
     }
 
-    public async Task<Address?> AddAddress(int userId, string unitNumber, string streetNumber, string addrLine1,
+    public async Task<ErrorOr<Address>> AddAddressAsync(int userId, string unitNumber, string streetNumber,
+        string addrLine1,
         string addrLine2,
         string postalCodes, string city, string region, int countryId)
     {
         var country = await _context.Countries.FindAsync(countryId);
         if (country == null)
-            return null;
+            return Errors.Country.NotFound;
 
         var userAddress = await _context.UserAddresses
             .AsNoTracking()
             .FirstOrDefaultAsync(ua => ua.UserId == userId);
+
         if (userAddress == null)
         {
             userAddress = new UserAddress
@@ -101,17 +107,16 @@ public class AddressService : IAddressService
         try
         {
             await _context.Addresses.AddAsync(address);
-            var updates = await _context.SaveChangesAsync();
-
-            return updates > 0 ? address : null;
+            await _context.SaveChangesAsync();
+            return address;
         }
         catch
         {
-            return null;
+            return Errors.Address.AddFailure;
         }
     }
 
-    public async Task DeleteAddress(int userId, int addressId)
+    public async Task DeleteAddressAsync(int userId, int addressId)
     {
         var addressToDelete = await _context.Addresses.FindAsync(addressId);
         if (addressToDelete == null) return;
@@ -130,7 +135,7 @@ public class AddressService : IAddressService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<UserAddress?> UpdateDefaultAddress(int userId, int newDefaultAddressId)
+    public async Task<UserAddress?> UpdateDefaultAddressAsync(int userId, int newDefaultAddressId)
     {
         var userAddress = await _context.UserAddresses.AsNoTracking().FirstOrDefaultAsync(ua => ua.UserId == userId);
         if (userAddress == null)

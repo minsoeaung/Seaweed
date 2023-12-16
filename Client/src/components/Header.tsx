@@ -15,9 +15,9 @@ import {
     MenuItem,
     MenuList,
     Stack,
+    useBreakpointValue,
     useColorMode,
     useColorModeValue,
-    useMediaQuery,
 } from '@chakra-ui/react';
 import { MoonIcon, SearchIcon, SettingsIcon, SunIcon } from '@chakra-ui/icons';
 import { LuHeart } from 'react-icons/lu';
@@ -37,7 +37,14 @@ const Header = () => {
     const { colorMode, toggleColorMode } = useColorMode();
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchInputValue, setSearchInputValue] = useState(searchParams.get('searchTerm') || '');
-    const [isMobile] = useMediaQuery('(max-width: 400px)');
+
+    const isMobile = useBreakpointValue({
+        base: true,
+        sm: true,
+        xs: true,
+        md: false,
+    });
+
     const [searchBoxVisible, setSearchBoxVisible] = useState(window.innerWidth > 400);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -56,7 +63,7 @@ const Header = () => {
             });
         }
     };
-
+    
     return (
         <Box
             as="nav"

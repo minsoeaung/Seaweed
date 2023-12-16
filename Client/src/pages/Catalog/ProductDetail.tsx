@@ -112,14 +112,20 @@ const ProductDetailPage = () => {
                                     {data.description}
                                 </Text>
                                 <HStack w="full" mt={4}>
-                                    <AddToCartButton
-                                        buttonProps={{
-                                            width: '50%',
-                                            isDisabled: !cart,
-                                        }}
-                                        productId={data.id}
-                                        isInCart={isInCart}
-                                    />
+                                    {data.quantityInStock === 0 ? (
+                                        <Button variant="outline" colorScheme="blue" isDisabled>
+                                            Out of stock
+                                        </Button>
+                                    ) : (
+                                        <AddToCartButton
+                                            buttonProps={{
+                                                width: '50%',
+                                                isDisabled: !cart,
+                                            }}
+                                            productId={data.id}
+                                            isInCart={isInCart}
+                                        />
+                                    )}
                                     <Button
                                         leftIcon={<Icon as={AiOutlineHeart} />}
                                         colorScheme={isFavorite ? 'red' : 'blue'}

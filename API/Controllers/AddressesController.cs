@@ -12,7 +12,7 @@ namespace API.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/[controller]")]
-public class AddressesController : ControllerBase
+public class AddressesController : BaseApiController
 {
     private readonly IAddressService _service;
     private readonly IMapper _mapper;
@@ -26,7 +26,7 @@ public class AddressesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<AddressDetails?>> GetAddress(int id)
     {
-        var userAddress = await _service.GetUserAddress(GetUserId(), id);
+        var userAddress = await _service.GetUserAddressAsync(GetUserId(), id);
         var address = userAddress.Addresses.FirstOrDefault();
         if (address == null)
             return NotFound();
@@ -41,7 +41,7 @@ public class AddressesController : ControllerBase
     [HttpGet]
     public async Task<IEnumerable<AddressDetails>> GetAddresses()
     {
-        var userAddress = await _service.GetUserAddress(GetUserId());
+        var userAddress = await _service.GetUserAddressAsync(GetUserId());
         var addresses = userAddress.Addresses;
 
         var addressDetailsList = _mapper.Map<IEnumerable<AddressDetails>>(addresses.AsEnumerable()).ToList();
@@ -55,9 +55,9 @@ public class AddressesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<AddressDetails?>> AddAddress(CreateAddressDto dto)
+    public async Task<ActionResult<AddressDetails>> AddAddress(CreateAddressDto dto)
     {
-        var address = await _service.AddAddress(
+        var addressOrError = await _service.AddAddressAsync(
             GetUserId(),
             dto.UnitNumber,
             dto.StreetNumber,
@@ -68,13 +68,18 @@ public class AddressesController : ControllerBase
             dto.Region,
             dto.CountryId
         );
-        return address == null ? BadRequest() : _mapper.Map<AddressDetails>(address);
+
+        return addressOrError.Match(
+            address => CreatedAtAction(nameof(GetAddress), new { address.Id },
+                _mapper.Map<AddressDetails>(address)),
+            Problem
+        );
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<AddressDetails>> UpdateAddress(int id, UpdateAddressDto dto)
     {
-        var address = await _service.UpdateAddress(
+        var addressOrError = await _service.UpdateAddressAsync(
             id,
             dto.UnitNumber,
             dto.StreetNumber,
@@ -86,10 +91,10 @@ public class AddressesController : ControllerBase
             dto.CountryId
         );
 
-        if (address == null)
-            return NotFound();
+        if (addressOrError.IsError)
+            return Problem(addressOrError.Errors);
 
-        var addressDetails = _mapper.Map<AddressDetails>(address);
+        var addressDetails = _mapper.Map<AddressDetails>(addressOrError.Value);
         addressDetails.IsDefault = dto.IsDefault;
         return addressDetails;
     }
@@ -98,14 +103,14 @@ public class AddressesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAddress(int id)
     {
-        await _service.DeleteAddress(GetUserId(), id);
+        await _service.DeleteAddressAsync(GetUserId(), id);
         return NoContent();
     }
 
     [HttpPut("change-default-address")]
     public async Task<ActionResult> UpdateDefaultAddress(int id)
     {
-        var userAddress = await _service.UpdateDefaultAddress(GetUserId(), id);
+        var userAddress = await _service.UpdateDefaultAddressAsync(GetUserId(), id);
         return userAddress == null ? NotFound() : NoContent();
     }
 

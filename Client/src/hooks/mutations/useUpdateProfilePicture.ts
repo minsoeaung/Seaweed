@@ -23,11 +23,14 @@ export const useUpdateProfilePicture = () => {
                 });
 
                 const data = queryClient.getQueryData<User>(ACCOUNT);
+                
                 if (data) {
-                    !data.profilePicture && (await queryClient.invalidateQueries(ACCOUNT));
-
-                    data.profilePicture = `${data.profilePicture}?time=${Date.now()}`;
-                    queryClient.setQueryData(ACCOUNT, data);
+                    if (!data.profilePicture) {
+                        await queryClient.invalidateQueries(ACCOUNT);
+                    } else {
+                        data.profilePicture = `${data.profilePicture}?time=${Date.now()}`;
+                        queryClient.setQueryData(ACCOUNT, data);
+                    }
                 }
             },
         }
