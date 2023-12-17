@@ -34,8 +34,8 @@ ApiClient.interceptors.response.use(
                     },
                 })
                     .then((response) => {
-                        sessionStorage.setItem('jwtToken', response.data.accessToken);
-                        originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+                        sessionStorage.setItem('jwtToken', response.data.token);
+                        originalRequest.headers.Authorization = `Bearer ${response.data.token}`;
 
                         ApiClient(originalRequest)
                             .then((response) => {

@@ -13,5 +13,5 @@ public class RegisterDto
     [MinLength(6, ErrorMessage = "The field Password must have a minimum length of 6.")]
     public string Password { get; set; }
 
-    [Required] public string Email { get; set; }
+    [Required] [EmailAddress] public string Email { get; set; }
 }

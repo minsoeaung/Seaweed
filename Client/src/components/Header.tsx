@@ -63,7 +63,7 @@ const Header = () => {
             });
         }
     };
-    
+
     return (
         <Box
             as="nav"
@@ -96,7 +96,7 @@ const Header = () => {
                 )}
 
                 {(isMobile ? searchBoxVisible : true) && (
-                    <InputGroup maxWidth={700}>
+                    <InputGroup maxWidth={700} ml={2}>
                         <InputLeftElement pointerEvents="none">
                             <SearchIcon color={useColorModeValue('red.500', 'red.300')} />
                         </InputLeftElement>

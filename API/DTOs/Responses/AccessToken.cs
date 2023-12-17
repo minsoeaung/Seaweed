@@ -1,6 +1,6 @@
-namespace API.Entities;
+namespace API.DTOs.Responses;
 
-public class RefreshToken
+public class AccessToken
 {
     public string Token { get; set; }
     public DateTime CreatedAt { get; set; }

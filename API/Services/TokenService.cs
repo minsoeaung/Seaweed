@@ -20,22 +20,24 @@ public class TokenService : ITokenService
         _jwtConfig = jwtConfig.Value;
     }
 
-    public TokenResult GenerateAccessToken(User user, IEnumerable<string> roles)
+    public AccessToken GenerateAccessToken(User user, IEnumerable<string> roles)
     {
-        var expiration = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpTimeInMinutes);
+        var expiredAt = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpTimeInMinutes);
+        var createdAt = DateTime.UtcNow;
 
         var token = CreateJwtToken(
             CreateClaims(user, roles.ToList()),
             CreateSigningCredentials(),
-            expiration
+            expiredAt
         );
 
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        return new TokenResult
+        return new AccessToken
         {
-            AccessToken = tokenHandler.WriteToken(token),
-            ExpTime = expiration
+            Token = tokenHandler.WriteToken(token),
+            ExpiredAt = expiredAt,
+            CreatedAt = createdAt
         };
     }
 
@@ -47,37 +49,6 @@ public class TokenService : ITokenService
             CreatedAt = DateTime.UtcNow,
             ExpiredAt = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpTimeInDays),
         };
-    }
-
-    public void SetRefreshTokenInCookies(RefreshToken token, HttpResponse response)
-    {
-        if (token.Token is null)
-            throw new InvalidOperationException();
-
-        var cookieOptions = new CookieOptions
-        {
-            Secure = true,
-            HttpOnly = true,
-            Expires = token.ExpiredAt,
-            IsEssential = true,
-            SameSite = SameSiteMode.None,
-        };
-
-        response.Cookies.Append("refreshToken", token.Token, cookieOptions);
-    }
-
-    public void DeleteRefreshTokenInCookies(HttpResponse response)
-    {
-        var cookieOptions = new CookieOptions
-        {
-            Secure = true,
-            HttpOnly = true,
-            Expires = DateTime.Now.AddDays(-1),
-            IsEssential = true,
-            SameSite = SameSiteMode.None,
-        };
-
-        response.Cookies.Append("refreshToken", "", cookieOptions);
     }
 
     private JwtSecurityToken CreateJwtToken(IEnumerable<Claim> claims, SigningCredentials credentials,

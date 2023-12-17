@@ -59,11 +59,11 @@ builder.Services.AddAWSService<IAmazonCloudFront>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IImageService, ImageService>();
-builder.Services.AddScoped<IUserLoginService, UserLoginService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IMailService, MailService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddIdentityCore<User>(options =>
     {

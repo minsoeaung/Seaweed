@@ -8,7 +8,7 @@ public class ResetPasswordDto
     [MinLength(6, ErrorMessage = "The field Password must have a minimum length of 6.")]
     public string NewPassword { get; set; }
 
-    [Required] public string Email { get; set; }
-    
+    [Required] [EmailAddress] public string Email { get; set; }
+
     [Required] public string Token { get; set; }
 }
