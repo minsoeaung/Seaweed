@@ -8,23 +8,29 @@ import {
     IconButton,
     Input,
     InputGroup,
-    InputLeftElement,
+    InputRightElement,
     Menu,
     MenuButton,
     MenuDivider,
     MenuItem,
     MenuList,
+    Modal,
+    ModalBody,
+    ModalContent,
+    ModalOverlay,
     Stack,
+    Text,
     useBreakpointValue,
     useColorMode,
     useColorModeValue,
+    useDisclosure,
 } from '@chakra-ui/react';
-import { MoonIcon, SearchIcon, SettingsIcon, SunIcon } from '@chakra-ui/icons';
+import { ArrowRightIcon, MoonIcon, SearchIcon, SettingsIcon, SunIcon } from '@chakra-ui/icons';
 import { LuHeart } from 'react-icons/lu';
 import { FiShoppingCart } from 'react-icons/fi';
 import { RxPerson } from 'react-icons/rx';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { AppLogo, AppLogoSlim } from './AppLogo.tsx';
+import { AppLogo } from './AppLogo.tsx';
 import React, { useState } from 'react';
 import { useCart } from '../hooks/queries/useCart.ts';
 import { MdOutlineInventory2 } from 'react-icons/md';
@@ -38,6 +44,8 @@ const Header = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchInputValue, setSearchInputValue] = useState(searchParams.get('searchTerm') || '');
 
+    const { isOpen, onClose, onOpen } = useDisclosure();
+
     const isMobile = useBreakpointValue({
         base: true,
         sm: true,
@@ -45,22 +53,27 @@ const Header = () => {
         md: false,
     });
 
-    const [searchBoxVisible, setSearchBoxVisible] = useState(window.innerWidth > 400);
-    const { user, logout } = useAuth();
+    const { logout } = useAuth();
+
     const navigate = useNavigate();
 
     const { data: wishList } = useWishList();
     const { data: cart } = useCart();
     const { data: account } = useMyAccount();
 
+    const search = () => {
+        searchParams.set('searchTerm', searchInputValue);
+        setSearchParams(searchParams);
+        navigate({
+            pathname: '/catalog',
+            search: searchParams.toString(),
+        });
+        onClose();
+    };
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            searchParams.set('searchTerm', searchInputValue);
-            setSearchParams(searchParams);
-            navigate({
-                pathname: '/catalog',
-                search: searchParams.toString(),
-            });
+            search();
         }
     };
 
@@ -79,49 +92,18 @@ const Header = () => {
             }}
         >
             <Flex h={12} alignItems={'center'} justifyContent={'space-between'}>
-                {isMobile ? (
-                    searchBoxVisible ? (
-                        <Link to="/catalog">
-                            <AppLogoSlim />
-                        </Link>
-                    ) : (
-                        <Link to="/catalog">
-                            <AppLogo />
-                        </Link>
-                    )
-                ) : (
-                    <Link to="/catalog">
-                        <AppLogo />
-                    </Link>
-                )}
-
-                {(isMobile ? searchBoxVisible : true) && (
-                    <InputGroup maxWidth={700} ml={2}>
-                        <InputLeftElement pointerEvents="none">
-                            <SearchIcon color={useColorModeValue('red.500', 'red.300')} />
-                        </InputLeftElement>
-                        <Input
-                            type="search"
-                            placeholder={isMobile ? 'Search' : 'What are you looking for?'}
-                            autoComplete="off"
-                            name="search"
-                            value={searchInputValue}
-                            onChange={(e) => setSearchInputValue(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                        />
-                    </InputGroup>
-                )}
+                <Link to="/catalog">
+                    <AppLogo size={isMobile ? 'small' : 'large'} />
+                </Link>
 
                 <Flex alignItems={'center'}>
                     <Stack direction={'row'} spacing={2}>
-                        {(isMobile ? !searchBoxVisible : false) && (
-                            <IconButton
-                                aria-label="Toggle search box visibility"
-                                variant="unstyled"
-                                icon={<SearchIcon color={useColorModeValue('red.500', 'red.300')} />}
-                                onClick={() => setSearchBoxVisible(!searchBoxVisible)}
-                            />
-                        )}
+                        <IconButton
+                            aria-label="Toggle search box visibility"
+                            variant="unstyled"
+                            icon={<SearchIcon color={useColorModeValue('red.500', 'red.300')} />}
+                            onClick={onOpen}
+                        />
                         <IconButton
                             aria-label="Color mode"
                             variant="unstyled"
@@ -129,7 +111,7 @@ const Header = () => {
                             onClick={toggleColorMode}
                         />
 
-                        {user && !isMobile && (
+                        {account && !isMobile && (
                             <Button
                                 as={Link}
                                 to="/user/wishlist"
@@ -160,7 +142,7 @@ const Header = () => {
                             </Button>
                         )}
 
-                        {!user && (
+                        {!account && (
                             <Button
                                 as={Link}
                                 to="/login"
@@ -172,7 +154,7 @@ const Header = () => {
                             </Button>
                         )}
 
-                        {user && (
+                        {account && (
                             <>
                                 {!isMobile && (
                                     <Button
@@ -215,15 +197,15 @@ const Header = () => {
                                     >
                                         <Avatar size={'sm'} src={account?.profilePicture} />
                                     </MenuButton>
-                                    <MenuList alignItems={'center'} zIndex={3}>
+                                    <MenuList alignItems={'center'} zIndex={3} maxW="3xs">
                                         <br />
                                         <Center>
                                             <Avatar size={'2xl'} src={account?.profilePicture} />
                                         </Center>
                                         <br />
-                                        <Center>
-                                            <p>{user.userName}</p>
-                                        </Center>
+                                        <Text textAlign="center" fontWeight="bold">
+                                            {account.userName}
+                                        </Text>
                                         <br />
                                         <MenuDivider />
                                         <MenuItem
@@ -242,7 +224,7 @@ const Header = () => {
                                         <MenuItem as={Link} to="/user/my-account" icon={<SettingsIcon />}>
                                             My Account
                                         </MenuItem>
-                                        {user.roles.some((role) => ['Admin', 'Super'].includes(role)) && (
+                                        {account.roles.some((role) => ['Admin', 'Super'].includes(role)) && (
                                             <>
                                                 <MenuDivider />
                                                 <MenuItem
@@ -266,6 +248,33 @@ const Header = () => {
                     </Stack>
                 </Flex>
             </Flex>
+            <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent mx={3}>
+                    <ModalBody p={0}>
+                        <InputGroup maxWidth={700} size="lg">
+                            <Input
+                                placeholder="What are you looking for?"
+                                autoComplete="off"
+                                value={searchInputValue}
+                                onChange={(e) => setSearchInputValue(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                fontSize="xl"
+                            />
+                            <InputRightElement>
+                                <IconButton
+                                    aria-label="Search"
+                                    icon={<ArrowRightIcon />}
+                                    size="lg"
+                                    variant="link"
+                                    colorScheme="blue"
+                                    onClick={search}
+                                />
+                            </InputRightElement>
+                        </InputGroup>
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
         </Box>
     );
 };

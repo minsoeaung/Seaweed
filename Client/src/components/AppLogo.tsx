@@ -1,9 +1,13 @@
 import { HStack, Image } from '@chakra-ui/react';
 import logo from '../assets/logo.png';
 
-export const AppLogo = () => {
+type Props = {
+    size?: 'small' | 'large';
+};
+
+export const AppLogo = ({ size = 'large' }: Props) => {
     return (
-        <HStack spacing={0} width="200px" justifyContent="center" alignItems="center">
+        <HStack spacing={0} width={size === 'small' ? '150px' : '200px'} justifyContent="center" alignItems="center">
             <Image src={logo} />
         </HStack>
     );

@@ -13,27 +13,27 @@ import {
 import { FavouriteButton } from './FavouriteButton';
 import { PriceTag } from '../PriceTag';
 import { Product } from '../../types/product';
-import { useWishList } from '../../hooks/queries/useWishList.ts';
-import { useCart } from '../../hooks/queries/useCart.ts';
 import { Link } from 'react-router-dom';
 import { Rating } from '../Rating.tsx';
 import { AddToCartButton } from '../AddToCartButton.tsx';
 import { PRODUCT_IMAGES } from '../../constants/fileUrls.ts';
 import placeholderImage from '../../assets/placeholderImage.webp';
-import { useState } from 'react';
+import { memo, useState } from 'react';
+import { useAuth } from '../../context/AuthContext.tsx';
 
 interface Props {
     product: Product;
+    isInWishList: boolean;
+    isInCart: boolean;
     rootProps?: StackProps;
 }
 
-export const ProductCard = (props: Props) => {
-    const { product, rootProps } = props;
+export const ProductCard = memo((props: Props) => {
+    const { product, rootProps, isInWishList, isInCart } = props;
     const { name, price, averageRating, numOfRatings } = product;
     const [imageSrc, setImageSrc] = useState(PRODUCT_IMAGES + product.id);
 
-    const { data: wishList } = useWishList();
-    const { data: cart } = useCart();
+    const { user } = useAuth();
 
     return (
         <Link to={`/catalog/${product.id}`}>
@@ -51,7 +51,7 @@ export const ProductCard = (props: Props) => {
                             borderRadius={{ base: 'md', md: 'xl' }}
                         />
                     </AspectRatio>
-                    {wishList && (
+                    {user && (
                         <FavouriteButton
                             iconButtonProps={{
                                 position: 'absolute',
@@ -60,7 +60,7 @@ export const ProductCard = (props: Props) => {
                                 'aria-label': `Add ${name} to your favourites`,
                             }}
                             productId={product.id}
-                            isChecked={wishList.findIndex((w) => w.productId === product.id) >= 0}
+                            isChecked={isInWishList}
                         />
                     )}
                 </Box>
@@ -84,16 +84,10 @@ export const ProductCard = (props: Props) => {
                     {product.quantityInStock === 0 ? (
                         <i>Out of stock</i>
                     ) : (
-                        <AddToCartButton
-                            buttonProps={{
-                                isDisabled: !cart,
-                            }}
-                            productId={product.id}
-                            isInCart={cart ? cart.cartItems.findIndex((c) => c.product.id === product.id) >= 0 : false}
-                        />
+                        <AddToCartButton productId={product.id} isInCart={isInCart} />
                     )}
                 </Stack>
             </Stack>
         </Link>
     );
-};
+});

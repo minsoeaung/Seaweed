@@ -24,8 +24,8 @@ export const Products = () => {
         setParams(newParams);
     };
 
-    useWishList();
-    useCart();
+    const { data: wishList } = useWishList();
+    const { data: cart } = useCart();
 
     return (
         <Box maxW="7xl" mx="auto" px={{ base: '2', md: '8', lg: '12' }}>
@@ -43,7 +43,20 @@ export const Products = () => {
                         </Flex>
                         <ProductGrid>
                             {data.results.map((product) => (
-                                <ProductCard key={product.id} product={product} />
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    isInWishList={
+                                        Array.isArray(wishList)
+                                            ? wishList.findIndex((w) => w.productId === product.id) >= 0
+                                            : false
+                                    }
+                                    isInCart={
+                                        Array.isArray(cart?.cartItems)
+                                            ? cart!.cartItems.findIndex((c) => c.product.id === product.id) >= 0
+                                            : false
+                                    }
+                                />
                             ))}
                             {data.results.length === 0 && (
                                 <Center>

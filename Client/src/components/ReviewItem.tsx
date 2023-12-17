@@ -43,8 +43,8 @@ type Props = {
 
 export const ReviewItem = ({ data, ownByUser }: Props) => {
     const { review, rating, userName, userProfilePicture, updatedAt, productId } = data;
-    const [ratingValue, setRatingValue] = useState(String(rating));
-    const [reviewValue, setReviewValue] = useState(review);
+    const [ratingInput, setRatingInput] = useState(String(rating));
+    const [reviewInput, setReviewInput] = useState(review);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
@@ -68,9 +68,9 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
             .mutateAsync({
                 type: 'UPDATE',
                 payload: {
-                    review: reviewValue,
+                    review: reviewInput,
                     productId: productId,
-                    rating: Number(ratingValue),
+                    rating: Number(ratingInput),
                 },
             })
             .then(() => {
@@ -99,7 +99,7 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
                                 icon={<HamburgerIcon />}
                                 variant="ghost"
                                 colorScheme="blue"
-                                size={{ base: 'xs', md: 'md' }}
+                                size={{ base: 'sm', md: 'md' }}
                             />
                             <MenuList>
                                 <MenuItem onClick={onOpen} icon={<EditIcon />}>
@@ -112,12 +112,12 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
                         </Menu>
                         <Modal isOpen={isOpen} onClose={onClose} isCentered>
                             <ModalOverlay />
-                            <ModalContent maxWidth={{ base: '95%', md: 'md' }}>
+                            <ModalContent>
                                 <ModalHeader>Edit review</ModalHeader>
                                 <ModalCloseButton />
                                 <ModalBody>
                                     <Text mb={2}>Rating</Text>
-                                    <RadioGroup value={ratingValue} onChange={setRatingValue}>
+                                    <RadioGroup value={ratingInput} onChange={setRatingInput}>
                                         <HStack spacing="24px">
                                             <Radio value="1">1</Radio>
                                             <Radio value="2">2</Radio>
@@ -127,23 +127,28 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
                                         </HStack>
                                     </RadioGroup>
                                     <br />
-                                    <Text mb={2}>Comment</Text>
+                                    <Text mb={2}>Review</Text>
                                     <Textarea
-                                        minHeight="sm"
-                                        placeholder="Your comment"
-                                        value={reviewValue}
-                                        onChange={(e) => setReviewValue(e.target.value)}
-                                        height="25vh"
+                                        placeholder="Excellent product!"
+                                        value={reviewInput}
+                                        onChange={(e) => setReviewInput(e.target.value)}
                                         maxLength={500}
+                                        autoFocus
                                     />
+                                    <Text
+                                        textAlign="right"
+                                        color={useColorModeValue('gray.600', 'gray.400')}
+                                        fontSize="sm"
+                                    >
+                                        {reviewInput.length}/500
+                                    </Text>
                                 </ModalBody>
 
                                 <ModalFooter>
                                     <Button
                                         colorScheme="blue"
-                                        mr={3}
                                         onClick={handleEditReview}
-                                        isDisabled={!review.trim()}
+                                        isDisabled={!reviewInput.trim()}
                                         isLoading={mutation.isLoading}
                                     >
                                         Save changes

@@ -12,6 +12,7 @@ import {
     RadioGroup,
     Text,
     Textarea,
+    useColorModeValue,
     useDisclosure,
 } from '@chakra-ui/react';
 import { useReviewCUD } from '../hooks/mutations/useReviewCUD.ts';
@@ -23,8 +24,8 @@ type Props = {
 
 export const WriteAReviewModalButton = ({ productId }: Props) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [rating, setRating] = useState('5');
-    const [review, setReview] = useState('');
+    const [ratingInput, setRatingInput] = useState('5');
+    const [reviewInput, setReviewInput] = useState('');
 
     const mutation = useReviewCUD();
 
@@ -33,16 +34,22 @@ export const WriteAReviewModalButton = ({ productId }: Props) => {
             .mutateAsync({
                 type: 'CREATE',
                 payload: {
-                    rating: Number(rating),
-                    review,
+                    rating: Number(ratingInput),
+                    review: reviewInput,
                     productId,
                 },
             })
             .then(() => {
                 onClose();
-                setReview('');
-                setReview('5');
+                setReviewInput('');
+                setReviewInput('5');
             });
+    };
+
+    const handleCancel = () => {
+        setReviewInput('');
+        setRatingInput('5');
+        onClose();
     };
 
     return (
@@ -50,14 +57,14 @@ export const WriteAReviewModalButton = ({ productId }: Props) => {
             <Button variant="solid" colorScheme="blue" onClick={onOpen}>
                 Write a review
             </Button>
-            <Modal isOpen={isOpen} onClose={onClose} isCentered>
+            <Modal isOpen={isOpen} onClose={handleCancel} isCentered>
                 <ModalOverlay />
-                <ModalContent maxWidth={{ base: '95%', md: 'md' }}>
+                <ModalContent>
                     <ModalHeader>Write a review</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
                         <Text mb={2}>Rating</Text>
-                        <RadioGroup value={rating} onChange={setRating}>
+                        <RadioGroup value={ratingInput} onChange={setRatingInput}>
                             <HStack spacing="24px">
                                 <Radio value="1">1</Radio>
                                 <Radio value="2">2</Radio>
@@ -67,26 +74,33 @@ export const WriteAReviewModalButton = ({ productId }: Props) => {
                             </HStack>
                         </RadioGroup>
                         <br />
-                        <Text mb={2}>Comment</Text>
+                        <Text mb={2}>Review</Text>
                         <Textarea
-                            placeholder="Your comment"
-                            value={review}
-                            onChange={(e) => setReview(e.target.value)}
-                            height="25vh"
+                            placeholder="Excellent product!"
+                            value={reviewInput}
+                            onChange={(e) => setReviewInput(e.target.value)}
                             maxLength={500}
+                            autoFocus
                         />
+                        <Text textAlign="right" color={useColorModeValue('gray.600', 'gray.400')} fontSize="sm">
+                            {reviewInput.length}/500
+                        </Text>
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button
-                            colorScheme="blue"
-                            mr={3}
-                            onClick={handleSubmitReview}
-                            isDisabled={!review.trim()}
-                            isLoading={mutation.isLoading}
-                        >
-                            Submit review
-                        </Button>
+                        <HStack>
+                            <Button mr={3} onClick={handleCancel}>
+                                Cancel
+                            </Button>
+                            <Button
+                                colorScheme="blue"
+                                onClick={handleSubmitReview}
+                                isDisabled={!reviewInput.trim()}
+                                isLoading={mutation.isLoading}
+                            >
+                                Post
+                            </Button>
+                        </HStack>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

@@ -62,8 +62,15 @@ const Login = () => {
         <Box maxW="xl" mx="auto">
             <Stack spacing={8} py={{ base: 6, md: 12 }} px={{ base: 2, md: 6 }}>
                 <Heading fontSize={'3xl'} textAlign={'center'}>
-                    Welcome to Shop! Please login.
+                    Log in to your account
                 </Heading>
+                <Text align={'center'}>
+                    Don't have an account?{' '}
+                    <Link as={ReactRouterLink} to="/register" replace color={useColorModeValue('blue.600', 'blue.400')}>
+                        Register
+                    </Link>{' '}
+                    here.
+                </Text>
                 <Box rounded={'lg'} bg={useColorModeValue('white', 'gray.700')} boxShadow={'lg'} p={8}>
                     <form onSubmit={handleSubmit}>
                         <Stack spacing={4}>
@@ -83,18 +90,18 @@ const Login = () => {
                                         <IconButton
                                             variant="ghost"
                                             aria-label="Show password"
-                                            icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                                            icon={showPassword ? <ViewIcon color="blue.500" /> : <ViewOffIcon />}
                                             onClick={() => setShowPassword((showPassword) => !showPassword)}
                                         />
                                     </InputRightElement>
                                 </InputGroup>
-                                <FormHelperText textAlign="right">
+                                <FormHelperText textAlign="right" mt={6}>
                                     <Button
                                         as={ReactRouterLink}
                                         to="/forgot-password"
                                         variant="link"
                                         colorScheme="blue"
-                                        size="sm"
+                                        size="md"
                                     >
                                         Forgot password?
                                     </Button>
@@ -123,15 +130,6 @@ const Login = () => {
                                     </Box>
                                 </>
                             )}
-                            <Stack pt={6}>
-                                <Text align={'center'}>
-                                    New member?{' '}
-                                    <Link as={ReactRouterLink} to="/register" replace color={'blue.400'}>
-                                        Register
-                                    </Link>{' '}
-                                    here.
-                                </Text>
-                            </Stack>
                         </Stack>
                     </form>
                 </Box>

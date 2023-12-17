@@ -41,7 +41,7 @@ const ForgotPassword = () => {
         <Box maxW="xl" mx="auto">
             <Card>
                 <CardHeader>
-                    <Heading fontSize="2xl">Forgot password?</Heading>
+                    <Heading fontSize="3xl">Forgot password?</Heading>
                 </CardHeader>
                 <CardBody>
                     {sent ? (

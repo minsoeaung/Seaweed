@@ -61,7 +61,7 @@ const Register = () => {
         <Box maxW="xl" mx="auto">
             <Stack spacing={8} py={{ base: 6, md: 12 }} px={{ base: 2, md: 6 }}>
                 <Heading fontSize={'3xl'} textAlign={'center'}>
-                    Create Your Account
+                    Create your account
                 </Heading>
                 <Box rounded={'lg'} bg={useColorModeValue('white', 'gray.700')} boxShadow={'lg'} p={8}>
                     <form onSubmit={handleSubmit}>
@@ -73,6 +73,7 @@ const Register = () => {
                                     name="userName"
                                     value={formValues.userName}
                                     onChange={handleFormValueChange('userName')}
+                                    minLength={4}
                                 />
                                 <FormHelperText>4-50 characters, A-Z, a-z, 0-9 only.</FormHelperText>
                             </FormControl>
@@ -87,12 +88,13 @@ const Register = () => {
                                         type={showPassword ? 'text' : 'password'}
                                         name="password"
                                         onChange={handleFormValueChange('password')}
+                                        minLength={6}
                                     />
                                     <InputRightElement h={'full'}>
                                         <IconButton
                                             variant="ghost"
                                             aria-label="Show password"
-                                            icon={showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                                            icon={showPassword ? <ViewIcon color="blue.500" /> : <ViewOffIcon />}
                                             onClick={() => setShowPassword((showPassword) => !showPassword)}
                                         />
                                     </InputRightElement>
@@ -125,7 +127,11 @@ const Register = () => {
                             <Stack pt={6}>
                                 <Text align={'center'}>
                                     Already a user?{' '}
-                                    <Link as={ReactRouterLink} to="/login" color={'blue.400'}>
+                                    <Link
+                                        as={ReactRouterLink}
+                                        to="/login"
+                                        color={useColorModeValue('blue.600', 'blue.400')}
+                                    >
                                         Login
                                     </Link>
                                     .
