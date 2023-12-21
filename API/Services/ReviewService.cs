@@ -1,6 +1,8 @@
+using API.ApiErrors;
 using API.Data;
 using API.Entities;
 using API.RequestHelpers;
+using ErrorOr;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,27 +31,36 @@ public class ReviewService : IReviewService
         return await PagedList<ProductReview>.ToPagedList(query, pageNumber, pageSize);
     }
 
-    public async Task<ProductReview?> GetReview(int userId, int productId)
+    public async Task<ErrorOr<ProductReview>> GetReview(int userId, int productId)
     {
-        return await _context.ProductReviews
+        var review = await _context.ProductReviews
             .Include(r => r.User)
             .FirstOrDefaultAsync(r => r.UserId == userId && r.ProductId == productId);
+
+        if (review == null)
+            return Errors.ProductReview.NotFound;
+
+        return review;
     }
 
-    public async Task<ProductReview?> CreateOrUpdateReview(int userId, int productId, int rating, string reviewComment)
+    public async Task<ErrorOr<ProductReview>> CreateOrUpdateReview(int userId, int productId, int rating, string review)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null) return null;
+        if (user == null)
+            return Errors.User.NotFound;
 
         var product = await _context.Products.FindAsync(productId);
-        if (product == null) return null;
+        if (product == null)
+            return Errors.Product.NotFound;
 
-        var existingReview = await GetReview(userId, productId);
+        var existingReview = await _context.ProductReviews
+            .Include(r => r.User)
+            .FirstOrDefaultAsync(r => r.UserId == userId && r.ProductId == productId);
 
         if (existingReview != null)
         {
             product.UpdateRating(existingReview.Rating, rating);
-            existingReview.Review = reviewComment;
+            existingReview.Review = review;
             existingReview.Rating = rating;
 
             // Both must succeed or fail
@@ -66,7 +77,7 @@ public class ReviewService : IReviewService
             User = user,
             ProductId = productId,
             Rating = rating,
-            Review = reviewComment,
+            Review = review,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -81,13 +92,19 @@ public class ReviewService : IReviewService
         return newReview;
     }
 
-    public async Task DeleteReview(int userId, int productId)
+    public async Task<ErrorOr<Deleted>> DeleteReview(int userId, int productId)
     {
-        var review = await GetReview(userId, productId);
-        if (review == null) return;
+        var review = await _context.ProductReviews
+            .Include(r => r.User)
+            .FirstOrDefaultAsync(r => r.UserId == userId && r.ProductId == productId);
+
+        if (review == null)
+            return Errors.ProductReview.NotFound;
 
         var product = await _context.Products.FindAsync(productId);
-        if (product == null) return;
+        if (product == null)
+            return Errors.Product.NotFound;
+
         product.RemoveRating(review.Rating);
 
         // Both must succeed or fail
@@ -97,5 +114,7 @@ public class ReviewService : IReviewService
         // SaveChanges is guaranteed to either completely succeed, or leave the database unmodified if an error occurs
         // https://learn.microsoft.com/en-us/ef/core/saving/transactions#default-transaction-behavior
         await _context.SaveChangesAsync();
+
+        return Result.Deleted;
     }
 }

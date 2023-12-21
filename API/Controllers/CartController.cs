@@ -1,6 +1,8 @@
 using System.Security.Claims;
+using API.ApiErrors;
 using API.DTOs.Responses;
 using API.Services;
+using ErrorOr;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +13,7 @@ namespace API.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/[controller]")]
-public class CartController : ControllerBase
+public class CartController : BaseApiController
 {
     private readonly ICartService _cartService;
     private readonly IMapper _mapper;
@@ -27,7 +29,7 @@ public class CartController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null)
-            return BadRequest();
+            return Problem(new List<Error> { Errors.User.NotFound });
 
         var cartItems = await _cartService.GetCartItemsAsync(int.Parse(userId));
         return _mapper.Map<CartDetails>(cartItems);
@@ -38,10 +40,10 @@ public class CartController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null)
-            return BadRequest();
+            return Problem(new List<Error> { Errors.User.NotFound });
 
-        await _cartService.AddToCartAsync(int.Parse(userId), productId, quantity);
-        return Ok();
+        var errorOrUpdated = await _cartService.AddToCartAsync(int.Parse(userId), productId, quantity);
+        return errorOrUpdated.Match(_ => Ok(), Problem);
     }
 
     [HttpDelete]
@@ -51,7 +53,7 @@ public class CartController : ControllerBase
         if (userId is null)
             return BadRequest();
 
-        await _cartService.RemoveFromCartAsync(int.Parse(userId), productId);
-        return Ok();
+        var errorOrDeleted = await _cartService.RemoveFromCartAsync(int.Parse(userId), productId);
+        return errorOrDeleted.Match(_ => NoContent(), Problem);
     }
 }

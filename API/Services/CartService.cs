@@ -1,5 +1,7 @@
+using API.ApiErrors;
 using API.Data;
 using API.Entities;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
@@ -23,14 +25,14 @@ public class CartService : ICartService
             .ToListAsync();
     }
 
-    public async Task AddToCartAsync(int userId, int productId, int quantity)
+    public async Task<ErrorOr<Updated>> AddToCartAsync(int userId, int productId, int quantity)
     {
         if (int.IsNegative(quantity))
-            return;
+            return Errors.Cart.NegativeQuantity;
 
         var product = await _storeContext.Products.FindAsync(productId);
         if (product == null)
-            return;
+            return Errors.Product.NotFound;
 
         var cartItem = await _storeContext.CartItems
             .SingleOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
@@ -39,10 +41,11 @@ public class CartService : ICartService
         {
             _storeContext.CartItems.Remove(cartItem);
             await _storeContext.SaveChangesAsync();
-            return;
+            return Result.Updated;
         }
 
-        var newQuantity = product.QuantityInStock < quantity ? product.QuantityInStock : quantity;
+        if (product.QuantityInStock < quantity)
+            return Errors.Product.NotEnoughQuantity;
 
         if (cartItem == null)
         {
@@ -50,7 +53,7 @@ public class CartService : ICartService
             {
                 UserId = userId,
                 ProductId = productId,
-                Quantity = newQuantity,
+                Quantity = quantity,
             };
 
             await _storeContext.CartItems.AddAsync(cartItem);
@@ -59,25 +62,29 @@ public class CartService : ICartService
         }
         else
         {
-            cartItem.Quantity = newQuantity;
+            cartItem.Quantity = quantity;
         }
 
         await _storeContext.SaveChangesAsync();
+
+        return Result.Updated;
     }
 
-    public async Task RemoveFromCartAsync(int userId, int productId)
+    public async Task<ErrorOr<Deleted>> RemoveFromCartAsync(int userId, int productId)
     {
         var product = await _storeContext.Products.FindAsync(productId);
         if (product is null)
-            return;
+            return Errors.Product.NotFound;
 
         var cartItem = await _storeContext.CartItems
             .SingleOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
 
         if (cartItem == null)
-            return;
+            return Errors.Cart.CartItemNotFound;
 
         _storeContext.CartItems.Remove(cartItem);
         await _storeContext.SaveChangesAsync();
+
+        return Result.Deleted;
     }
 }

@@ -1,6 +1,7 @@
 import {
     Box,
     Button,
+    Center,
     FormControl,
     FormHelperText,
     FormLabel,
@@ -22,6 +23,7 @@ import { LoginDto } from '../../types/loginDto.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { ErrorDisplay } from '../../components/ErrorDisplay.tsx';
 import { ApiError } from '../../types/apiError.ts';
+import { AppLogo } from '../../components/AppLogo.tsx';
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -61,16 +63,14 @@ const Login = () => {
     return (
         <Box maxW="xl" mx="auto">
             <Stack spacing={8} py={{ base: 6, md: 12 }} px={{ base: 2, md: 6 }}>
-                <Heading fontSize={'3xl'} textAlign={'center'}>
+                <Box display={{ base: 'block', md: 'none' }}>
+                    <Center>
+                        <AppLogo />
+                    </Center>
+                </Box>
+                <Heading fontSize={'2xl'} textAlign={'center'}>
                     Log in to your account
                 </Heading>
-                <Text align={'center'}>
-                    Don't have an account?{' '}
-                    <Link as={ReactRouterLink} to="/register" replace color={useColorModeValue('blue.600', 'blue.400')}>
-                        Register
-                    </Link>{' '}
-                    here.
-                </Text>
                 <Box rounded={'lg'} bg={useColorModeValue('white', 'gray.700')} boxShadow={'lg'} p={8}>
                     <form onSubmit={handleSubmit}>
                         <Stack spacing={4}>
@@ -95,7 +95,7 @@ const Login = () => {
                                         />
                                     </InputRightElement>
                                 </InputGroup>
-                                <FormHelperText textAlign="right" mt={6}>
+                                <FormHelperText textAlign="right" mt={3}>
                                     <Button
                                         as={ReactRouterLink}
                                         to="/forgot-password"
@@ -130,6 +130,18 @@ const Login = () => {
                                     </Box>
                                 </>
                             )}
+                            <Text align={'center'} mt={6}>
+                                Don't have an account?{' '}
+                                <Link
+                                    as={ReactRouterLink}
+                                    to="/register"
+                                    replace
+                                    color={useColorModeValue('blue.600', 'blue.400')}
+                                >
+                                    Register
+                                </Link>{' '}
+                                here.
+                            </Text>
                         </Stack>
                     </form>
                 </Box>

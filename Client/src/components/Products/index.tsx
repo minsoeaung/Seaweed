@@ -1,4 +1,4 @@
-import { Box, Center, Flex, IconButton, Progress } from '@chakra-ui/react';
+import { Box, Center, Flex, IconButton } from '@chakra-ui/react';
 import { ProductGrid } from './ProductGrid.tsx';
 import { ProductCard } from './ProductCard.tsx';
 import { usePaginatedProducts } from '../../hooks/queries/usePaginatedProducts.ts';
@@ -12,11 +12,13 @@ import { Fallback } from '../Fallback';
 import { useCart } from '../../hooks/queries/useCart.ts';
 import { ProductSortBy } from '../ProductSortBy.tsx';
 import { ProductFilters } from '../ProductFilters.tsx';
+import { ErrorDisplay } from '../ErrorDisplay.tsx';
+import { ApiError } from '../../types/apiError.ts';
 
 export const Products = () => {
     const [params, setParams] = useSearchParams();
 
-    const { data, isLoading, isFetching, isError } = usePaginatedProducts(params.toString());
+    const { data, isLoading, isFetching, isError, error } = usePaginatedProducts(params.toString());
 
     const handlePageChange = (page: number) => {
         const newParams = new URLSearchParams(params);
@@ -29,11 +31,13 @@ export const Products = () => {
 
     return (
         <Box maxW="7xl" mx="auto" px={{ base: '2', md: '8', lg: '12' }}>
-            {isFetching && <Fallback />}
+            {isFetching && !isLoading && <Fallback />}
             {isLoading ? (
-                <AntdSpin />
+                <Box mt={10}>
+                    <AntdSpin />
+                </Box>
             ) : isError ? (
-                <p>Something went wrong.</p>
+                <ErrorDisplay error={error as ApiError} />
             ) : (
                 data && (
                     <>
@@ -64,13 +68,6 @@ export const Products = () => {
                                 </Center>
                             )}
                         </ProductGrid>
-                        <br />
-                        <Progress
-                            size="xs"
-                            isIndeterminate
-                            colorScheme="blue"
-                            visibility={isFetching ? 'visible' : 'hidden'}
-                        />
                         <br />
                         <ResponsivePagination
                             current={data.pagination.currentPage}

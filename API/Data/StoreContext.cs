@@ -55,4 +55,5 @@ public class StoreContext : IdentityDbContext<User, UserRole, int>
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<OrderAddress> OrderAddresses => Set<OrderAddress>();
+    // public DbSet<ProductReviewSummary> ProductReviewSummaries => Set<ProductReviewSummary>();
 }

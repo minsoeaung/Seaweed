@@ -9,5 +9,6 @@ public class ProductMapping : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<CreateProductDto, Product>();
+        config.NewConfig<Product, CreateProductDto>();
     }
 }

@@ -2,7 +2,6 @@ using API.Data;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
 using API.Entities;
-using API.Extensions;
 using API.RequestHelpers;
 using API.Services;
 using MapsterMapper;
@@ -14,115 +13,77 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController : ControllerBase
+public class ProductsController : BaseApiController
 {
     private readonly StoreContext _storeContext;
     private readonly IMapper _mapper;
     private readonly IImageService _imageService;
+    private readonly IProductService _productService;
 
-    public ProductsController(StoreContext storeContext, IMapper mapper, IImageService imageService)
+    public ProductsController(StoreContext storeContext,
+        IMapper mapper,
+        IImageService imageService,
+        IProductService productService)
     {
         _storeContext = storeContext;
         _mapper = mapper;
         _imageService = imageService;
+        _productService = productService;
     }
 
     [HttpGet]
     public async Task<ActionResult<PagedResponse<Product>>> GetProducts([FromQuery] ProductParams productParams)
     {
-        var query = _storeContext.Products
-            .Include(p => p.Brand)
-            .Include(p => p.Category)
-            .Sort(productParams.OrderBy)
-            .Search(productParams.SearchTerm)
-            .Filter(productParams.Brands, productParams.Categories)
-            .AsNoTracking()
-            .AsQueryable();
+        var errorOrPagedProduct = await _productService.GetPaginatedProducts(productParams);
 
-        var products = await PagedList<Product>
-            .ToPagedList(query, productParams.PageNumber, productParams.PageSize);
+        return errorOrPagedProduct.Match(
+            pagedProduct => Ok(new PagedResponse<Product>
+            {
+                Pagination = pagedProduct.MetaData,
+                Results = pagedProduct
+            }),
+            Problem
+        );
 
         // Response.AddPaginationHeader(products.MetaData);
-
-        return new PagedResponse<Product>
-        {
-            Pagination = products.MetaData,
-            Results = products
-        };
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Product>> GetProduct(int id)
     {
-        var product = await _storeContext.Products
-            .Include(p => p.Category)
-            .Include(p => p.Brand)
-            .Where(p => p.Id == id)
-            .AsNoTracking()
-            .FirstOrDefaultAsync();
-        return product == null ? NotFound() : product;
+        var errorOrProduct = await _productService.GetProduct(id);
+        return errorOrProduct.Match(Ok, Problem);
     }
 
     [Authorize(Roles = "Super,Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProduct(int id)
     {
-        var product = await _storeContext.Products.FindAsync(id);
-        if (product == null) return NotFound();
-
-        _storeContext.Products.Remove(product);
-        await _storeContext.SaveChangesAsync();
-        await _imageService.DeleteImageAsync(product.Id, ImageFolders.ProductImages);
-
-        return NoContent();
+        var errorOrDeleted = await _productService.DeleteProduct(id);
+        return errorOrDeleted.Match(_ => NoContent(), Problem);
     }
 
     [Authorize(Roles = "Super,Admin")]
     [HttpPost]
-    public async Task<ActionResult<Product>> CreateProduct([FromForm] CreateProductDto productDto)
+    public async Task<ActionResult<Product>> CreateProduct([FromForm] CreateProductDto dto)
     {
-        var product = _mapper.Map<Product>(productDto);
-        product.AverageRating = 0;
-        product.NumOfRatings = 0;
-        await _storeContext.Products.AddAsync(product);
-        var result = await _storeContext.SaveChangesAsync();
+        var errorOrProduct = await _productService.AddProduct(dto.Name, dto.Sku, dto.Description,
+            dto.Price, dto.QuantityInStock, dto.CategoryId, dto.BrandId,
+            dto.Picture);
 
-        if (result <= 0)
-            return BadRequest(new ProblemDetails { Title = "Problem creating new product" });
-
-        if (productDto.Picture != null)
-            await _imageService.UploadImageAsync(product.Id, productDto.Picture, ImageFolders.ProductImages);
-
-        return CreatedAtAction(nameof(GetProduct), new { product.Id }, product);
+        return errorOrProduct.Match(product => CreatedAtAction(nameof(GetProduct), new { product.Id }, product),
+            Problem);
     }
 
     [Authorize(Roles = "Super,Admin")]
     [HttpPut("{id}")]
     public async Task<ActionResult<Product>> UpdateProduct(int id, [FromForm] CreateProductDto dto)
     {
-        var product = await _storeContext.Products.FindAsync(id);
-        if (product == null) return NotFound();
+        var errorOrProduct = await _productService.UpdateProduct(id, dto.Name, dto.Sku, dto.Description,
+            dto.Price, dto.QuantityInStock, dto.CategoryId, dto.BrandId,
+            dto.Picture);
 
-        product.Name = dto.Name;
-        product.Sku = dto.Sku;
-        product.Description = dto.Description;
-        product.Price = dto.Price;
-        product.QuantityInStock = dto.QuantityInStock;
-        product.CategoryId = dto.CategoryId;
-        product.BrandId = dto.BrandId;
-
-        _storeContext.Entry(product).State = EntityState.Modified;
-
-        var updates = await _storeContext.SaveChangesAsync();
-        if (updates > 0)
-        {
-            if (dto.Picture != null)
-                await _imageService.UploadImageAsync(id, dto.Picture, ImageFolders.ProductImages);
-
-            return product;
-        }
-
-        return BadRequest();
+        return errorOrProduct.Match(Ok, Problem);
     }
 
     [HttpGet("filters")]

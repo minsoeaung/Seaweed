@@ -26,8 +26,10 @@ public class AccountsController : BaseApiController
 
     private readonly IAccountService _accountService;
 
-    public AccountsController(UserManager<User> userManager, IMapper mapper,
-        IMailService mailService, IAccountService accountService)
+    public AccountsController(UserManager<User> userManager,
+        IMapper mapper,
+        IMailService mailService,
+        IAccountService accountService)
     {
         _userManager = userManager;
         _mapper = mapper;
@@ -51,10 +53,7 @@ public class AccountsController : BaseApiController
     {
         var errorOrUpdated = await _accountService.UpdateProfilePicture(GetUserId(), picture);
 
-        return errorOrUpdated.Match(
-            _ => NoContent(),
-            Problem
-        );
+        return errorOrUpdated.Match(_ => NoContent(), Problem);
     }
 
     [Authorize(Roles = "Super")]
@@ -63,10 +62,7 @@ public class AccountsController : BaseApiController
     {
         var errorOrCreated = await _accountService.CreateAdminAccount(dto.UserName, dto.Email, dto.Password);
 
-        return errorOrCreated.Match(
-            _ => NoContent(),
-            Problem
-        );
+        return errorOrCreated.Match(_ => NoContent(), Problem);
     }
 
     [AllowAnonymous]

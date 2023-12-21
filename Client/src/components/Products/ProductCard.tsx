@@ -82,7 +82,9 @@ export const ProductCard = memo((props: Props) => {
                 </Stack>
                 <Stack align="center">
                     {product.quantityInStock === 0 ? (
-                        <i>Out of stock</i>
+                        <Text fontStyle="italic" fontSize="sm">
+                            Out of stock
+                        </Text>
                     ) : (
                         <AddToCartButton productId={product.id} isInCart={isInCart} />
                     )}

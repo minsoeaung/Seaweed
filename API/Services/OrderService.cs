@@ -1,6 +1,8 @@
+using API.ApiErrors;
 using API.Data;
 using API.DTOs.Responses;
 using API.Entities;
+using ErrorOr;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +19,7 @@ public class OrderService : IOrderService
         _mapper = mapper;
     }
 
-    public async Task CreateOrder(int userId, int addressId)
+    public async Task<ErrorOr<Created>> CreateOrder(int userId, int addressId)
     {
         var cartItems = await _context.CartItems
             .Where(c => c.UserId == userId)
@@ -25,10 +27,12 @@ public class OrderService : IOrderService
             .AsNoTracking()
             .ToListAsync();
 
-        if (!cartItems.Any()) return;
+        if (!cartItems.Any())
+            return Errors.Order.NoItemInCart;
 
         var address = await _context.Addresses.FindAsync(addressId);
-        if (address == null) return;
+        if (address == null)
+            return Errors.Address.NotFound;
 
         var cartDetails = _mapper.Map<CartDetails>(cartItems);
 
@@ -55,6 +59,8 @@ public class OrderService : IOrderService
         _context.Orders.Add(order);
 
         await _context.SaveChangesAsync();
+
+        return Result.Created;
     }
 
     public async Task<IEnumerable<Order>> GetOrders(int userId)

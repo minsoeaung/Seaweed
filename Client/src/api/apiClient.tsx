@@ -1,4 +1,5 @@
-import axios, { InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { Token } from '../types/token.ts';
 
 const authRequestInterceptor = (config: InternalAxiosRequestConfig) => {
     const token = sessionStorage.getItem('jwtToken');
@@ -25,7 +26,7 @@ ApiClient.interceptors.response.use(
         if (error.response.status === 401) {
             // Very important to return a promise, otherwise react-query get error before this interceptor finished
             return new Promise((resolve, reject) => {
-                axios({
+                axios<never, AxiosResponse<Token>>({
                     method: 'GET',
                     url: `${import.meta.env.VITE_ROOT_URL}api/Accounts/renew-tokens`,
                     withCredentials: true,

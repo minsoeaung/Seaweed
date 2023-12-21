@@ -21,7 +21,7 @@ export const Footer = (props: BoxProps) => {
                 justify={{ base: 'center', md: 'space-between' }}
                 align={{ base: 'center', md: 'center' }}
             >
-                <AppLogo />
+                <AppLogo size="small" />
                 <VStack align="start" spacing={0}>
                     <Text>© {new Date().getFullYear()} Tech Gadget. All rights reserved.</Text>
                     <Text color={useColorModeValue('gray.600', 'gray.400')}>

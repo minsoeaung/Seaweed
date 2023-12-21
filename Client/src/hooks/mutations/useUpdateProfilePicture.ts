@@ -23,11 +23,12 @@ export const useUpdateProfilePicture = () => {
                 });
 
                 const data = queryClient.getQueryData<User>(ACCOUNT);
-                
+
                 if (data) {
                     if (!data.profilePicture) {
                         await queryClient.invalidateQueries(ACCOUNT);
                     } else {
+                        // TODO: image is cached for 300s, user might think the image is not updated
                         data.profilePicture = `${data.profilePicture}?time=${Date.now()}`;
                         queryClient.setQueryData(ACCOUNT, data);
                     }

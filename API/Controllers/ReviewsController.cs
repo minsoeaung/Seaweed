@@ -1,9 +1,7 @@
 using System.Security.Claims;
 using API.DTOs.Requests;
 using API.DTOs.Responses;
-using API.RequestHelpers;
 using API.Services;
-using Bogus;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +12,7 @@ namespace API.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/[controller]")]
-public class ReviewsController : ControllerBase
+public class ReviewsController : BaseApiController
 {
     private readonly IReviewService _reviewService;
     private readonly IMapper _mapper;
@@ -67,16 +65,13 @@ public class ReviewsController : ControllerBase
 
 
     [HttpGet("me")]
-    public async Task<ActionResult<ReviewResponse?>> GetMyReview(int productId)
+    public async Task<ActionResult<ReviewResponse>> GetMyReview(int productId)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         int.TryParse(userId, out int validUserId);
 
-        var review = await _reviewService.GetReview(validUserId, productId);
-        if (review == null)
-            return NotFound();
-
-        return _mapper.Map<ReviewResponse>(review);
+        var errorOrReview = await _reviewService.GetReview(validUserId, productId);
+        return errorOrReview.Match(review => Ok(_mapper.Map<ReviewResponse>(review)), Problem);
     }
 
     [HttpDelete]
@@ -84,8 +79,9 @@ public class ReviewsController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         int.TryParse(userId, out int validUserId);
-        await _reviewService.DeleteReview(validUserId, productId);
-        return NoContent();
+
+        var errorOrDeleted = await _reviewService.DeleteReview(validUserId, productId);
+        return errorOrDeleted.Match(_ => NoContent(), Problem);
     }
 
 
@@ -95,7 +91,9 @@ public class ReviewsController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         int.TryParse(userId, out int validUserId);
 
-        var review = await _reviewService.CreateOrUpdateReview(validUserId, dto.ProductId, dto.Rating, dto.Review);
-        return review == null ? BadRequest() : _mapper.Map<ReviewResponse>(review);
+        var errorOrReview = await _reviewService
+            .CreateOrUpdateReview(validUserId, dto.ProductId, dto.Rating, dto.Review);
+
+        return errorOrReview.Match(review => Ok(_mapper.Map<ReviewResponse>(review)), Problem);
     }
 }

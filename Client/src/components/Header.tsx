@@ -28,16 +28,15 @@ import {
 import { ArrowRightIcon, MoonIcon, SearchIcon, SettingsIcon, SunIcon } from '@chakra-ui/icons';
 import { LuHeart } from 'react-icons/lu';
 import { FiShoppingCart } from 'react-icons/fi';
-import { RxPerson } from 'react-icons/rx';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { AppLogo } from './AppLogo.tsx';
-import React, { useState } from 'react';
+import { AppLogo, AppLogoSlim } from './AppLogo.tsx';
+import React, { useEffect, useState } from 'react';
 import { useCart } from '../hooks/queries/useCart.ts';
 import { MdOutlineInventory2 } from 'react-icons/md';
-import { useMyAccount } from '../hooks/queries/useMyAccount.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 import { useWishList } from '../hooks/queries/useWishList.ts';
+import { useMyAccount } from '../hooks/queries/useMyAccount.ts';
 
 const Header = () => {
     const { colorMode, toggleColorMode } = useColorMode();
@@ -53,13 +52,19 @@ const Header = () => {
         md: false,
     });
 
-    const { logout } = useAuth();
+    const { user, setUser, logout } = useAuth();
 
     const navigate = useNavigate();
 
     const { data: wishList } = useWishList();
     const { data: cart } = useCart();
-    const { data: account } = useMyAccount();
+    const { data: myAccount } = useMyAccount();
+
+    useEffect(() => {
+        if (myAccount) {
+            setUser(myAccount);
+        }
+    }, [myAccount]);
 
     const search = () => {
         searchParams.set('searchTerm', searchInputValue);
@@ -93,25 +98,32 @@ const Header = () => {
         >
             <Flex h={12} alignItems={'center'} justifyContent={'space-between'}>
                 <Link to="/catalog">
-                    <AppLogo size={isMobile ? 'small' : 'large'} />
+                    {isMobile ? (
+                        <Box pr={5}>
+                            <AppLogoSlim />
+                        </Box>
+                    ) : (
+                        <AppLogo />
+                    )}
                 </Link>
-
-                <Flex alignItems={'center'}>
-                    <Stack direction={'row'} spacing={2}>
+                <Flex alignItems="center">
+                    <Stack direction="row" spacing={{ base: 1, md: 2 }} alignItems="center">
                         <IconButton
                             aria-label="Toggle search box visibility"
-                            variant="unstyled"
+                            variant="ghost"
                             icon={<SearchIcon color={useColorModeValue('red.500', 'red.300')} />}
                             onClick={onOpen}
+                            size={{ base: 'sm', md: 'md' }}
                         />
                         <IconButton
                             aria-label="Color mode"
-                            variant="unstyled"
+                            variant="ghost"
                             icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
                             onClick={toggleColorMode}
+                            size={{ base: 'sm', md: 'md' }}
                         />
 
-                        {account && !isMobile && (
+                        {user && !isMobile && (
                             <Button
                                 as={Link}
                                 to="/user/wishlist"
@@ -142,19 +154,30 @@ const Header = () => {
                             </Button>
                         )}
 
-                        {!account && (
-                            <Button
-                                as={Link}
-                                to="/login"
-                                rightIcon={<Icon as={RxPerson} />}
-                                variant="solid"
-                                colorScheme="blue"
-                            >
-                                Login
-                            </Button>
+                        {!user && (
+                            <>
+                                <Button
+                                    as={Link}
+                                    to="/login"
+                                    variant="outline"
+                                    colorScheme="blue"
+                                    size={{ base: 'sm', md: 'md' }}
+                                >
+                                    Login
+                                </Button>
+                                <Button
+                                    as={Link}
+                                    to="/register"
+                                    variant="solid"
+                                    colorScheme="blue"
+                                    size={{ base: 'sm', md: 'md' }}
+                                >
+                                    Sign up
+                                </Button>
+                            </>
                         )}
 
-                        {account && (
+                        {user && (
                             <>
                                 {!isMobile && (
                                     <Button
@@ -195,16 +218,16 @@ const Header = () => {
                                         cursor={'pointer'}
                                         minW={0}
                                     >
-                                        <Avatar size={'sm'} src={account?.profilePicture} />
+                                        <Avatar size={'sm'} src={user?.profilePicture} />
                                     </MenuButton>
                                     <MenuList alignItems={'center'} zIndex={3} maxW="3xs">
                                         <br />
                                         <Center>
-                                            <Avatar size={'2xl'} src={account?.profilePicture} />
+                                            <Avatar size={'2xl'} src={user?.profilePicture} />
                                         </Center>
                                         <br />
                                         <Text textAlign="center" fontWeight="bold">
-                                            {account.userName}
+                                            {user.userName}
                                         </Text>
                                         <br />
                                         <MenuDivider />
@@ -224,7 +247,7 @@ const Header = () => {
                                         <MenuItem as={Link} to="/user/my-account" icon={<SettingsIcon />}>
                                             My Account
                                         </MenuItem>
-                                        {account.roles.some((role) => ['Admin', 'Super'].includes(role)) && (
+                                        {user.roles.some((role) => ['Admin', 'Super'].includes(role)) && (
                                             <>
                                                 <MenuDivider />
                                                 <MenuItem

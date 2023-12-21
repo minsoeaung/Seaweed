@@ -11,14 +11,14 @@ public class Product
     public double Price { get; set; }
     public int QuantityInStock { get; set; }
 
-    [Range(0.0, 5.0)] public double AverageRating { get; set; }
-    [Range(0, int.MaxValue)] public int NumOfRatings { get; set; }
-
     public int CategoryId { get; set; }
     public Category Category { get; set; }
 
     public int BrandId { get; set; }
     public Brand Brand { get; set; }
+
+    [Range(0.0, 5.0)] public double AverageRating { get; private set; }
+    [Range(0, int.MaxValue)] public int NumOfRatings { get; private set; }
 
     public void AddNewRating(int rating)
     {

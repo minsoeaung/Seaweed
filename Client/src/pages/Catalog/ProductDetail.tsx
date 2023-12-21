@@ -1,6 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
-    AbsoluteCenter,
     AlertDialog,
     AlertDialogContent,
     AlertDialogFooter,
@@ -68,9 +67,9 @@ const ProductDetailPage = () => {
 
     if (isLoading) {
         return (
-            <AbsoluteCenter axis="both">
+            <Box mt={10}>
                 <AntdSpin />
-            </AbsoluteCenter>
+            </Box>
         );
     }
 

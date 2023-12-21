@@ -10,17 +10,13 @@ namespace API.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/[controller]")]
-public class OrderController : ControllerBase
+public class OrderController : BaseApiController
 {
     private readonly IOrderService _orderService;
-    private readonly IAddressService _addressService;
-    private readonly ICartService _cartService;
 
-    public OrderController(IOrderService orderService, IAddressService addressService, ICartService cartService)
+    public OrderController(IOrderService orderService)
     {
         _orderService = orderService;
-        _addressService = addressService;
-        _cartService = cartService;
     }
 
     [HttpGet]
@@ -32,8 +28,8 @@ public class OrderController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateOrder(int addressId)
     {
-        await _orderService.CreateOrder(GetUserId(), addressId);
-        return NoContent();
+        var errorOrCreated = await _orderService.CreateOrder(GetUserId(), addressId);
+        return errorOrCreated.Match(_ => NoContent(), Problem);
     }
 
 

@@ -32,6 +32,7 @@ export const AddToCartButton = ({ isInCart, productId, buttonProps }: Props) => 
         <>
             <Button
                 colorScheme={isInCart ? 'red' : 'blue'}
+                size={{ base: 'sm', md: 'md' }}
                 width="full"
                 variant="outline"
                 {...buttonProps}

@@ -1,6 +1,7 @@
 import {
     Box,
     Button,
+    Center,
     FormControl,
     FormHelperText,
     FormLabel,
@@ -22,6 +23,7 @@ import { RegisterDto } from '../../types/registerDto.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { ErrorDisplay } from '../../components/ErrorDisplay.tsx';
 import { ApiError } from '../../types/apiError.ts';
+import { AppLogo } from '../../components/AppLogo.tsx';
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -60,7 +62,12 @@ const Register = () => {
     return (
         <Box maxW="xl" mx="auto">
             <Stack spacing={8} py={{ base: 6, md: 12 }} px={{ base: 2, md: 6 }}>
-                <Heading fontSize={'3xl'} textAlign={'center'}>
+                <Box display={{ base: 'block', md: 'none' }}>
+                    <Center>
+                        <AppLogo />
+                    </Center>
+                </Box>
+                <Heading fontSize={'2xl'} textAlign={'center'}>
                     Create your account
                 </Heading>
                 <Box rounded={'lg'} bg={useColorModeValue('white', 'gray.700')} boxShadow={'lg'} p={8}>
@@ -126,7 +133,7 @@ const Register = () => {
                             )}
                             <Stack pt={6}>
                                 <Text align={'center'}>
-                                    Already a user?{' '}
+                                    Already have an account?{' '}
                                     <Link
                                         as={ReactRouterLink}
                                         to="/login"
@@ -134,7 +141,6 @@ const Register = () => {
                                     >
                                         Login
                                     </Link>
-                                    .
                                 </Text>
                             </Stack>
                         </Stack>
