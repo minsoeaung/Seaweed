@@ -91,7 +91,7 @@ const MyOrdersPage = () => {
                                                 <Td>{item.id}</Td>
                                                 <Td>
                                                     {new Date(item.createdAt)
-                                                        .toLocaleDateString('my-MM', {
+                                                        .toLocaleDateString('en-US', {
                                                             weekday: 'long',
                                                             year: 'numeric',
                                                             month: 'long',

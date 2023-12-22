@@ -148,6 +148,7 @@ const ProductDetailPage = () => {
                                             wordWrap: 'break-word',
                                             overflow: 'hidden',
                                         }}
+                                        size={{ base: 'sm', md: 'md' }}
                                     >
                                         {isFavorite ? (isMobile ? 'Remove' : 'Remove from favorite') : 'Favorite'}
                                     </Button>

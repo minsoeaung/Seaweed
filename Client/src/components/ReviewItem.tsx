@@ -191,7 +191,7 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
                 <Rating max={5} defaultValue={rating} />
                 <Text color={useColorModeValue('gray.600', 'gray.400')}>
                     {new Date(updatedAt)
-                        .toLocaleDateString('my-MM', {
+                        .toLocaleDateString('en-US', {
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',

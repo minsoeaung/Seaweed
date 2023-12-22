@@ -82,15 +82,15 @@ export const ProductFilters = () => {
             <IconButton
                 aria-label="Filter"
                 variant="ghost"
-                size="lg"
+                size={{ base: 'sm', md: 'lg' }}
                 // variant={filterApplied ? "solid" : "outline"}
                 // colorScheme={filterApplied ? "blue" : "gray"}
                 icon={<AiOutlineFilter />}
                 onClick={onOpen}
                 isLoading={isLoading}
             />
-            <Modal isOpen={isOpen} onClose={onClose} colorScheme="blue">
-                <ModalOverlay backdropFilter="blur(3px)" />
+            <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Filter</ModalHeader>
                     <ModalCloseButton />

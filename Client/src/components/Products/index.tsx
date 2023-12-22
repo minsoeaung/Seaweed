@@ -41,7 +41,7 @@ export const Products = () => {
             ) : (
                 data && (
                     <>
-                        <Flex justifyContent="space-between" mb={4}>
+                        <Flex justifyContent="space-between" mb={{ base: 2, md: 4 }}>
                             <ProductFilters />
                             <ProductSortBy />
                         </Flex>

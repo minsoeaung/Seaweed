@@ -18,10 +18,18 @@ export const ProductSortBy = () => {
         setParams(params);
     };
 
+    const sortedBy = sortMenus[(params.get('orderBy') || '_') as keyof typeof sortMenus];
+
     return (
         <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} px={4} variant="ghost" size="lg">
-                Sort by: {sortMenus[(params.get('orderBy') || '_') as keyof typeof sortMenus] || ''}
+            <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                px={4}
+                variant="ghost"
+                size={{ base: 'sm', md: 'lg' }}
+            >
+                Sort by{sortedBy ? `: ${sortedBy}` : ''}
             </MenuButton>
             <MenuList>
                 <MenuItem onClick={handleSortMenuClick('default')}>Default</MenuItem>

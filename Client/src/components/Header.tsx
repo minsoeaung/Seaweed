@@ -37,6 +37,7 @@ import { useAuth } from '../context/AuthContext.tsx';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 import { useWishList } from '../hooks/queries/useWishList.ts';
 import { useMyAccount } from '../hooks/queries/useMyAccount.ts';
+import { FaRegHeart } from 'react-icons/fa';
 
 const Header = () => {
     const { colorMode, toggleColorMode } = useColorMode();
@@ -108,51 +109,65 @@ const Header = () => {
                 </Link>
                 <Flex alignItems="center">
                     <Stack direction="row" spacing={{ base: 1, md: 2 }} alignItems="center">
-                        <IconButton
-                            aria-label="Toggle search box visibility"
-                            variant="ghost"
-                            icon={<SearchIcon color={useColorModeValue('red.500', 'red.300')} />}
-                            onClick={onOpen}
-                            size={{ base: 'sm', md: 'md' }}
-                        />
+                        <IconButton aria-label="Show search" variant="ghost" icon={<SearchIcon />} onClick={onOpen} />
                         <IconButton
                             aria-label="Color mode"
                             variant="ghost"
                             icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
                             onClick={toggleColorMode}
-                            size={{ base: 'sm', md: 'md' }}
                         />
 
-                        {user && !isMobile && (
-                            <Button
-                                as={Link}
-                                to="/user/wishlist"
-                                variant="ghost"
-                                rightIcon={
-                                    <>
-                                        <Icon as={LuHeart} />
-                                        {!!wishList?.length && (
-                                            <Box
-                                                as={'span'}
-                                                position={'absolute'}
-                                                top="-2px"
-                                                right={'4px'}
-                                                fontSize={'0.8rem'}
-                                                bgColor={'red'}
-                                                color="white"
-                                                borderRadius={'xl'}
-                                                zIndex={9999}
-                                                p={'2px'}
-                                            >
-                                                {wishList.length}
-                                            </Box>
-                                        )}
-                                    </>
-                                }
-                            >
-                                Wishlist
-                            </Button>
-                        )}
+                        {user &&
+                            (isMobile ? (
+                                <Box position="relative">
+                                    <IconButton
+                                        as={Link}
+                                        to="/user/wishlist"
+                                        aria-label="Wish list"
+                                        variant="ghost"
+                                        icon={<FaRegHeart />}
+                                    />
+                                    {Array.isArray(wishList) && wishList.length > 0 && (
+                                        <Text
+                                            position="absolute"
+                                            top="0"
+                                            right="0"
+                                            fontSize="0.8rem"
+                                            color={useColorModeValue('red.500', 'red.300')}
+                                            fontWeight="bold"
+                                        >
+                                            {wishList.length}
+                                        </Text>
+                                    )}
+                                </Box>
+                            ) : (
+                                <Button
+                                    as={Link}
+                                    to="/user/wishlist"
+                                    variant="ghost"
+                                    rightIcon={
+                                        <>
+                                            <Icon as={FaRegHeart} />
+                                            {!!wishList?.length && (
+                                                <Box
+                                                    as={'span'}
+                                                    position={'absolute'}
+                                                    top="-1px"
+                                                    right={'2px'}
+                                                    fontSize={'0.9rem'}
+                                                    color={useColorModeValue('red.500', 'red.300')}
+                                                    zIndex={9999}
+                                                    p={'2px'}
+                                                >
+                                                    {wishList.length}
+                                                </Box>
+                                            )}
+                                        </>
+                                    }
+                                >
+                                    Wishlist
+                                </Button>
+                            ))}
 
                         {!user && (
                             <>
@@ -179,7 +194,29 @@ const Header = () => {
 
                         {user && (
                             <>
-                                {!isMobile && (
+                                {isMobile ? (
+                                    <Box position="relative">
+                                        <IconButton
+                                            as={Link}
+                                            to="/user/cart"
+                                            aria-label="Cart"
+                                            variant="ghost"
+                                            icon={<FiShoppingCart />}
+                                        />
+                                        {Array.isArray(cart?.cartItems) && cart!.cartItems.length > 0 && (
+                                            <Text
+                                                position="absolute"
+                                                top="0"
+                                                right="0"
+                                                fontSize="0.8rem"
+                                                color={useColorModeValue('red.500', 'red.300')}
+                                                fontWeight="bold"
+                                            >
+                                                {cart!.cartItems.length}
+                                            </Text>
+                                        )}
+                                    </Box>
+                                ) : (
                                     <Button
                                         as={Link}
                                         to="user/cart"
@@ -191,11 +228,10 @@ const Header = () => {
                                                     <Box
                                                         as={'span'}
                                                         position={'absolute'}
-                                                        top="-2px"
-                                                        right={'4px'}
-                                                        fontSize={'0.8rem'}
-                                                        bgColor={'red'}
-                                                        color="white"
+                                                        top="-1px"
+                                                        right={'2px'}
+                                                        fontSize={'0.9rem'}
+                                                        color={useColorModeValue('red.500', 'red.300')}
                                                         borderRadius={'xl'}
                                                         zIndex={9999}
                                                         p={'2px'}
@@ -217,6 +253,7 @@ const Header = () => {
                                         variant={'link'}
                                         cursor={'pointer'}
                                         minW={0}
+                                        pl={3}
                                     >
                                         <Avatar size={'sm'} src={user?.profilePicture} />
                                     </MenuButton>
@@ -231,6 +268,10 @@ const Header = () => {
                                         </Text>
                                         <br />
                                         <MenuDivider />
+                                        <MenuItem as={Link} to="/user/my-account" icon={<SettingsIcon />}>
+                                            My Account
+                                        </MenuItem>
+                                        <MenuDivider />
                                         <MenuItem
                                             as={Link}
                                             to="/user/my-orders"
@@ -243,9 +284,6 @@ const Header = () => {
                                         </MenuItem>
                                         <MenuItem as={Link} to="/user/cart" icon={<Icon as={FiShoppingCart} />}>
                                             Cart {!!cart?.cartItems.length && `(${cart.cartItems.length})`}
-                                        </MenuItem>
-                                        <MenuItem as={Link} to="/user/my-account" icon={<SettingsIcon />}>
-                                            My Account
                                         </MenuItem>
                                         {user.roles.some((role) => ['Admin', 'Super'].includes(role)) && (
                                             <>
