@@ -37,7 +37,7 @@ export const AddToCartButton = ({ isInCart, productId, buttonProps }: Props) => 
                 variant="outline"
                 {...buttonProps}
                 onClick={async (e) => {
-                    e.preventDefault();
+                    e.stopPropagation();
 
                     if (user) {
                         await mutation.mutateAsync({

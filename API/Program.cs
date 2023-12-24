@@ -6,7 +6,9 @@ using API.Data;
 using API.Entities;
 using API.Extensions;
 using API.Services;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -15,7 +17,6 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -109,6 +110,9 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddMappings();
 
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<StoreContext>();
+
 var app = builder.Build();
 
 app.UseExceptionHandler("/error");
@@ -136,5 +140,10 @@ app.MapControllers();
 app.CreateDbIfNotExistsAndSeed();
 
 app.MapFallbackToFile("index.html");
+
+app.MapHealthChecks("/_health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.Run();

@@ -1,8 +1,9 @@
 import {
     Box,
     Button,
-    Checkbox,
     Heading,
+    HStack,
+    Icon,
     IconButton,
     Modal,
     ModalBody,
@@ -11,16 +12,21 @@ import {
     ModalFooter,
     ModalHeader,
     ModalOverlay,
+    Tag,
+    TagLabel,
+    TagLeftIcon,
     useColorModeValue,
     useDisclosure,
     Wrap,
 } from '@chakra-ui/react';
 import { AiOutlineFilter } from 'react-icons/ai';
-import { useCallback, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useProductFilters from '../hooks/queries/useProductFilters.ts';
+import { IoMdRadioButtonOff } from 'react-icons/io';
+import { CheckCircleIcon } from '@chakra-ui/icons';
 
-export const ProductFilters = () => {
+export const ProductFilters = memo(() => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -42,31 +48,25 @@ export const ProductFilters = () => {
         const catsObj: Record<string, true> = {};
         catsArray.forEach((b) => (catsObj[b] = true));
         setSelectedCategories(catsObj);
-    }, []);
+    }, [isOpen]);
 
-    const handleBrandsChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleBrandsChange = (name: string) => {
         setSelectedBrands((prevState) => {
             const d = { ...prevState };
-            if (event.target.checked) {
-                d[event.target.name] = true;
-            } else {
-                delete d[event.target.name];
-            }
+            if (d[name]) delete d[name];
+            else d[name] = true;
             return d;
         });
-    }, []);
+    };
 
-    const handleCategoriesChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCategoriesChange = (name: string) => {
         setSelectedCategories((prevState) => {
             const d = { ...prevState };
-            if (event.target.checked) {
-                d[event.target.name] = true;
-            } else {
-                delete d[event.target.name];
-            }
+            if (d[name]) delete d[name];
+            else d[name] = true;
             return d;
         });
-    }, []);
+    };
 
     const handleSave = () => {
         searchParams.set('brands', Object.keys(selectedBrands).join(','));
@@ -75,16 +75,20 @@ export const ProductFilters = () => {
         onClose();
     };
 
-    // const filterApplied = !!Object.keys(selectedCategories).length || !!Object.keys(selectedCategories).length
+    const handleReset = () => {
+        setSelectedCategories({});
+        setSelectedBrands({});
+    };
 
+    const filterApplied = !!Object.keys(selectedCategories).length || !!Object.keys(selectedBrands).length;
+    
     return (
         <>
             <IconButton
                 aria-label="Filter"
                 variant="ghost"
                 size={{ base: 'sm', md: 'lg' }}
-                // variant={filterApplied ? "solid" : "outline"}
-                // colorScheme={filterApplied ? "blue" : "gray"}
+                colorScheme={filterApplied ? 'blue' : 'gray'}
                 icon={<AiOutlineFilter />}
                 onClick={onOpen}
                 isLoading={isLoading}
@@ -96,50 +100,79 @@ export const ProductFilters = () => {
                     <ModalCloseButton />
                     <ModalBody>
                         <Heading as="h3" size="sm" color={useColorModeValue('red.500', 'red.300')}>
-                            Brands
+                            Filter by brand
                         </Heading>
-                        <Box overflowY="auto" mt={2}>
+                        <Box overflowY="auto" mt={3}>
                             <Wrap>
                                 {data &&
-                                    data.brands.map((brand) => (
-                                        <Checkbox
-                                            key={brand.id}
-                                            name={brand.name}
-                                            onChange={handleBrandsChange}
-                                            isChecked={selectedBrands[brand.name]}
-                                        >
-                                            {brand.name}
-                                        </Checkbox>
-                                    ))}
+                                    data.brands.map((brand) => {
+                                        const isSelected = selectedBrands[brand.name];
+
+                                        return (
+                                            <Tag
+                                                key={brand.id}
+                                                variant={isSelected ? 'outline' : 'subtle'}
+                                                colorScheme={isSelected ? 'messenger' : 'gray'}
+                                                onClick={() => handleBrandsChange(brand.name)}
+                                                cursor="pointer"
+                                                userSelect="none"
+                                            >
+                                                <TagLeftIcon>
+                                                    {isSelected ? (
+                                                        <CheckCircleIcon />
+                                                    ) : (
+                                                        <Icon as={IoMdRadioButtonOff} fontSize="24px" />
+                                                    )}
+                                                </TagLeftIcon>
+                                                <TagLabel>{brand.name}</TagLabel>
+                                            </Tag>
+                                        );
+                                    })}
                             </Wrap>
                         </Box>
-                        <Heading as="h3" size="sm" mt={2} color={useColorModeValue('red.500', 'red.300')}>
-                            Categories
+                        <Heading as="h3" size="sm" mt={4} color={useColorModeValue('red.500', 'red.300')}>
+                            Filter by category
                         </Heading>
-                        <Box overflowY="auto" mt={2}>
+                        <Box overflowY="auto" mt={3}>
                             <Wrap>
                                 {data &&
-                                    data.categories.map((category) => (
-                                        <Checkbox
-                                            key={category.id}
-                                            name={category.name}
-                                            onChange={handleCategoriesChange}
-                                            isChecked={selectedCategories[category.name]}
-                                        >
-                                            {category.name}
-                                        </Checkbox>
-                                    ))}
+                                    data.categories.map((category) => {
+                                        const isSelected = selectedCategories[category.name];
+
+                                        return (
+                                            <Tag
+                                                key={category.id}
+                                                variant={isSelected ? 'outline' : 'subtle'}
+                                                colorScheme={isSelected ? 'messenger' : 'gray'}
+                                                onClick={() => handleCategoriesChange(category.name)}
+                                                cursor="pointer"
+                                                userSelect="none"
+                                            >
+                                                <TagLeftIcon>
+                                                    {isSelected ? (
+                                                        <CheckCircleIcon />
+                                                    ) : (
+                                                        <Icon as={IoMdRadioButtonOff} fontSize="24px" />
+                                                    )}
+                                                </TagLeftIcon>
+                                                <TagLabel>{category.name}</TagLabel>
+                                            </Tag>
+                                        );
+                                    })}
                             </Wrap>
                         </Box>
                     </ModalBody>
                     <ModalFooter>
-                        <Button colorScheme="blue" mr={3} onClick={handleSave}>
-                            Save
-                        </Button>
-                        <Button onClick={onClose}>Close</Button>
+                        <HStack>
+                            <Button onClick={onClose}>Close</Button>
+                            <Button onClick={handleReset}>Reset</Button>
+                            <Button colorScheme="blue" onClick={handleSave}>
+                                Apply
+                            </Button>
+                        </HStack>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
         </>
     );
-};
+});

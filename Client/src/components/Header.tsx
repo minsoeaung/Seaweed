@@ -67,6 +67,11 @@ const Header = () => {
         }
     }, [myAccount]);
 
+    useEffect(() => {
+        const searchTerm = searchParams.get('searchTerm');
+        if (!searchTerm) setSearchInputValue('');
+    }, [searchParams]);
+
     const search = () => {
         searchParams.set('searchTerm', searchInputValue);
         setSearchParams(searchParams);
@@ -109,7 +114,13 @@ const Header = () => {
                 </Link>
                 <Flex alignItems="center">
                     <Stack direction="row" spacing={{ base: 1, md: 2 }} alignItems="center">
-                        <IconButton aria-label="Show search" variant="ghost" icon={<SearchIcon />} onClick={onOpen} />
+                        <IconButton
+                            aria-label="Show search"
+                            variant="ghost"
+                            colorScheme={isOpen ? 'blue' : 'gray'}
+                            icon={<SearchIcon />}
+                            onClick={onOpen}
+                        />
                         <IconButton
                             aria-label="Color mode"
                             variant="ghost"
@@ -125,6 +136,7 @@ const Header = () => {
                                         to="/user/wishlist"
                                         aria-label="Wish list"
                                         variant="ghost"
+                                        colorScheme={window.location.pathname === '/user/wishlist' ? 'blue' : 'gray'}
                                         icon={<FaRegHeart />}
                                     />
                                     {Array.isArray(wishList) && wishList.length > 0 && (
@@ -201,6 +213,7 @@ const Header = () => {
                                             to="/user/cart"
                                             aria-label="Cart"
                                             variant="ghost"
+                                            colorScheme={window.location.pathname === '/user/cart' ? 'blue' : 'gray'}
                                             icon={<FiShoppingCart />}
                                         />
                                         {Array.isArray(cart?.cartItems) && cart!.cartItems.length > 0 && (
@@ -255,7 +268,7 @@ const Header = () => {
                                         minW={0}
                                         pl={3}
                                     >
-                                        <Avatar size={'sm'} src={user?.profilePicture} />
+                                        <Avatar size={'sm'} src={user?.profilePicture} border="1px solid #ccc" />
                                     </MenuButton>
                                     <MenuList alignItems={'center'} zIndex={3} maxW="3xs">
                                         <br />

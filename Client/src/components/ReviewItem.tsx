@@ -32,7 +32,7 @@ import {
 } from '@chakra-ui/react';
 import { Rating } from './Rating.tsx';
 import { Review } from '../types/review.ts';
-import { useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 import { useReviewCUD } from '../hooks/mutations/useReviewCUD.ts';
 import { DeleteIcon, EditIcon, HamburgerIcon } from '@chakra-ui/icons';
 
@@ -41,7 +41,7 @@ type Props = {
     ownByUser?: boolean;
 };
 
-export const ReviewItem = ({ data, ownByUser }: Props) => {
+export const ReviewItem = memo(({ data, ownByUser }: Props) => {
     const { review, rating, userName, userProfilePicture, updatedAt, productId } = data;
     const [ratingInput, setRatingInput] = useState(String(rating));
     const [reviewInput, setReviewInput] = useState(review);
@@ -51,7 +51,7 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
     const cancelRef = useRef(null);
 
     const mutation = useReviewCUD();
-
+    
     const handleDelete = async () => {
         await mutation
             .mutateAsync({
@@ -110,7 +110,7 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
                                 </MenuItem>
                             </MenuList>
                         </Menu>
-                        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+                        <Modal isOpen={isOpen} onClose={onClose}>
                             <ModalOverlay />
                             <ModalContent>
                                 <ModalHeader>Edit review</ModalHeader>
@@ -207,4 +207,4 @@ export const ReviewItem = ({ data, ownByUser }: Props) => {
             </Text>
         </Box>
     );
-};
+});

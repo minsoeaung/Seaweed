@@ -34,7 +34,7 @@ import AntdSpin from '../../components/AntdSpin';
 import { AiOutlineHeart } from 'react-icons/ai';
 import { useToggleWishList } from '../../hooks/mutations/useToggleWishList.ts';
 import { PRODUCT_IMAGES } from '../../constants/fileUrls.ts';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { AddToCartButton } from '../../components/AddToCartButton.tsx';
 import { Reviews } from '../../components/Reviews.tsx';
@@ -64,6 +64,13 @@ const ProductDetailPage = () => {
     const { data: myReview, isLoading: myReviewLoading } = useMyReview(id);
 
     const goToLoginPage = () => navigate('/login');
+
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'instant',
+        });
+    }, []);
 
     if (isLoading) {
         return (
@@ -96,7 +103,7 @@ const ProductDetailPage = () => {
 
     return (
         <Box maxW={{ base: '3xl', lg: '7xl' }} mx="auto">
-            <Card variant="outline">
+            <Card variant="outline" overflow="hidden">
                 <Flex justifyContent="space-between" direction={{ base: 'column', lg: 'row' }}>
                     <Box width="100%" height="30vh" mb={8} display={{ base: 'block', lg: 'none' }}>
                         <ImageSlider imgHeight="50vh" images={[PRODUCT_IMAGES + data.id]} />
@@ -130,9 +137,7 @@ const ProductDetailPage = () => {
                                         colorScheme={isFavorite ? 'red' : 'blue'}
                                         width="50%"
                                         variant={'outline'}
-                                        onClick={async (e) => {
-                                            e.preventDefault();
-
+                                        onClick={async () => {
                                             if (user) {
                                                 await favoriteMutation.mutateAsync({
                                                     type: isFavorite ? 'REMOVE' : 'ADD',

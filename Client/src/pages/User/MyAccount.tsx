@@ -1,5 +1,17 @@
 import { useMyAccount } from '../../hooks/queries/useMyAccount.ts';
-import { Avatar, AvatarBadge, Box, Button, Card, Center, Heading, IconButton, Input, VStack } from '@chakra-ui/react';
+import {
+    Avatar,
+    AvatarBadge,
+    Box,
+    Button,
+    Card,
+    Center,
+    Heading,
+    IconButton,
+    Input,
+    useToast,
+    VStack,
+} from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
 import AntdSpin from '../../components/AntdSpin';
 import { useUpdateProfilePicture } from '../../hooks/mutations/useUpdateProfilePicture.ts';
@@ -14,9 +26,25 @@ const MyAccount = () => {
     const { data, isLoading, isError } = useMyAccount();
     const inputRef = useRef<HTMLInputElement>(null);
     const updateProfileMutation = useUpdateProfilePicture();
+    const toast = useToast();
 
-    const updateProfilePicture = async (pic: FileList | null) => {
-        !!pic && (await updateProfileMutation.mutateAsync(pic));
+    const updateProfilePicture = async (files: FileList | null) => {
+        const maxSize = 1024 * 1024 * 5; // 5MB
+
+        if (files?.length) {
+            const file = files[0];
+            if (file.size > maxSize) {
+                toast({
+                    title: 'Picture Size Cannot Be More Than 5MB',
+                    status: 'warning',
+                    isClosable: true,
+                    duration: 5000,
+                    position: 'top',
+                });
+            } else {
+                await updateProfileMutation.mutateAsync(file);
+            }
+        }
     };
 
     if (isLoading) {

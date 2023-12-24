@@ -9,16 +9,18 @@ export const useUpdateProfilePicture = () => {
     const toast = useToast();
 
     return useMutation(
-        async (picture: FileList) => {
+        async (picture: File) => {
             const formData = new FormData();
-            formData.set('picture', picture[0]);
+            formData.set('picture', picture);
             return await ApiClient.post<never, never>(`api/Accounts/profile-picture`, formData);
         },
         {
             onSuccess: async () => {
                 toast({
-                    title: 'Success',
+                    title: 'Profile picture updated.',
+                    description: 'Picture may take up to 15 minutes to reflect in the UI due to caching.',
                     status: 'success',
+                    duration: 9000,
                     isClosable: true,
                 });
 
@@ -28,8 +30,7 @@ export const useUpdateProfilePicture = () => {
                     if (!data.profilePicture) {
                         await queryClient.invalidateQueries(ACCOUNT);
                     } else {
-                        // TODO: image is cached for 300s, user might think the image is not updated
-                        data.profilePicture = `${data.profilePicture}?time=${Date.now()}`;
+                        data.profilePicture = `${data.profilePicture}?abc=${Date.now()}`;
                         queryClient.setQueryData(ACCOUNT, data);
                     }
                 }

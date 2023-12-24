@@ -1,6 +1,7 @@
 import { Button, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { useSearchParams } from 'react-router-dom';
+import { memo } from 'react';
 
 const sortMenus = {
     name: 'Name',
@@ -10,7 +11,7 @@ const sortMenus = {
     _: '',
 };
 
-export const ProductSortBy = () => {
+export const ProductSortBy = memo(() => {
     const [params, setParams] = useSearchParams();
 
     const handleSortMenuClick = (value: string) => () => {
@@ -40,4 +41,4 @@ export const ProductSortBy = () => {
             </MenuList>
         </Menu>
     );
-};
+});

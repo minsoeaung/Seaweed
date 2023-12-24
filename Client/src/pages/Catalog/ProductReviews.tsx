@@ -47,12 +47,13 @@ const ProductReviewsPage = () => {
 
     return (
         <Box maxW={{ base: '3xl', lg: '7xl' }} mx="auto">
-            <Card variant="outline">
+            <Card variant="outline" overflow="hidden">
                 {data && (
                     <CardHeader
                         position="sticky"
                         top={0}
                         border="1px"
+                        borderRadius="inherit"
                         borderColor={useColorModeValue('gray.300', 'gray.600')}
                         zIndex={1}
                         bgColor={useColorModeValue('white', '#1A202C')}

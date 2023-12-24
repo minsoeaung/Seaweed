@@ -31,7 +31,8 @@ export const FavouriteButton = ({ isChecked, productId, iconButtonProps }: Props
                 boxShadow="base"
                 {...iconButtonProps}
                 onClick={async (e) => {
-                    e.preventDefault();
+                    e.stopPropagation();
+                    
                     await mutation.mutateAsync({
                         type: isChecked ? 'REMOVE' : 'ADD',
                         productId,

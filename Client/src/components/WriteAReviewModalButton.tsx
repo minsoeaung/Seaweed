@@ -57,7 +57,7 @@ export const WriteAReviewModalButton = ({ productId }: Props) => {
             <Button variant="solid" colorScheme="blue" onClick={onOpen}>
                 Write a review
             </Button>
-            <Modal isOpen={isOpen} onClose={handleCancel} isCentered>
+            <Modal isOpen={isOpen} onClose={handleCancel}>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Write a review</ModalHeader>

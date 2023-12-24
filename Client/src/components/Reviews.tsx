@@ -5,14 +5,14 @@ import { useReviews } from '../hooks/queries/useReviews.ts';
 import AntdSpin from './AntdSpin';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useMyReview } from '../hooks/queries/useMyReview.ts';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useIsVisible } from '../hooks/useIsVisible.ts';
 
 type Props = {
     firstPageOnly?: boolean;
 };
 
-export const Reviews = ({ firstPageOnly }: Props) => {
+export const Reviews = memo(({ firstPageOnly }: Props) => {
     const { id } = useParams();
     const { user } = useAuth();
 
@@ -71,4 +71,4 @@ export const Reviews = ({ firstPageOnly }: Props) => {
             <div ref={setLastElementRef} />
         </>
     );
-};
+});
