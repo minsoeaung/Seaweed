@@ -6,9 +6,7 @@ using API.Data;
 using API.Entities;
 using API.Extensions;
 using API.Services;
-using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,7 +15,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddMvc();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -67,7 +65,7 @@ builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
-builder.Services.AddIdentityCore<User>(options =>
+builder.Services.AddIdentity<User, UserRole>(options =>
     {
         options.Password.RequiredLength = 6;
         options.Password.RequireDigit = false;
@@ -79,15 +77,16 @@ builder.Services.AddIdentityCore<User>(options =>
         options.User.AllowedUserNameCharacters =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
     })
-    .AddRoles<UserRole>()
+    // .AddRoles<UserRole>()
     .AddEntityFrameworkStores<StoreContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication(options =>
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(cookieOptions =>
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        cookieOptions.SlidingExpiration = true;
+        cookieOptions.LoginPath = "/login";
+        cookieOptions.Cookie.SameSite = SameSiteMode.None;
     })
     .AddJwtBearer(jwtBearerOptions =>
     {
@@ -103,15 +102,11 @@ builder.Services.AddAuthentication(options =>
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             RequireExpirationTime = true,
-            // Without this, token expiration time has additional 5 minutes
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero // Without this, token expiration time has additional 5 minutes
         };
     });
 
 builder.Services.AddMappings();
-
-builder.Services.AddHealthChecks()
-    .AddDbContextCheck<StoreContext>();
 
 var app = builder.Build();
 
@@ -133,17 +128,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
-
-app.CreateDbIfNotExistsAndSeed();
+app.MapRazorPages(); // For Identity Razor Pages
+app.MapControllers(); // For REST APIs
+app.MapControllerRoute( // For Admin MVC
+    name: "Admin",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapFallbackToFile("index.html");
 
-app.MapHealthChecks("/_health", new HealthCheckOptions
-{
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+app.CreateDbIfNotExistsAndSeed();
 
 app.Run();
